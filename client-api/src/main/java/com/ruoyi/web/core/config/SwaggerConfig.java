@@ -52,10 +52,10 @@ public class SwaggerConfig
                 // 设置哪些接口暴露给Swagger展示
                 .select()
                 // 扫描所有有注解的api，用这种方式更灵活
-                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
+//                .apis(RequestHandlerSelectors.withMethodAnnotation(ApiOperation.class))
                 // 扫描指定包中的swagger注解
-                // .apis(RequestHandlerSelectors.basePackage("com.ruoyi.project.tool.swagger"))
-                // 扫描所有 .apis(RequestHandlerSelectors.any())
+//                 .apis(RequestHandlerSelectors.basePackage("com.ruoyi.web"))
+//                .apis(RequestHandlerSelectors.any())
                 .paths(PathSelectors.any())
                 .build()
                 /* 设置安全模式，swagger可以设置访问token */
