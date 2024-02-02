@@ -16,7 +16,7 @@ public class WalletRegisterBody
      * 用户钱包地址
      */
     @Schema(description="钱包地址",defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398")
-    private String walletAddress;
+    private String wallet;
 
     /**
      * 用户签名后信息

@@ -48,7 +48,7 @@ public class TopUserController
     {
         AjaxResult ajax = AjaxResult.success();
         try {
-            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(),"青年人的责任重大！努力吧...",loginBody.getWalletAddress());
+            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(),"青年人的责任重大！努力吧...",loginBody.getWallet());
             if(!validateResult){
                 return AjaxResult.error("validate sign error!");
             }
@@ -56,19 +56,13 @@ public class TopUserController
             throw new RuntimeException(e);
         }
         //check the user wallet is exist.
-        LambdaQueryWrapper<TopUserEntity> queryWallet = Wrappers.lambdaQuery();
-        queryWallet.eq(TopUserEntity::getWallet,loginBody.getWalletAddress());
-        Optional userOpt = topUserService.getOneOpt(queryWallet);
+        Optional<TopUserEntity> userOpt = topUserService.getByWallet(loginBody.getWallet());
         if(userOpt.isPresent()){
             return AjaxResult.error("wallet is exist");
         }
 
         //检查邀请码用户是否存在
-        TopUserEntity queryInviteEntity = new TopUserEntity();
-        queryInviteEntity.setInvitedCode(loginBody.getInvitedCode());
-
-        LambdaQueryWrapper queryInvite = Wrappers.lambdaQuery(queryInviteEntity);
-        Optional inviteOpt = topUserService.getOneOpt(queryInvite);
+        Optional<TopUserEntity> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
         if(!inviteOpt.isPresent()){
             return AjaxResult.error("invite code is not exist");
         }
@@ -77,6 +71,7 @@ public class TopUserController
         BeanUtils.copyProperties(loginBody,topUserEntity);
         topUserEntity.setCreateTime(LocalDateTime.now());
         topUserEntity.setUpdateTime(LocalDateTime.now());
+        topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
         // 生成邀请码.
         topUserEntity.setInvitedCode(NumbersUtils.createInvite());
         topUserService.save(topUserEntity);
