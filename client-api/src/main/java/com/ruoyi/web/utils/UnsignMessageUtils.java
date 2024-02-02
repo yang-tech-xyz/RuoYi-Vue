@@ -22,6 +22,7 @@ public class UnsignMessageUtils {
     public static void main(String[] args) {
         try {
             String signMsg = signPrefixedMessage(content,priKey);
+            System.out.println("signMsg is ："+signMsg);
             boolean result = validate(signMsg,content,walletAddress);
             System.out.println("result is ："+result);
         } catch (SignatureException e) {

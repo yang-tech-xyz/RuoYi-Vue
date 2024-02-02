@@ -3,7 +3,6 @@ package com.ruoyi.web.aop;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.ruoyi.web.annotation.SignVerifyCheck;
 import com.ruoyi.web.utils.DecodeMessageUtils;
 import com.ruoyi.web.utils.WebUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,11 +22,11 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class SignVerifyAop {
 
-	@Pointcut("@annotation(com.ruoyi.web.annotation.SignVerifyCheck)")
-	private void signVerifyCheck() {
+	@Pointcut("@annotation(com.ruoyi.web.annotation.TransactionVerifyCheck)")
+	private void transactionVerifyCheck() {
 	}
 
-	@Around("signVerifyCheck()")
+	@Around("transactionVerifyCheck()")
 	public Object check(ProceedingJoinPoint joinPoint) throws Throwable {
 		Object[] objects = joinPoint.getArgs();
 

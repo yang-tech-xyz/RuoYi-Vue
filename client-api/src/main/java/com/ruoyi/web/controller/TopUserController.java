@@ -3,11 +3,11 @@ package com.ruoyi.web.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.core.domain.AjaxResult;
-import com.ruoyi.common.core.domain.model.WalletRegisterBody;
-import com.ruoyi.web.annotation.SignVerifyCheck;
+import com.ruoyi.VO.WalletRegisterBody;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.NumbersUtils;
+import com.ruoyi.web.utils.UnsignMessageUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.SignatureException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -41,16 +42,22 @@ public class TopUserController
      * @return 结果
      */
     @Operation(summary = "注册用户", description = "需要授权")
-    @SignVerifyCheck
+//    @TransactionVerifyCheck
     @PostMapping("/register")
     public AjaxResult register(@RequestBody WalletRegisterBody loginBody)
     {
         AjaxResult ajax = AjaxResult.success();
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(),"青年人的责任重大！努力吧...",loginBody.getWalletAddress());
+            if(!validateResult){
+                return AjaxResult.error("validate sign error!");
+            }
+        } catch (SignatureException e) {
+            throw new RuntimeException(e);
+        }
         //check the user wallet is exist.
-        TopUserEntity queryWalletEntity = new TopUserEntity();
-        queryWalletEntity.setWallet(loginBody.getWalletAddress());
-
-        LambdaQueryWrapper queryWallet = Wrappers.lambdaQuery(queryWalletEntity);
+        LambdaQueryWrapper<TopUserEntity> queryWallet = Wrappers.lambdaQuery();
+        queryWallet.eq(TopUserEntity::getWallet,loginBody.getWalletAddress());
         Optional userOpt = topUserService.getOneOpt(queryWallet);
         if(userOpt.isPresent()){
             return AjaxResult.error("wallet is exist");
