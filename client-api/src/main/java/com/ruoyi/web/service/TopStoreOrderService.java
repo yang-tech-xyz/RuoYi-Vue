@@ -2,9 +2,12 @@ package com.ruoyi.web.service;
 
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.dto.StoreOrderDTO;
+import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.entity.TopStore;
 import com.ruoyi.web.entity.TopStoreOrder;
 import com.ruoyi.web.enums.Account;
@@ -12,6 +15,8 @@ import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopStoreMapper;
 import com.ruoyi.web.mapper.TopStoreOrderMapper;
+import com.ruoyi.web.vo.PageVO;
+import com.ruoyi.web.vo.StoreOrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,5 +78,16 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 )
         );
         return true;
+    }
+
+    public PageVO<StoreOrderVO> getPage(Long mebId, StoreOrderPageDTO dto) {
+        IPage<StoreOrderVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+        iPage = baseMapper.selectPageVO(iPage, mebId);
+        PageVO<StoreOrderVO> pageVO = new PageVO<>();
+        pageVO.setPageNum(dto.getPageNum());
+        pageVO.setPageSize(dto.getPageSize());
+        pageVO.setTotal(iPage.getTotal());
+        pageVO.setList(iPage.getRecords());
+        return pageVO;
     }
 }

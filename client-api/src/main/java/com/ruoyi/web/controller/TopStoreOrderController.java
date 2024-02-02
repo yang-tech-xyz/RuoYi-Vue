@@ -2,14 +2,12 @@ package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.dto.StoreOrderDTO;
+import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.service.TopStoreOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "存币生息订单", value = "存币生息订单")
 @RestController
@@ -26,6 +24,12 @@ public class TopStoreOrderController {
     @PostMapping("/order")
     public AjaxResult order(@RequestBody StoreOrderDTO dto) {
         return AjaxResult.success(service.order(1L, dto));
+    }
+
+    @ApiOperation("查询订单")
+    @GetMapping("/getPage")
+    public AjaxResult getPage(@ModelAttribute StoreOrderPageDTO dto) {
+        return AjaxResult.success(service.getPage(1L, dto));
     }
 
 }
