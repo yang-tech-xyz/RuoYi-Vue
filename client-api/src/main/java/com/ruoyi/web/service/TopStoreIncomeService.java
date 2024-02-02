@@ -1,5 +1,14 @@
 package com.ruoyi.web.service;
 
-public interface TopStoreIncomeService {
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.web.entity.TopStore;
+import com.ruoyi.web.mapper.TopStoreMapper;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+@Slf4j
+@Service
+public class TopStoreIncomeService extends ServiceImpl<TopStoreMapper, TopStore> {
+
 
 }
