@@ -6,8 +6,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for t_account_tx
 -- ----------------------------
-DROP TABLE IF EXISTS `t_account_tx`;
-CREATE TABLE `t_account_tx`  (
+DROP TABLE IF EXISTS `top_account_tx`;
+CREATE TABLE `top_account_tx`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `meb_id` bigint NOT NULL COMMENT '会员ID',
   `account_id` bigint NOT NULL COMMENT '资产ID',

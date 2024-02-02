@@ -6,8 +6,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for t_account
 -- ----------------------------
-DROP TABLE IF EXISTS `t_account`;
-CREATE TABLE `t_account`  (
+DROP TABLE IF EXISTS `top_account`;
+CREATE TABLE `top_account`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `meb_id` bigint NOT NULL COMMENT '会员ID',
   `symbol` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '代币',
@@ -19,7 +19,7 @@ CREATE TABLE `t_account`  (
   `updated_date` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新日期',
   `updated_by` varchar(300) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '更新人',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uk_mebId_coinId`(`meb_id` ASC, `symbol` ASC) USING BTREE
+  UNIQUE INDEX `uk_mebId_symbol`(`meb_id` ASC, `symbol` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 15434 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

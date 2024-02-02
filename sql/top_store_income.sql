@@ -6,8 +6,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 -- Table structure for t_store_income
 -- ----------------------------
-DROP TABLE IF EXISTS `t_store_income`;
-CREATE TABLE `t_store_income`  (
+DROP TABLE IF EXISTS `top_store_income`;
+CREATE TABLE `top_store_income`  (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `meb_id` bigint NOT NULL COMMENT '用户ID',
   `store_no` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '存单号',
