@@ -1,4 +1,4 @@
-package com.ruoyi;
+package com.ruoyi.web;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
  * 
  * @author ruoyi
  */
-@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class })
+@SpringBootApplication(scanBasePackages = {"com.ruoyi"},exclude = { DataSourceAutoConfiguration.class })
 @MapperScan(basePackages = {"com.ruoyi.web.mapper"})
 public class ClientApiApplication
 {

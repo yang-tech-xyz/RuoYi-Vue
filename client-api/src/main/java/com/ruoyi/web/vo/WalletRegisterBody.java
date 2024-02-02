@@ -1,4 +1,4 @@
-package com.ruoyi.VO;
+package com.ruoyi.web.vo;
 
 import lombok.Data;
 
