@@ -2,6 +2,10 @@ package com.ruoyi.web.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.*;
+import java.math.BigDecimal;
 import java.io.Serializable;
 import lombok.*;
 import com.baomidou.mybatisplus.annotation.*;
@@ -17,29 +21,37 @@ public class TopStore implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty("用户ID")
-    @TableField(value = "meb_id")
-    private Long mebId;
+    @ApiModelProperty("产品名称")
+    @TableField(value = "name")
+    private String name;
     
-    @ApiModelProperty("存单号")
-    @TableField(value = "store_no")
-    private String storeNo;
+    @ApiModelProperty("产品周期")
+    @TableField(value = "period")
+    private Integer period;
     
     @ApiModelProperty("存入币种")
     @TableField(value = "token")
     private String token;
     
-    @ApiModelProperty("存入金额")
-    @TableField(value = "amount")
-    private BigDecimal amount;
+    @ApiModelProperty("最小投资额")
+    @TableField(value = "min_order_amount")
+    private BigDecimal minOrderAmount;
     
-    @ApiModelProperty("存入时间")
-    @TableField(value = "store_date")
-    private LocalDateTime storeDate;
+    @ApiModelProperty("最大投注额")
+    @TableField(value = "max_order_amount")
+    private BigDecimal maxOrderAmount;
     
-    @ApiModelProperty("释放时间")
-    @TableField(value = "release_date")
-    private LocalDateTime releaseDate;
+    @ApiModelProperty("最小收益利率")
+    @TableField(value = "min_rate")
+    private BigDecimal minRate;
+    
+    @ApiModelProperty("最大收益利率")
+    @TableField(value = "max_rate")
+    private BigDecimal maxRate;
+    
+    @ApiModelProperty("状态：1=有效，2=无效")
+    @TableField(value = "status")
+    private Integer status;
     
     @ApiModelProperty("创建日期")
     @TableField(value = "created_date")

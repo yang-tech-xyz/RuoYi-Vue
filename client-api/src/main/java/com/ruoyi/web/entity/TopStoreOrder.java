@@ -1,7 +1,6 @@
 package com.ruoyi.web.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -15,8 +14,8 @@ import io.swagger.annotations.ApiModelProperty;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(value = "top_store_income")
-public class TopStoreIncome implements Serializable {
+@TableName(value = "top_store_order")
+public class TopStoreOrder implements Serializable {
     
     @ApiModelProperty("主键")
     @TableId(value = "id", type = IdType.AUTO)
@@ -34,21 +33,21 @@ public class TopStoreIncome implements Serializable {
     @TableField(value = "order_no")
     private String orderNo;
     
-    @ApiModelProperty("存币U价")
-    @TableField(value = "token_price")
-    private BigDecimal tokenPrice;
+    @ApiModelProperty("存入币种")
+    @TableField(value = "token")
+    private String token;
     
-    @ApiModelProperty("收益金额")
-    @TableField(value = "income")
-    private BigDecimal income;
+    @ApiModelProperty("存入金额")
+    @TableField(value = "amount")
+    private BigDecimal amount;
     
-    @ApiModelProperty("收益比例")
-    @TableField(value = "income_rate")
-    private BigDecimal incomeRate;
+    @ApiModelProperty("存入时间")
+    @TableField(value = "store_date")
+    private LocalDateTime storeDate;
     
-    @ApiModelProperty("收益时间")
-    @TableField(value = "income_date")
-    private LocalDate incomeDate;
+    @ApiModelProperty("释放时间")
+    @TableField(value = "release_date")
+    private LocalDateTime releaseDate;
     
     @ApiModelProperty("创建日期")
     @TableField(value = "created_date")
