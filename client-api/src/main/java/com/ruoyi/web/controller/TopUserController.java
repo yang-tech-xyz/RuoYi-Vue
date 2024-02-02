@@ -2,7 +2,7 @@ package com.ruoyi.web.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.ruoyi.common.core.domain.AjaxResult;
+import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.vo.WalletRegisterBody;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.service.TopUserService;
