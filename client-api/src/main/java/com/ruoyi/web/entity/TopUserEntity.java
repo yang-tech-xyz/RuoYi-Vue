@@ -1,5 +1,6 @@
 package com.ruoyi.web.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,8 +19,8 @@ import java.time.LocalDateTime;
 @Schema(description = "用户表")
 public class TopUserEntity {
 
-	@TableId()
-	private int id;
+	@TableId(value = "id", type = IdType.AUTO)
+	private Integer id;
 	/**
 	* 主键
 	*/

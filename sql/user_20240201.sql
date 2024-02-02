@@ -12,3 +12,6 @@ COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE UNIQUE INDEX top_user_wallet_IDX USING BTREE ON `ry-vue`.top_user (wallet);
 CREATE UNIQUE INDEX top_user_invited_code_IDX USING BTREE ON `ry-vue`.top_user (invited_code);
+
+INSERT INTO `ry-vue`.top_user (wallet,create_time,invited_code,invited_user_code,update_time) VALUES
+	 ('1','2024-02-02 12:00:00','123','111','2024-02-02 12:00:00');
