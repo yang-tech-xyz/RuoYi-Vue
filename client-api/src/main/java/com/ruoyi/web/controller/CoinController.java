@@ -1,38 +1,49 @@
 package com.ruoyi.web.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.AjaxResult;
-import com.ruoyi.web.vo.WalletRegisterBody;
+import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.service.TopTokenService;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.utils.UnsignMessageUtils;
+import com.ruoyi.web.vo.TopTokenChainVO;
+import com.ruoyi.web.vo.WalletRegisterBody;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
- * 登录验证
+ * 充值
  * 
  * @author ruoyi
  */
-@RequestMapping("/topUser")
-@Tag(description = "TopUserController", name = "用户信息")
+@RequestMapping("/token")
+@Tag(description = "TokenController", name = "token信息")
 @RestController
-public class TopUserController
+public class CoinController
 {
     @Autowired
     private TopUserService topUserService;
+
+    @Autowired
+    private TopTokenService topTokenService;
+
+    @Operation(summary = "根据链id查询所有支持的token")
+    @GetMapping("queryTokensByChainId")
+    public AjaxResult queryTokensByChainId(@Parameter String chainId){
+        List<TopTokenChainVO> list= topTokenService.queryTokensByChainId(chainId);
+        return AjaxResult.success("success",list);
+    }
 
 
     /**
