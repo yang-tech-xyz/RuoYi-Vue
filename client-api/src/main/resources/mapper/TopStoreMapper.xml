@@ -2,5 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.web.mapper.TopStoreMapper">
 
+    <select id="selectValidList" resultType="com.ruoyi.web.vo.StoreVO">
+        select *
+        from top_store
+        where status = 1
+        order by id
+    </select>
+
 </mapper>
 
