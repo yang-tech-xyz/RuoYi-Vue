@@ -90,4 +90,15 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         pageVO.setList(iPage.getRecords());
         return pageVO;
     }
+
+    /**
+     * 赎回
+     * 1.每日执行，查询到期订单，执行赎回操作
+     * 2.收益U入系统
+     * TODO:本金上链或入系统
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void redeem() {
+
+    }
 }

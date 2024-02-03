@@ -1,6 +1,6 @@
 package com.ruoyi.web.task;
 
-import com.ruoyi.web.service.TopStoreIncomeService;
+import com.ruoyi.web.service.TopStoreOrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -9,14 +9,13 @@ import org.springframework.stereotype.Component;
 public class StoreTask {
 
     @Autowired
-    private TopStoreIncomeService incomeService;
+    private TopStoreOrderService service;
 
     /**
-     * 每天0点计算收益
-     * 1.到期自动赎回：本金+利息
+     * 每日1点执行
      */
-    @Scheduled(cron = "0 0 0 * * ?")
-    public void compute() {
-        incomeService.compute();
+    @Scheduled(cron = "0 0 1 * * ?")
+    public void redeem() {
+        service.redeem();
     }
 }
