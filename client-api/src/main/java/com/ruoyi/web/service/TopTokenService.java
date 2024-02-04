@@ -10,6 +10,7 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.entity.TopChain;
 import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.entity.TopTransaction;
+import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopTokenMapper;
 import com.ruoyi.web.vo.RechargeBody;
 import com.ruoyi.web.vo.TopTokenChainVO;
@@ -21,16 +22,20 @@ import org.web3j.abi.TypeDecoder;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameter;
+import org.web3j.protocol.core.methods.response.EthBlockNumber;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
@@ -83,6 +88,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             if(!"0x1".equals(status)){
                 return AjaxResult.error("transaction not success!");
             }
+            if(transactionReceipt.get().getLogs().size()==0){
+                throw new ServiceException("transaction have no logs");
+            }
             Optional<Transaction> transactions = web3j.ethGetTransactionByHash(hash).send().getTransaction();
             if(!transactions.isPresent()){
                 return AjaxResult.error("get transaction error!");
@@ -124,8 +132,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             BigDecimal pow = new BigDecimal(10).pow(topToken.getDecimals());
             BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow,10, RoundingMode.FLOOR);
             topTransaction.setTokenAmount(tokenAmount);
+            topTransaction.setHeight(transaction.getBlockNumber());
             log.info("tokenAmount is:{}",tokenAmount);
-            topTransaction.setConfirm(1);
+            topTransaction.setConfirm(BigInteger.ONE);
             topTransactionService.save(topTransaction);
             SystemTimer systemTimer = new SystemTimer();
             systemTimer.start();
@@ -140,5 +149,30 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     public Optional<TopTokenChainVO> queryTokenByTokenIdAndChainId(Integer tokenId, Long chainId) {
         return this.baseMapper.queryTokenByTokenIdAndChainId(tokenId,chainId);
+    }
+
+    public boolean confirmRechargeToken(String hash) throws ExecutionException, InterruptedException {
+        try{
+            Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(hash);
+            if(!topTransactionOptional.isPresent()){
+                throw new ServiceException("transaction not exist!");
+            }
+            TopTransaction topTransaction = topTransactionOptional.get();
+            String rpcEndpoint = topTransaction.getRpcEndpoint();
+            Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+            //获取当前的区块高度
+            EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
+            BigInteger currentHeight = ethBlockNumber.getBlockNumber();
+            BigInteger topTransactionHeight = topTransaction.getHeight();
+            //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
+            if(currentHeight.compareTo(topTransactionHeight.add(topTransaction.getConfirm()))==1){
+                topTransaction.setConfirm(BigInteger.ZERO);
+            }
+            return true;
+        }catch (Exception e){
+            log.error("confirmRechargeToken error:",e);
+            throw e;
+        }
+
     }
 }

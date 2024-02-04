@@ -53,7 +53,10 @@ public class TopTransaction extends BaseEntity
     private BigDecimal tokenAmount;
 
     @ApiModelProperty(name = "充值是否成功标价,0:充值成功,1:充值失败")
-    private Integer confirm;
+    private BigInteger confirm;
+
+    @ApiModelProperty(name = "事务区块高度")
+    private BigInteger height;
 
 
 }

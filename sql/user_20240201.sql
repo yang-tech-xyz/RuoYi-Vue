@@ -85,6 +85,7 @@ ALTER TABLE `ry-vue`.top_transacttion ADD symbol varchar(100) NULL COMMENT 'toke
 ALTER TABLE `ry-vue`.top_transacttion ADD amount decimal(20,10) NULL COMMENT '充值数量';
 CREATE UNIQUE INDEX top_transaction_hash_IDX USING BTREE ON `ry-vue`.top_transaction (hash);
 ALTER TABLE `ry-vue`.top_transaction ADD comfirm tinyint NULL COMMENT '确认是否充值成功,0，充值成功，1：充值失败';
+ALTER TABLE `ry-vue`.top_transaction ADD height BIGINT NULL COMMENT '事务区块高度';
 
 
 
