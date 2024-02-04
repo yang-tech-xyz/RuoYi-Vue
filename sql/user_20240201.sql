@@ -79,3 +79,7 @@ ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_0900_ai_ci
 COMMENT='用户充值提现信息表';
+
+ALTER TABLE `ry-vue`.top_transacttion ADD status varchar(100) NULL COMMENT '事务状态';
+ALTER TABLE `ry-vue`.top_transacttion ADD symbol varchar(100) NULL COMMENT 'token标记';
+ALTER TABLE `ry-vue`.top_transacttion ADD amount decimal(20,10) NULL COMMENT '充值数量';

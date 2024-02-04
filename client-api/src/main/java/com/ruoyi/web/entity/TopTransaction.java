@@ -4,6 +4,10 @@ import com.ruoyi.common.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.web3j.abi.datatypes.generated.Uint256;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * 【请填写功能名称】对象 top_chain
@@ -21,23 +25,29 @@ public class TopTransaction extends BaseEntity
     private Long id;
 
     /** 链类型 */
-    @ApiModelProperty(name = "链类型")
-    private String chainType;
+    @ApiModelProperty(name = "链hash")
+    private String hash;
 
     /** rpc 节点url */
-    @ApiModelProperty(name = "rpc 节点url")
-    private String rpcEndpoint;
+    @ApiModelProperty(name = "节点id")
+    private Integer chainId;
 
     /** 在多少个区块确认之后 才确认充值成功 */
-    @ApiModelProperty(name = "在多少个区块确认之后 才确认充值成功")
-    private Long blockConfirm;
+    @ApiModelProperty(name = "币种id")
+    private Integer tokenId;
 
     /** 链id */
-    @ApiModelProperty(name = "链id")
-    private Long chainId;
+    @ApiModelProperty(name = "链rpc节点")
+    private String rpcEndpoint;
 
-    /** 项目方收款地址 */
-    @ApiModelProperty(name = "项目方收款地址")
-    private String receiveAddress;
+    @ApiModelProperty(name = "事务状态")
+    private String status;
+
+    @ApiModelProperty(name = "token标记")
+    private String symbol;
+
+    @ApiModelProperty(name = "充值数量")
+    private BigDecimal tokenAmount;
+
 
 }
