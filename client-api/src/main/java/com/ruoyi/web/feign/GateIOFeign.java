@@ -1,3 +1,4 @@
+/*
 package com.ruoyi.web.feign;
 
 import com.ruoyi.web.feign.back.GateIOFeignFallBack;
@@ -13,10 +14,13 @@ import java.util.List;
 @FeignClient(name = "GateIO", url = "https://api.gateio.ws", fallbackFactory = GateIOFeignFallBack.class)
 public interface GateIOFeign {
 
-    /**
+    */
+/**
      * https://api.gateio.ws/api/v4/spot/tickers?currency_pair=GT_USDT
-     */
+     *//*
+
     @GetMapping("api/v4/spot/tickers")
     public List<TickerVO> getTickers(@RequestParam(value = "currency_pair") String currency_pair);
 
 }
+*/

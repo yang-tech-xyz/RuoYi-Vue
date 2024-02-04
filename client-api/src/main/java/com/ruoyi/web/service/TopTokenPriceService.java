@@ -2,19 +2,14 @@ package com.ruoyi.web.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.entity.TopTokenPrice;
-import com.ruoyi.web.feign.GateIOFeign;
 import com.ruoyi.web.mapper.TopTokenMapper;
 import com.ruoyi.web.mapper.TopTokenPriceMapper;
-import com.ruoyi.web.vo.TickerVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -24,8 +19,8 @@ public class TopTokenPriceService extends ServiceImpl<TopTokenPriceMapper, TopTo
     @Autowired
     private TopTokenMapper topTokenMapper;
 
-    @Autowired
-    private GateIOFeign gateIOFeign;
+    /*@Autowired
+    private GateIOFeign gateIOFeign;*/
 
     /**
      * 查询币种价格
@@ -44,7 +39,7 @@ public class TopTokenPriceService extends ServiceImpl<TopTokenPriceMapper, TopTo
      * 刷新币种价格
      */
     public void refPrice() {
-        List<TopToken> tokens = topTokenMapper.selectList(new LambdaQueryWrapper<TopToken>());
+       /* List<TopToken> tokens = topTokenMapper.selectList(new LambdaQueryWrapper<TopToken>());
         for (TopToken token : tokens) {
             try {
                 Optional<TopTokenPrice> optional = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopTokenPrice>()
@@ -73,6 +68,6 @@ public class TopTokenPriceService extends ServiceImpl<TopTokenPriceMapper, TopTo
             } catch (Exception ex) {
                 log.error("token price error:{}", token.getSymbol(), ex);
             }
-        }
+        }*/
     }
 }
