@@ -1,7 +1,5 @@
 package com.ruoyi.web.config;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -62,15 +60,15 @@ public class SwaggerConfig
 //                .pathMapping(pathMapping);
     }
 
-    /**
-     * 安全模式，这里指定token通过Authorization头请求头传递
-     */
-    private List<SecurityScheme> securitySchemes()
-    {
-        List<SecurityScheme> apiKeyList = new ArrayList<SecurityScheme>();
-        apiKeyList.add(new ApiKey("Authorization", "Authorization", In.HEADER.toValue()));
-        return apiKeyList;
-    }
+//    /**
+//     * 安全模式，这里指定token通过Authorization头请求头传递
+//     */
+//    private List<SecurityScheme> securitySchemes()
+//    {
+//        List<SecurityScheme> apiKeyList = new ArrayList<SecurityScheme>();
+//        apiKeyList.add(new ApiKey("Authorization", "Authorization", io.swagger.v3.oas.models.security.SecurityScheme.In.HEADER.toValue()));
+//        return apiKeyList;
+//    }
 
     /**
      * 安全上下文

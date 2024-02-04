@@ -2,9 +2,11 @@ package com.ruoyi.web;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.cloud.openfeign.FeignAutoConfiguration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -16,6 +18,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @MapperScan(basePackages = {"com.ruoyi.web.mapper"})
 @EnableScheduling
 @EnableFeignClients(basePackages = {"com.ruoyi.web"})
+@ImportAutoConfiguration({FeignAutoConfiguration.class})
 public class ClientApiApplication
 {
     public static void main(String[] args)
