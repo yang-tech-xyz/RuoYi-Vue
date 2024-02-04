@@ -30,7 +30,9 @@ public class TopTokenChainVO extends BaseEntity
     @ApiModelProperty(name = "是否上线: 0,上线,1下线")
     private Integer online;
 
+    @ApiModelProperty(name = "该币种在该链的ERC20地址")
     private String erc20Address;
 
+    @ApiModelProperty(name = "链id")
     private Integer chainId;
 }

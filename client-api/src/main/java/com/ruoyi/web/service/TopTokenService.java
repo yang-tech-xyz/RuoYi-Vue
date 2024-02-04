@@ -18,4 +18,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     public List<TopTokenChainVO> queryTokensByChainId(String chainId) {
         return this.baseMapper.queryTokensByChainId(chainId);
     }
+
+    public Optional<TopToken> queryTokenBySymbol(String tokenSymbol) {
+        LambdaQueryWrapper<TopToken> query = Wrappers.lambdaQuery();
+        query.eq(TopToken::getSymbol,tokenSymbol);
+        return this.getOneOpt(query);
+    }
+
+    public Optional<TopTokenChainVO> queryTokenByTokenIdAndChainId(Integer tokenId, Long chainId) {
+        return this.baseMapper.queryTokenByTokenIdAndChainId(tokenId,chainId);
+    }
 }

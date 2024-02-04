@@ -20,7 +20,7 @@ INSERT INTO `ry-vue`.top_user (wallet,create_time,invited_code,invited_user_code
 CREATE TABLE `ry-vue`.top_token (
 	id INT auto_increment primary key NOT NULL COMMENT '主键',
 	symbol varchar(100) NOT NULL COMMENT 'token 名称',
-	`decimal` INT NOT NULL COMMENT '小数位',
+	decimals INT NOT NULL COMMENT '小数位',
 	create_time DATETIME NULL,
 	update_time DATETIME NULL,
 	create_by varchar(100) NULL,
@@ -68,3 +68,14 @@ COMMENT='币种-链关系配置表';
 
 ALTER TABLE `ry-vue`.top_chain ADD receive_addres varchar(100) NOT NULL COMMENT '项目方收款地址';
 
+CREATE TABLE `ry-vue`.top_transacttion (
+	id bigint auto_increment primary key NOT NULL COMMENT 'id',
+	hash varchar(100) NULL COMMENT '事务hash值',
+	chain_id int NULL COMMENT '链id',
+	token_id INT NULL COMMENT '链id',
+	rpc_endpoint varchar(100) NULL COMMENT '链RPC地址'
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci
+COMMENT='用户充值提现信息表';

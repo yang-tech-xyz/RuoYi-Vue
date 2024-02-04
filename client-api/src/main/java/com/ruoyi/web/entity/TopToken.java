@@ -2,6 +2,7 @@ package com.ruoyi.web.entity;
 
 import com.ruoyi.common.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * 币种配置对象 top_token
@@ -9,12 +10,13 @@ import io.swagger.annotations.ApiModelProperty;
  * @author ruoyi
  * @date 2024-02-03
  */
+@Data
 public class TopToken extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
     /** 主键 */
-    private Long id;
+    private Integer id;
 
     /** token 名称 */
     @ApiModelProperty(name = "token 名称")
@@ -22,7 +24,7 @@ public class TopToken extends BaseEntity
 
     /** 小数位 */
     @ApiModelProperty(name = "小数位")
-    private Long decimal;
+    private Long decimals;
 
     /** 是否上线: 0,上线,1下线 */
     @ApiModelProperty(name = "是否上线: 0,上线,1下线")
