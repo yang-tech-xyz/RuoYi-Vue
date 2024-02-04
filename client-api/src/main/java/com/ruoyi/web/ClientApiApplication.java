@@ -17,8 +17,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication(scanBasePackages = {"com.ruoyi"})
 @MapperScan(basePackages = {"com.ruoyi.web.mapper"})
 @EnableScheduling
-@EnableFeignClients(basePackages = {"com.ruoyi.web"})
-@ImportAutoConfiguration({FeignAutoConfiguration.class})
+//@EnableFeignClients(basePackages = {"com.ruoyi.web"})
+//@ImportAutoConfiguration({FeignAutoConfiguration.class})
 public class ClientApiApplication
 {
     public static void main(String[] args)

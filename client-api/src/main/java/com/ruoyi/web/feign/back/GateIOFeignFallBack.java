@@ -1,3 +1,4 @@
+/*
 package com.ruoyi.web.feign.back;
 
 import com.ruoyi.web.feign.GateIOFeign;
@@ -21,3 +22,4 @@ public class GateIOFeignFallBack implements FallbackFactory<GateIOFeign> {
         };
     }
 }
+*/
