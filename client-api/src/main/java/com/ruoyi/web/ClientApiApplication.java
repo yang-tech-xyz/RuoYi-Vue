@@ -4,6 +4,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication(scanBasePackages = {"com.ruoyi"})
 @MapperScan(basePackages = {"com.ruoyi.web.mapper"})
 @EnableScheduling
+@EnableFeignClients(basePackages = {"com.ruoyi.web"})
 public class ClientApiApplication
 {
     public static void main(String[] args)
