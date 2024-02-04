@@ -61,7 +61,7 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
                 }
                 tx.setAccountId(accountId);
                 tx.setMebId(a.getMebId());
-                tx.setToken(lockAccount.getToken());
+                tx.setSymbol(lockAccount.getSymbol());
                 tx.setUniqueId(a.getUniqueId());
                 tx.setAmount(a.getBalanceChanged());
                 tx.setFee(a.getFee());

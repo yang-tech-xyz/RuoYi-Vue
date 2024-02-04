@@ -2,10 +2,6 @@ package com.ruoyi.web.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.*;
-import java.math.BigDecimal;
 import java.io.Serializable;
 import lombok.*;
 import com.baomidou.mybatisplus.annotation.*;
@@ -30,12 +26,12 @@ public class TopStore implements Serializable {
     private Integer period;
     
     @ApiModelProperty("存入币种")
-    @TableField(value = "token")
-    private String token;
+    @TableField(value = "symbol")
+    private String symbol;
     
     @ApiModelProperty("收益币种")
-    @TableField(value = "income_token")
-    private String incomeToken;
+    @TableField(value = "income_symbol")
+    private String incomeSymbol;
     
     @ApiModelProperty("最小投资额")
     @TableField(value = "min_order_amount")

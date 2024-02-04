@@ -2,6 +2,7 @@ package com.ruoyi.web.entity;
 
 import com.ruoyi.common.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
 
 /**
  * 币种配置对象 top_token
@@ -9,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
  * @author ruoyi
  * @date 2024-02-03
  */
+@Data
 public class TopToken extends BaseEntity
 {
     private static final long serialVersionUID = 1L;

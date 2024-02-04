@@ -56,7 +56,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 || dto.getAmount().compareTo(store.getMaxOrderAmount()) > 0) {
             throw new ServiceException("投注金额过小或过大", 500);
         }
-        BigDecimal tokenPrice = topTokenPriceService.getPrice(store.getToken());
+        BigDecimal tokenPrice = topTokenPriceService.getPrice(store.getSymbol());
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
             throw new ServiceException("币种价格无法获取", 500);
         }
@@ -65,8 +65,8 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setStoreId(store.getId());
         order.setMebId(mebId);
         order.setOrderNo(orderNo);
-        order.setToken(store.getToken());
-        order.setIncomeToken(store.getIncomeToken());
+        order.setSymbol(store.getSymbol());
+        order.setIncomeSymbol(store.getIncomeSymbol());
         order.setPrice(tokenPrice);
         order.setAmount(dto.getAmount());
         order.setRate(store.getRate());
@@ -85,7 +85,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                         AccountRequest.builder()
                                 .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.STORE_IN.typeCode))
                                 .mebId(mebId)
-                                .token(store.getToken())
+                                .token(store.getSymbol())
                                 .fee(BigDecimal.ZERO)
                                 .balanceChanged(dto.getAmount().negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
@@ -139,7 +139,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                     AccountRequest.builder()
                             .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.STORE_REDEEM.typeCode))
                             .mebId(mebId)
-                            .token(lock.getToken())
+                            .token(lock.getSymbol())
                             .fee(BigDecimal.ZERO)
                             .balanceChanged(lock.getAmount())
                             .balanceTxType(Account.Balance.AVAILABLE)
@@ -151,7 +151,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                     AccountRequest.builder()
                             .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.STORE_REDEEM_INTEREST.typeCode))
                             .mebId(mebId)
-                            .token(lock.getIncomeToken())
+                            .token(lock.getIncomeSymbol())
                             .fee(BigDecimal.ZERO)
                             .balanceChanged(lock.getIncome())
                             .balanceTxType(Account.Balance.AVAILABLE)

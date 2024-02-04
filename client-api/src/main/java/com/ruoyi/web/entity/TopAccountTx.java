@@ -26,8 +26,8 @@ public class TopAccountTx implements Serializable {
     private Long accountId;
     
     @ApiModelProperty("代币")
-    @TableField(value = "token")
-    private String token;
+    @TableField(value = "symbol")
+    private String symbol;
     
     @ApiModelProperty("交易金额")
     @TableField(value = "amount")

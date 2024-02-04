@@ -2,10 +2,6 @@ package com.ruoyi.web.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.*;
-import java.math.BigDecimal;
 import java.io.Serializable;
 import lombok.*;
 import com.baomidou.mybatisplus.annotation.*;
@@ -22,8 +18,8 @@ public class TopTokenPrice implements Serializable {
     private Long id;
 
     @ApiModelProperty("币种")
-    @TableField(value = "token")
-    private String token;
+    @TableField(value = "symbol")
+    private String symbol;
     
     @ApiModelProperty("价格")
     @TableField(value = "price")

@@ -22,8 +22,8 @@ public class TopAccount implements Serializable {
     private Long mebId;
     
     @ApiModelProperty("代币")
-    @TableField(value = "token")
-    private String token;
+    @TableField(value = "symbol")
+    private String symbol;
     
     @ApiModelProperty("可用金额")
     @TableField(value = "available_balance")

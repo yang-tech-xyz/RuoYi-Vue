@@ -50,13 +50,13 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
 
     public TopAccount getAccount(Long mebId, String token) {
         Optional<TopAccount> optional = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopAccount>()
-                .eq(TopAccount::getMebId, mebId).eq(TopAccount::getToken, token)));
+                .eq(TopAccount::getMebId, mebId).eq(TopAccount::getSymbol, token)));
         if (optional.isPresent()) {
             return optional.get();
         }
         TopAccount account = new TopAccount();
         account.setMebId(mebId);
-        account.setToken(token);
+        account.setSymbol(token);
         account.setAvailableBalance(BigDecimal.ZERO);
         account.setLockupBalance(BigDecimal.ZERO);
         account.setFrozenBalance(BigDecimal.ZERO);
@@ -77,7 +77,7 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         return accounts.stream().map(account -> {
             AccountVO vo = new AccountVO();
             vo.setMebId(account.getMebId());
-            vo.setSymbol(account.getToken());
+            vo.setSymbol(account.getSymbol());
             vo.setAvailableBalance(account.getAvailableBalance());
             vo.setLockupBalance(account.getLockupBalance());
             vo.setFrozenBalance(account.getFrozenBalance());
