@@ -11,6 +11,7 @@ import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.entity.TopStore;
 import com.ruoyi.web.entity.TopStoreOrder;
 import com.ruoyi.web.enums.Account;
+import com.ruoyi.web.enums.Status;
 import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopStoreMapper;
@@ -34,6 +35,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
     @Autowired
     private TopAccountService accountService;
 
+    @Autowired
+    private TopTokenPriceService topTokenPriceService;
+
     /**
      * 存单
      */
@@ -47,16 +51,23 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 || dto.getAmount().compareTo(store.getMaxOrderAmount()) > 0) {
             throw new ServiceException("投注金额过小或过大", 500);
         }
-
+        BigDecimal tokenPrice = topTokenPriceService.getPrice(store.getToken());
+        if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
+            throw new ServiceException("币种价格无法获取", 500);
+        }
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
         TopStoreOrder order = new TopStoreOrder();
         order.setStoreId(store.getId());
         order.setMebId(mebId);
         order.setOrderNo(orderNo);
         order.setToken(store.getToken());
+        order.setPrice(tokenPrice);
         order.setAmount(dto.getAmount());
+        order.setRate(store.getRate());
+        order.setIncome(order.getAmount().multiply(order.getPrice()).multiply(order.getRate()));
         order.setStoreDate(LocalDateTime.now());
-        order.setReleaseDate(LocalDateTime.now().plusMonths(store.getPeriod()));
+        order.setReleaseDate(LocalDateTime.now().plusDays(store.getPeriod() * 30));
+        order.setStatus(Status._1.value);
         order.setCreatedBy(mebId.toString());
         order.setCreatedDate(LocalDateTime.now());
         order.setUpdatedBy(mebId.toString());
@@ -66,7 +77,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         accountService.processAccount(
                 Arrays.asList(
                         AccountRequest.builder()
-                                .uniqueId(UUID.fastUUID().toString().concat("_" + String.valueOf(mebId)).concat("_" + Account.TxType.STORE_IN.typeCode))
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.STORE_IN.typeCode))
                                 .mebId(mebId)
                                 .symbol(store.getToken())
                                 .fee(BigDecimal.ZERO)

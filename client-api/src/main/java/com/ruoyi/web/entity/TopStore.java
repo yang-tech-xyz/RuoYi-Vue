@@ -25,13 +25,9 @@ public class TopStore implements Serializable {
     @TableField(value = "name")
     private String name;
     
-    @ApiModelProperty("产品周期")
+    @ApiModelProperty("产品周期（月）,每月限定30天")
     @TableField(value = "period")
     private Integer period;
-    
-    @ApiModelProperty("周期类型：1=月，2=日")
-    @TableField(value = "type")
-    private Integer type;
     
     @ApiModelProperty("存入币种")
     @TableField(value = "token")
