@@ -11,5 +11,7 @@ import com.ruoyi.web.entity.TopStoreOrder;
 public interface TopStoreOrderMapper extends BaseMapper<TopStoreOrder>{
 
     IPage<StoreOrderVO> selectPageVO(@Param("iPage") IPage<StoreOrderVO> iPage, @Param("mebId") Long mebId);
+
+    TopStoreOrder lockByOrderNo(@Param("orderNo") String orderNo);
 }
 

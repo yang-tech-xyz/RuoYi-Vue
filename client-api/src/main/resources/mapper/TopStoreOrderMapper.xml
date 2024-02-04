@@ -11,5 +11,11 @@
         order by tso.id desc
     </select>
 
+    <select id="lockByOrderNo" resultType="com.ruoyi.web.entity.TopStoreOrder">
+        select tso.*
+        from top_store_order tso
+        where tso.order_no = #{orderNo} for update
+    </select>
+
 </mapper>
 

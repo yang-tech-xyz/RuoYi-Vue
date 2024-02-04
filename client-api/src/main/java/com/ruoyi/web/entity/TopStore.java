@@ -33,6 +33,10 @@ public class TopStore implements Serializable {
     @TableField(value = "token")
     private String token;
     
+    @ApiModelProperty("收益币种")
+    @TableField(value = "income_token")
+    private String incomeToken;
+    
     @ApiModelProperty("最小投资额")
     @TableField(value = "min_order_amount")
     private BigDecimal minOrderAmount;

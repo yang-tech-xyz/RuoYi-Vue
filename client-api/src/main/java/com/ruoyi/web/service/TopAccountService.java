@@ -33,9 +33,9 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         requests.stream().filter(e -> e.getBalanceChanged().compareTo(BigDecimal.ZERO) != 0).forEach(e -> {
             txRequest.addDetail(AccountTxRequestDetail.builder()
                     .uniqueId(e.getUniqueId())
-                    .accountId(getAccount(e.getMebId(), e.getSymbol()).getId())
+                    .accountId(getAccount(e.getMebId(), e.getToken()).getId())
                     .mebId(e.getMebId())
-                    .symbol(e.getSymbol())
+                    .token(e.getToken())
                     .fee(e.getFee())
                     .balanceChanged(e.getBalanceChanged())
                     .balanceTxType(e.getBalanceTxType())
@@ -48,15 +48,15 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         }
     }
 
-    public TopAccount getAccount(Long mebId, String symbol) {
+    public TopAccount getAccount(Long mebId, String token) {
         Optional<TopAccount> optional = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopAccount>()
-                .eq(TopAccount::getMebId, mebId).eq(TopAccount::getSymbol, symbol)));
+                .eq(TopAccount::getMebId, mebId).eq(TopAccount::getToken, token)));
         if (optional.isPresent()) {
             return optional.get();
         }
         TopAccount account = new TopAccount();
         account.setMebId(mebId);
-        account.setSymbol(symbol);
+        account.setToken(token);
         account.setAvailableBalance(BigDecimal.ZERO);
         account.setLockupBalance(BigDecimal.ZERO);
         account.setFrozenBalance(BigDecimal.ZERO);
@@ -77,7 +77,7 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         return accounts.stream().map(account -> {
             AccountVO vo = new AccountVO();
             vo.setMebId(account.getMebId());
-            vo.setSymbol(account.getSymbol());
+            vo.setSymbol(account.getToken());
             vo.setAvailableBalance(account.getAvailableBalance());
             vo.setLockupBalance(account.getLockupBalance());
             vo.setFrozenBalance(account.getFrozenBalance());

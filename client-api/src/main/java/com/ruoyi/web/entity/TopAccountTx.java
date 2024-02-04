@@ -2,10 +2,6 @@ package com.ruoyi.web.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.*;
-import java.math.BigDecimal;
 import java.io.Serializable;
 import lombok.*;
 import com.baomidou.mybatisplus.annotation.*;
@@ -30,8 +26,8 @@ public class TopAccountTx implements Serializable {
     private Long accountId;
     
     @ApiModelProperty("代币")
-    @TableField(value = "symbol")
-    private String symbol;
+    @TableField(value = "token")
+    private String token;
     
     @ApiModelProperty("交易金额")
     @TableField(value = "amount")

@@ -1,6 +1,7 @@
 package com.ruoyi.web.entity;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -49,6 +50,10 @@ public class TopStoreOrder implements Serializable {
     @TableField(value = "rate")
     private BigDecimal rate;
     
+    @ApiModelProperty("收益币种")
+    @TableField(value = "income_token")
+    private String incomeToken;
+    
     @ApiModelProperty("收益")
     @TableField(value = "income")
     private BigDecimal income;
@@ -59,7 +64,11 @@ public class TopStoreOrder implements Serializable {
     
     @ApiModelProperty("释放时间")
     @TableField(value = "release_date")
-    private LocalDateTime releaseDate;
+    private LocalDate releaseDate;
+    
+    @ApiModelProperty("领取时间")
+    @TableField(value = "redeem_date")
+    private LocalDateTime redeemDate;
     
     @ApiModelProperty("状态：1=收益中，2=已领取")
     @TableField(value = "status")

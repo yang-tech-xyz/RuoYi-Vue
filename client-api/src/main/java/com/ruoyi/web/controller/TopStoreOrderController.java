@@ -26,6 +26,12 @@ public class TopStoreOrderController {
         return AjaxResult.success(service.order(1L, dto));
     }
 
+    @ApiOperation("赎回:[到期可以赎回]")
+    @PostMapping("/redeem")
+    public AjaxResult redeem() {
+        return AjaxResult.success(service.redeem(1L));
+    }
+
     @ApiOperation("查询订单")
     @GetMapping("/getPage")
     public AjaxResult getPage(@ModelAttribute StoreOrderPageDTO dto) {

@@ -2,10 +2,6 @@ package com.ruoyi.web.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.*;
-import java.math.BigDecimal;
 import java.io.Serializable;
 import lombok.*;
 import com.baomidou.mybatisplus.annotation.*;
@@ -26,8 +22,8 @@ public class TopAccount implements Serializable {
     private Long mebId;
     
     @ApiModelProperty("代币")
-    @TableField(value = "symbol")
-    private String symbol;
+    @TableField(value = "token")
+    private String token;
     
     @ApiModelProperty("可用金额")
     @TableField(value = "available_balance")
