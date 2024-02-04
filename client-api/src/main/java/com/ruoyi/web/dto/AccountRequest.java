@@ -18,7 +18,7 @@ public class AccountRequest {
 
     private Long mebId;
 
-    private String symbol;
+    private String token;
 
     private BigDecimal fee;
 

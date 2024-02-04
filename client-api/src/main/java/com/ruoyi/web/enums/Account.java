@@ -31,6 +31,8 @@ public interface Account {
     enum TxType {
 
         STORE_IN("STORE_IN", "理财存币"),
+        STORE_REDEEM("STORE_REDEEM", "理财赎回"),
+        STORE_REDEEM_INTEREST("STORE_REDEEM_INTEREST", "理财赎回利息"),
 
         ;
         public final String typeCode;

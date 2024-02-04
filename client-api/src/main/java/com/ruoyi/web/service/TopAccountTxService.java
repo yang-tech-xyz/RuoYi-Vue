@@ -1,7 +1,10 @@
 package com.ruoyi.web.service;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.web.dto.AccountTxPageDTO;
 import com.ruoyi.web.dto.AccountTxRequest;
 import com.ruoyi.web.dto.AccountTxRequestDetail;
 import com.ruoyi.web.entity.TopAccount;
@@ -10,6 +13,8 @@ import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopAccountMapper;
 import com.ruoyi.web.mapper.TopAccountTxMapper;
+import com.ruoyi.web.vo.AccountTxVO;
+import com.ruoyi.web.vo.PageVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,5 +85,16 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
         if (Arrays.stream(balance).anyMatch(e -> e.compareTo(BigDecimal.ZERO) < 0)) {
             throw new ServiceException("余额不足", 500);
         }
+    }
+
+    public PageVO<AccountTxVO> getPage(Long mebId, AccountTxPageDTO dto) {
+        IPage<AccountTxVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+        iPage = baseMapper.selectPageVO(iPage, mebId, dto);
+        PageVO<AccountTxVO> pageVO = new PageVO<>();
+        pageVO.setPageNum(dto.getPageNum());
+        pageVO.setPageSize(dto.getPageSize());
+        pageVO.setTotal(iPage.getTotal());
+        pageVO.setList(iPage.getRecords());
+        return pageVO;
     }
 }

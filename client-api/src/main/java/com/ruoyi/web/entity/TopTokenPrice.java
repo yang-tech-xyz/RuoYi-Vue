@@ -10,32 +10,20 @@ import io.swagger.annotations.ApiModelProperty;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(value = "top_account")
-public class TopAccount implements Serializable {
+@TableName(value = "top_token_price")
+public class TopTokenPrice implements Serializable {
     
     @ApiModelProperty("主键")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty("会员ID")
-    @TableField(value = "meb_id")
-    private Long mebId;
-    
-    @ApiModelProperty("代币")
+    @ApiModelProperty("币种")
     @TableField(value = "symbol")
     private String symbol;
     
-    @ApiModelProperty("可用金额")
-    @TableField(value = "available_balance")
-    private BigDecimal availableBalance;
-    
-    @ApiModelProperty("锁仓金额")
-    @TableField(value = "lockup_balance")
-    private BigDecimal lockupBalance;
-    
-    @ApiModelProperty("冻结金额")
-    @TableField(value = "frozen_balance")
-    private BigDecimal frozenBalance;
+    @ApiModelProperty("价格")
+    @TableField(value = "price")
+    private BigDecimal price;
     
     @ApiModelProperty("创建日期")
     @TableField(value = "created_date")
