@@ -1,5 +1,7 @@
 package com.ruoyi.web.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.ruoyi.common.BaseEntity;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -22,6 +24,7 @@ public class TopTransaction extends BaseEntity
     private static final long serialVersionUID = 1L;
 
     /** 链信息配置表 */
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /** 链类型 */
@@ -48,6 +51,9 @@ public class TopTransaction extends BaseEntity
 
     @ApiModelProperty(name = "充值数量")
     private BigDecimal tokenAmount;
+
+    @ApiModelProperty(name = "充值是否成功标价,0:充值成功,1:充值失败")
+    private Integer confirm;
 
 
 }

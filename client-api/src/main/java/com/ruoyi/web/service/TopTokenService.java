@@ -1,5 +1,7 @@
 package com.ruoyi.web.service;
 
+import cn.hutool.cron.timingwheel.SystemTimer;
+import cn.hutool.cron.timingwheel.TimerTask;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -8,9 +10,7 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.entity.TopChain;
 import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.entity.TopTransaction;
-import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.mapper.TopTokenMapper;
-import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.vo.RechargeBody;
 import com.ruoyi.web.vo.TopTokenChainVO;
 import lombok.extern.slf4j.Slf4j;
@@ -21,13 +21,14 @@ import org.web3j.abi.TypeDecoder;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.Response;
 import org.web3j.protocol.core.methods.response.Transaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,8 +69,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setRpcEndpoint(rpcEndpoint);
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
             String hash = rechargeBody.getHash();
+            topTransaction.setHash(hash);
             //通过hash获取交易
-            Response.Error error = web3j.ethGetTransactionByHash(hash).send().getError();
             Optional<TransactionReceipt> transactionReceipt = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
             if(!transactionReceipt.isPresent()){
                 log.warn("get transactionReceipt error! hash value:{}",hash);
@@ -120,10 +121,15 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Address address = (Address)refMethod.invoke(null,to,0,Address.class);
             log.info("address is:{}",address.toString());
             Uint256 amount = (Uint256) refMethod.invoke(null,value,0,Uint256.class);
-            BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(BigDecimal.valueOf(topToken.getDecimals()));
+            BigDecimal pow = new BigDecimal(10).pow(topToken.getDecimals());
+            BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow,10, RoundingMode.FLOOR);
             topTransaction.setTokenAmount(tokenAmount);
             log.info("tokenAmount is:{}",tokenAmount);
+            topTransaction.setConfirm(1);
             topTransactionService.save(topTransaction);
+            SystemTimer systemTimer = new SystemTimer();
+            systemTimer.start();
+            systemTimer.addTask(new TimerTask(() -> log.info("执行延时任务:{}", LocalTime.now()), 5000));
         }catch (Exception e){
             log.error("system error",e);
             throw e;

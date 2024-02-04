@@ -24,7 +24,7 @@ public class TopToken extends BaseEntity
 
     /** 小数位 */
     @ApiModelProperty(name = "小数位")
-    private Long decimals;
+    private Integer decimals;
 
     /** 是否上线: 0,上线,1下线 */
     @ApiModelProperty(name = "是否上线: 0,上线,1下线")
