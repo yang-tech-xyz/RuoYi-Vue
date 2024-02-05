@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/token")
 @Tag(description = "TokenController", name = "token信息")
 @RestController
-public class CoinController
+public class TopCoinController
 {
 
     @Autowired

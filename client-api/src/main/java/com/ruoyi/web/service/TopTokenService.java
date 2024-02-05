@@ -1,5 +1,6 @@
 package com.ruoyi.web.service;
 
+import cn.hutool.core.lang.UUID;
 import cn.hutool.cron.timingwheel.SystemTimer;
 import cn.hutool.cron.timingwheel.TimerTask;
 import com.alibaba.fastjson2.JSONObject;
@@ -7,13 +8,17 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.AjaxResult;
+import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.TopChain;
 import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.entity.TopTransaction;
+import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopTokenMapper;
 import com.ruoyi.web.vo.RechargeBody;
 import com.ruoyi.web.vo.TopTokenChainVO;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,7 +37,9 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -41,11 +48,25 @@ import java.util.concurrent.ExecutionException;
 @Service
 public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
+    static SystemTimer systemTimer = new SystemTimer();
+
+    static{
+        systemTimer.start();
+    }
     @Autowired
     private TopChainService topChainService;
 
     @Autowired
     private TopTransactionService topTransactionService;
+
+    @Autowired
+    private TopAccountService accountService;
+
+    @Autowired
+    private TopUserService topUserService;
+
+    @Autowired
+    private TopTokenService topTokenService;
 
     public List<TopTokenChainVO> queryTokensByChainId(String chainId) {
         return this.baseMapper.queryTokensByChainId(chainId);
@@ -76,19 +97,31 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             String hash = rechargeBody.getHash();
             topTransaction.setHash(hash);
             //通过hash获取交易
-            Optional<TransactionReceipt> transactionReceipt = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
-            if(!transactionReceipt.isPresent()){
-                log.warn("get transactionReceipt error! hash value:{}",hash);
-                return AjaxResult.error("get transactionReceipt error!");
+            Optional<TransactionReceipt> transactionReceiptOptional = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
+            if(!transactionReceiptOptional.isPresent()){
+                log.warn("get transactionReceiptOptional error! hash value:{}",hash);
+                return AjaxResult.error("get transactionReceiptOptional error!");
             }
-            log.info("transactionReceipt is:{}",transactionReceipt);
-            String status = transactionReceipt.get().getStatus();
+            log.info("transactionReceiptOptional is:{}",transactionReceiptOptional);
+            // 获取用户信息
+            TransactionReceipt transactionReceipt = transactionReceiptOptional.get();
+            String from = transactionReceipt.getFrom();
+            Optional<TopUserEntity> topUserOptional = topUserService.getByWallet(from);
+            if(!topUserOptional.isPresent()){
+                log.warn("user not exist,user address is:{}",from);
+                throw new ServiceException("user not exist");
+            }
+            Integer userId = topUserOptional.get().getId();
+            topTransaction.setUserId(userId);
+
+            String status = transactionReceipt.getStatus();
             topTransaction.setStatus(status);
-            log.info("transactionReceipt status is:{}",status);
+
+            log.info("transactionReceiptOptional status is:{}",status);
             if(!"0x1".equals(status)){
                 return AjaxResult.error("transaction not success!");
             }
-            if(transactionReceipt.get().getLogs().size()==0){
+            if(transactionReceipt.getLogs().size()==0){
                 throw new ServiceException("transaction have no logs");
             }
             Optional<Transaction> transactions = web3j.ethGetTransactionByHash(hash).send().getTransaction();
@@ -121,7 +154,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             String inputData = transaction.getInput();
             log.info("input is:{}",inputData);
             String method = inputData.substring(0,10);
-            System.out.println(method);
+            log.info("method is:{}",method);
             String to = inputData.substring(10,74);
             String value = inputData.substring(74);
             Method refMethod = TypeDecoder.class.getDeclaredMethod("decode",String.class,int.class,Class.class);
@@ -133,12 +166,17 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow,10, RoundingMode.FLOOR);
             topTransaction.setTokenAmount(tokenAmount);
             topTransaction.setHeight(transaction.getBlockNumber());
+
             log.info("tokenAmount is:{}",tokenAmount);
-            topTransaction.setConfirm(BigInteger.ONE);
+            topTransaction.setIsConfirm(1);
+            topTransaction.setCreateTime(LocalDateTime.now());
+            topTransaction.setUpdateTime(LocalDateTime.now());
+            topTransaction.setCreateBy(userId.toString());
+            topTransaction.setUpdateBy(userId.toString());
+            topTransaction.setBlockConfirm(topChain.getBlockConfirm());
             topTransactionService.save(topTransaction);
-            SystemTimer systemTimer = new SystemTimer();
-            systemTimer.start();
-            systemTimer.addTask(new TimerTask(() -> log.info("执行延时任务:{}", LocalTime.now()), 5000));
+
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
         }catch (Exception e){
             log.error("system error",e);
             throw e;
@@ -151,13 +189,30 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         return this.baseMapper.queryTokenByTokenIdAndChainId(tokenId,chainId);
     }
 
-    public boolean confirmRechargeToken(String hash) throws ExecutionException, InterruptedException {
+    /**
+     * 重新加载所有未执行的延时任务
+     */
+    @PostConstruct
+    public void initCountDown() {
+        //查询未确认的hash
+        List<TopTransaction> topTransactionList = topTransactionService.queryUnConfirm();
+        topTransactionList.stream().forEach(t->{
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(t.getHash()), 10000));
+        });
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean confirmRechargeToken(String hash){
         try{
             Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(hash);
             if(!topTransactionOptional.isPresent()){
                 throw new ServiceException("transaction not exist!");
             }
             TopTransaction topTransaction = topTransactionOptional.get();
+            // 重复检查transaction是否已经确认交易.
+            if(topTransaction.getIsConfirm()==0){
+                throw new ServiceException("transaction had been confirmed!");
+            }
             String rpcEndpoint = topTransaction.getRpcEndpoint();
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
             //获取当前的区块高度
@@ -165,13 +220,31 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             BigInteger currentHeight = ethBlockNumber.getBlockNumber();
             BigInteger topTransactionHeight = topTransaction.getHeight();
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
-            if(currentHeight.compareTo(topTransactionHeight.add(topTransaction.getConfirm()))==1){
-                topTransaction.setConfirm(BigInteger.ZERO);
+            if(currentHeight.compareTo(topTransactionHeight.add(BigInteger.valueOf(topTransaction.getBlockConfirm())))==1){
+                topTransaction.setIsConfirm(0);
+                Long mebId = topTransaction.getUserId().longValue();
+                accountService.processAccount(
+                        Arrays.asList(
+                                AccountRequest.builder()
+                                        .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.RECHARGE_IN.typeCode))
+                                        .mebId(mebId)
+                                        .token(topTransaction.getSymbol())
+                                        .fee(BigDecimal.ZERO)
+                                        .balanceChanged(topTransaction.getTokenAmount())
+                                        .balanceTxType(Account.Balance.AVAILABLE)
+                                        .txType(Account.TxType.RECHARGE_IN)
+                                        .remark("充值")
+                                        .build()
+                        )
+                );
+                topTransactionService.updateConfirm(topTransaction);
+            }else{
+                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
             }
             return true;
         }catch (Exception e){
             log.error("confirmRechargeToken error:",e);
-            throw e;
+            throw new ServiceException(e);
         }
 
     }

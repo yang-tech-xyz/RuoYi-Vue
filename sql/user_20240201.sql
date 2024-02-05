@@ -68,7 +68,7 @@ COMMENT='币种-链关系配置表';
 
 ALTER TABLE `ry-vue`.top_chain ADD receive_addres varchar(100) NOT NULL COMMENT '项目方收款地址';
 
-CREATE TABLE `ry-vue`.top_transacttion (
+CREATE TABLE `ry-vue`.top_transaction (
 	id bigint auto_increment primary key NOT NULL COMMENT 'id',
 	hash varchar(100) NULL COMMENT '事务hash值',
 	chain_id int NULL COMMENT '链id',
@@ -80,12 +80,17 @@ DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_0900_ai_ci
 COMMENT='用户充值提现信息表';
 
-ALTER TABLE `ry-vue`.top_transacttion ADD status varchar(100) NULL COMMENT '事务状态';
-ALTER TABLE `ry-vue`.top_transacttion ADD symbol varchar(100) NULL COMMENT 'token标记';
-ALTER TABLE `ry-vue`.top_transacttion ADD amount decimal(20,10) NULL COMMENT '充值数量';
+ALTER TABLE `ry-vue`.top_transaction ADD status varchar(100) NULL COMMENT '事务状态';
+ALTER TABLE `ry-vue`.top_transaction ADD symbol varchar(100) NULL COMMENT 'token标记';
+ALTER TABLE `ry-vue`.top_transaction ADD amount decimal(20,10) NULL COMMENT '充值数量';
 CREATE UNIQUE INDEX top_transaction_hash_IDX USING BTREE ON `ry-vue`.top_transaction (hash);
-ALTER TABLE `ry-vue`.top_transaction ADD comfirm tinyint NULL COMMENT '确认是否充值成功,0，充值成功，1：充值失败';
+ALTER TABLE `ry-vue`.top_transaction ADD is_confirm tinyint NULL COMMENT '确认是否充值成功,0，充值成功，1：充值失败';
 ALTER TABLE `ry-vue`.top_transaction ADD height BIGINT NULL COMMENT '事务区块高度';
+ALTER TABLE `ry-vue`.top_transaction ADD user_id int NULL COMMENT '用户id';
 
 
-
+ALTER TABLE `ry-vue`.top_transaction ADD create_time DATETIME NULL;
+ALTER TABLE `ry-vue`.top_transaction ADD update_time DATETIME NULL;
+ALTER TABLE `ry-vue`.top_transaction ADD create_by varchar(100) NULL;
+ALTER TABLE `ry-vue`.top_transaction ADD update_by varchar(100) NULL;
+ALTER TABLE `ry-vue`.top_transaction ADD block_confirm int NULL COMMENT '多少个高度后确认交易成功';
