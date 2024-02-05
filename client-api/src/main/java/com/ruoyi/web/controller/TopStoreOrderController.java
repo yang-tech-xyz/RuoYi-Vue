@@ -18,9 +18,12 @@ public class TopStoreOrderController {
     @Autowired
     private TopStoreOrderService service;
 
-    /**
-     * TODO:缺少用户ID
-     */
+    @ApiOperation("存单信息")
+    @PostMapping("/info")
+    public AjaxResult info() {
+        return AjaxResult.success(service.info(RequestUtil.getWalletAddress()));
+    }
+
     @ApiOperation("存单")
     @PostMapping("/order")
     public AjaxResult order(@RequestBody StoreOrderDTO dto) {

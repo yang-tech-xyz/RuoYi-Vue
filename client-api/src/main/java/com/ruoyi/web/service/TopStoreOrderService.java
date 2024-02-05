@@ -19,6 +19,7 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopStoreMapper;
 import com.ruoyi.web.mapper.TopStoreOrderMapper;
 import com.ruoyi.web.mapper.TopUserMapper;
+import com.ruoyi.web.vo.OrderInfoVO;
 import com.ruoyi.web.vo.PageVO;
 import com.ruoyi.web.vo.StoreOrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,14 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
 
     @Autowired
     private TopTokenPriceService topTokenPriceService;
+
+    /**
+     * 存单信息
+     */
+
+    public OrderInfoVO info(String walletAddress) {
+        return baseMapper.selectInfoVO(walletAddress);
+    }
 
     /**
      * 存单
@@ -174,4 +183,5 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         }
         return true;
     }
+
 }
