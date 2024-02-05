@@ -1,5 +1,5 @@
 CREATE TABLE `ry-vue`.top_user (
-	id INT auto_increment primary key NOT NULL COMMENT '自增id',
+	id bigint auto_increment primary key NOT NULL COMMENT '自增id',
 	wallet varchar(100) NOT NULL COMMENT '钱包地址',
 	create_time DATETIME NOT NULL,
 	invited_code varchar(100) NOT NULL COMMENT '邀请码',

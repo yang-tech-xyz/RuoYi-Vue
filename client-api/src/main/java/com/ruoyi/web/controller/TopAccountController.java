@@ -2,6 +2,7 @@ package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.service.TopAccountService;
+import com.ruoyi.web.utils.RequestUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class TopAccountController {
     @ApiOperation("资产信息")
     @GetMapping("/getAccounts")
     public AjaxResult getAccounts() {
-        return AjaxResult.success(service.getAccounts(1L));
+        return AjaxResult.success(service.getAccounts(RequestUtil.getWalletAddress()));
     }
 
 }

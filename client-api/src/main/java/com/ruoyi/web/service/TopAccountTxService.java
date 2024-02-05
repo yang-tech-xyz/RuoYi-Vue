@@ -60,7 +60,7 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
                     tx.setBalanceAfter(lockAccount.getLockupBalance());
                 }
                 tx.setAccountId(accountId);
-                tx.setMebId(a.getMebId());
+                tx.setUserId(a.getUserId());
                 tx.setSymbol(lockAccount.getSymbol());
                 tx.setUniqueId(a.getUniqueId());
                 tx.setAmount(a.getBalanceChanged());
@@ -70,9 +70,9 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
                 tx.setTxType(a.getTxType().typeCode);
                 tx.setRefNo(a.getRefNo());
                 tx.setRemark(a.getRemark());
-                tx.setCreatedBy(String.valueOf(tx.getMebId()));
+                tx.setCreatedBy(String.valueOf(tx.getUserId()));
                 tx.setCreatedDate(LocalDateTime.now());
-                tx.setUpdatedBy(String.valueOf(tx.getMebId()));
+                tx.setUpdatedBy(String.valueOf(tx.getUserId()));
                 tx.setUpdatedDate(LocalDateTime.now());
                 baseMapper.insert(tx);
             });
@@ -87,9 +87,9 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
         }
     }
 
-    public PageVO<AccountTxVO> getPage(Long mebId, AccountTxPageDTO dto) {
+    public PageVO<AccountTxVO> getPage(String walletAddress, AccountTxPageDTO dto) {
         IPage<AccountTxVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
-        iPage = baseMapper.selectPageVO(iPage, mebId, dto);
+        iPage = baseMapper.selectPageVO(iPage, walletAddress, dto);
         PageVO<AccountTxVO> pageVO = new PageVO<>();
         pageVO.setPageNum(dto.getPageNum());
         pageVO.setPageSize(dto.getPageSize());

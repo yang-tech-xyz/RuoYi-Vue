@@ -4,9 +4,9 @@
 
     <select id="selectPageVO" resultType="com.ruoyi.web.vo.AccountTxVO">
         select tat.*
-        from top_account_tx tat
+        from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
         <where>
-            tat.meb_id = #{mebId}
+            tu.wallet = #{walletAddress}
             <if test="dto.token != null and dto.token != ''">
                 and tat.token = #{dto.token}
             </if>

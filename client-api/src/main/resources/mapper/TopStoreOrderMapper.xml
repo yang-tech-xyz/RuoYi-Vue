@@ -4,9 +4,9 @@
 
     <select id="selectPageVO" resultType="com.ruoyi.web.vo.StoreOrderVO">
         select tso.*
-        from top_store_order tso
+        from top_user tu inner join top_store_order tso on tu.id = tso.user_id
         <where>
-            tso.meb_id = #{mebId}
+            tu.wallet = #{walletAddress}
         </where>
         order by tso.id desc
     </select>

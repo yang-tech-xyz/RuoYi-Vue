@@ -7,7 +7,9 @@ import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.dto.AccountTxRequest;
 import com.ruoyi.web.dto.AccountTxRequestDetail;
 import com.ruoyi.web.entity.TopAccount;
+import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.mapper.TopAccountMapper;
+import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.vo.AccountVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
     @Autowired
     private TopAccountTxService txService;
 
+    @Autowired
+    private TopUserMapper userMapper;
+
     public void processAccount(List<AccountRequest> requests) {
         log.info("【TOP - API】 -> 资产处理:{}", requests);
         AccountTxRequest txRequest = new AccountTxRequest();
@@ -33,8 +38,8 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         requests.stream().filter(e -> e.getBalanceChanged().compareTo(BigDecimal.ZERO) != 0).forEach(e -> {
             txRequest.addDetail(AccountTxRequestDetail.builder()
                     .uniqueId(e.getUniqueId())
-                    .accountId(getAccount(e.getMebId(), e.getToken()).getId())
-                    .mebId(e.getMebId())
+                    .accountId(getAccount(e.getUserId(), e.getToken()).getId())
+                    .userId(e.getUserId())
                     .token(e.getToken())
                     .fee(e.getFee())
                     .balanceChanged(e.getBalanceChanged())
@@ -50,12 +55,12 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
 
     public TopAccount getAccount(Long mebId, String token) {
         Optional<TopAccount> optional = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopAccount>()
-                .eq(TopAccount::getMebId, mebId).eq(TopAccount::getSymbol, token)));
+                .eq(TopAccount::getUserId, mebId).eq(TopAccount::getSymbol, token)));
         if (optional.isPresent()) {
             return optional.get();
         }
         TopAccount account = new TopAccount();
-        account.setMebId(mebId);
+        account.setUserId(mebId);
         account.setSymbol(token);
         account.setAvailableBalance(BigDecimal.ZERO);
         account.setLockupBalance(BigDecimal.ZERO);
@@ -71,12 +76,13 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
     /**
      * 获取用户所有资产
      */
-    public List<AccountVO> getAccounts(Long mebId) {
+    public List<AccountVO> getAccounts(String walletAddress) {
+        TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
         List<TopAccount> accounts = baseMapper.selectList(new LambdaQueryWrapper<TopAccount>()
-                .eq(TopAccount::getMebId, mebId));
+                .eq(TopAccount::getUserId, user.getId()));
         return accounts.stream().map(account -> {
             AccountVO vo = new AccountVO();
-            vo.setMebId(account.getMebId());
+            vo.setMebId(account.getUserId());
             vo.setSymbol(account.getSymbol());
             vo.setAvailableBalance(account.getAvailableBalance());
             vo.setLockupBalance(account.getLockupBalance());

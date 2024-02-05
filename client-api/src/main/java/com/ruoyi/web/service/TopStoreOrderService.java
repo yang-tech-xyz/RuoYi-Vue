@@ -11,12 +11,14 @@ import com.ruoyi.web.dto.StoreOrderDTO;
 import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.entity.TopStore;
 import com.ruoyi.web.entity.TopStoreOrder;
+import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.enums.Status;
 import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopStoreMapper;
 import com.ruoyi.web.mapper.TopStoreOrderMapper;
+import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.vo.PageVO;
 import com.ruoyi.web.vo.StoreOrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +40,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
     private TopStoreMapper storeMapper;
 
     @Autowired
+    private TopUserMapper userMapper;
+
+    @Autowired
     private TopAccountService accountService;
 
     @Autowired
@@ -47,7 +52,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
      * 存单
      */
     @Transactional(rollbackFor = Exception.class)
-    public Boolean order(Long mebId, StoreOrderDTO dto) {
+    public Boolean order(String walletAddress, StoreOrderDTO dto) {
         TopStore store = storeMapper.selectById(dto.getStoreId());
         if (store.getStatus() != 1) {
             throw new ServiceException("状态错误", 500);
@@ -60,10 +65,11 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
             throw new ServiceException("币种价格无法获取", 500);
         }
+        TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
         TopStoreOrder order = new TopStoreOrder();
         order.setStoreId(store.getId());
-        order.setMebId(mebId);
+        order.setUserId(user.getId());
         order.setOrderNo(orderNo);
         order.setSymbol(store.getSymbol());
         order.setIncomeSymbol(store.getIncomeSymbol());
@@ -74,17 +80,17 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setStoreDate(LocalDateTime.now());
         order.setReleaseDate(LocalDate.now().plusDays(store.getPeriod() * 30));
         order.setStatus(Status._1.value);
-        order.setCreatedBy(mebId.toString());
+        order.setCreatedBy(user.getId().toString());
         order.setCreatedDate(LocalDateTime.now());
-        order.setUpdatedBy(mebId.toString());
+        order.setUpdatedBy(user.getId().toString());
         order.setUpdatedDate(LocalDateTime.now());
         baseMapper.insert(order);
 
         accountService.processAccount(
                 Arrays.asList(
                         AccountRequest.builder()
-                                .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.STORE_IN.typeCode))
-                                .mebId(mebId)
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_IN.typeCode))
+                                .userId(user.getId())
                                 .token(store.getSymbol())
                                 .fee(BigDecimal.ZERO)
                                 .balanceChanged(dto.getAmount().negate())
@@ -97,9 +103,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         return true;
     }
 
-    public PageVO<StoreOrderVO> getPage(Long mebId, StoreOrderPageDTO dto) {
+    public PageVO<StoreOrderVO> getPage(String walletAddress, StoreOrderPageDTO dto) {
         IPage<StoreOrderVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
-        iPage = baseMapper.selectPageVO(iPage, mebId);
+        iPage = baseMapper.selectPageVO(iPage, walletAddress);
         PageVO<StoreOrderVO> pageVO = new PageVO<>();
         pageVO.setPageNum(dto.getPageNum());
         pageVO.setPageSize(dto.getPageSize());
@@ -114,10 +120,11 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
      * 2.达到赎回时间以后的订单
      */
     @Transactional(rollbackFor = Exception.class)
-    public Boolean redeem(Long mebId) {
+    public Boolean redeem(String walletAddress) {
+        TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
         LocalDate now = LocalDate.now();
         List<TopStoreOrder> storeOrders = baseMapper.selectList(new LambdaQueryWrapper<TopStoreOrder>()
-                .eq(TopStoreOrder::getMebId, mebId)
+                .eq(TopStoreOrder::getUserId, user.getId())
                 .eq(TopStoreOrder::getStatus, Status._1.value)
                 .ge(TopStoreOrder::getReleaseDate, now));
         if (storeOrders.isEmpty()) {
@@ -137,8 +144,8 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
             baseMapper.updateById(lock);
             requests.add(
                     AccountRequest.builder()
-                            .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.STORE_REDEEM.typeCode))
-                            .mebId(mebId)
+                            .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_REDEEM.typeCode))
+                            .userId(user.getId())
                             .token(lock.getSymbol())
                             .fee(BigDecimal.ZERO)
                             .balanceChanged(lock.getAmount())
@@ -149,8 +156,8 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
             );
             requests.add(
                     AccountRequest.builder()
-                            .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.STORE_REDEEM_INTEREST.typeCode))
-                            .mebId(mebId)
+                            .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_REDEEM_INTEREST.typeCode))
+                            .userId(user.getId())
                             .token(lock.getIncomeSymbol())
                             .fee(BigDecimal.ZERO)
                             .balanceChanged(lock.getIncome())
