@@ -18,8 +18,8 @@ public class TopAccount implements Serializable {
     private Long id;
 
     @ApiModelProperty("会员ID")
-    @TableField(value = "meb_id")
-    private Long mebId;
+    @TableField(value = "user_id")
+    private Long userId;
     
     @ApiModelProperty("代币")
     @TableField(value = "symbol")

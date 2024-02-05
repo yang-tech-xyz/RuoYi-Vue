@@ -19,23 +19,23 @@ import java.time.LocalDateTime;
 @Schema(description = "用户表")
 public class TopUserEntity {
 
-	@TableId(value = "id", type = IdType.AUTO)
-	private Integer id;
-	/**
-	* 主键
-	*/
-    @Schema(description="钱包地址")
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
+    /**
+     * 主键
+     */
+    @Schema(description = "钱包地址")
     private String wallet;
 
-    @Schema(description="邀请码")
+    @Schema(description = "邀请码")
     private String invitedCode;
 
 
-	@Schema(description="邀请人的邀请码")
-	private String invitedUserCode;
+    @Schema(description = "邀请人的邀请码")
+    private String invitedUserCode;
 
-	private LocalDateTime createTime;
+    private LocalDateTime createTime;
 
-	private LocalDateTime updateTime;
+    private LocalDateTime updateTime;
 
 }

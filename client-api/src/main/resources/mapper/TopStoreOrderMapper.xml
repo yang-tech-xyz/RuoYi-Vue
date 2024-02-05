@@ -2,11 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.web.mapper.TopStoreOrderMapper">
 
+    <select id="selectInfoVO" resultType="com.ruoyi.web.vo.OrderInfoVO">
+        select
+        sum(tso.amount) as amount,
+        sum(IF(tso.`status` = 1,tso.income,0)) as redeem,
+        sum(IF(tso.`status` = 2,tso.income,0)) as income
+        from top_user tu inner join top_store_order tso on tu.id = tso.user_id
+        <where>
+            tu.wallet = #{walletAddress}
+        </where>
+    </select>
+
     <select id="selectPageVO" resultType="com.ruoyi.web.vo.StoreOrderVO">
         select tso.*
-        from top_store_order tso
+        from top_user tu inner join top_store_order tso on tu.id = tso.user_id
         <where>
-            tso.meb_id = #{mebId}
+            tu.wallet = #{walletAddress}
         </where>
         order by tso.id desc
     </select>

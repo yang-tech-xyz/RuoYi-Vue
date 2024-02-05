@@ -16,7 +16,7 @@ public class AccountRequest {
 
     private String uniqueId;
 
-    private Long mebId;
+    private Long userId;
 
     private String token;
 

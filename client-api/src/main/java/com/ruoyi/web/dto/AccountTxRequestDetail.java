@@ -18,7 +18,7 @@ public class AccountTxRequestDetail {
 
     private Long accountId;
 
-    private Long mebId;
+    private Long userId;
 
     private String token;
 

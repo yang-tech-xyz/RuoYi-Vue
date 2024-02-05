@@ -23,8 +23,8 @@ public class TopStoreOrder implements Serializable {
     private Long storeId;
     
     @ApiModelProperty("用户ID")
-    @TableField(value = "meb_id")
-    private Long mebId;
+    @TableField(value = "user_id")
+    private Long userId;
     
     @ApiModelProperty("存单号")
     @TableField(value = "order_no")
