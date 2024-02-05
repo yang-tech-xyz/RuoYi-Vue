@@ -48,7 +48,7 @@ public class TopUserController
     {
         AjaxResult ajax = AjaxResult.success();
         try {
-            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(),"青年人的责任重大！努力吧...",loginBody.getWallet());
+            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(),loginBody.getContent(),loginBody.getWallet());
             if(!validateResult){
                 return AjaxResult.error("validate sign error!");
             }
