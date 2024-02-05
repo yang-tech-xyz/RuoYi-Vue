@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.entity.TopTokenPrice;
+import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopTokenMapper;
 import com.ruoyi.web.mapper.TopTokenPriceMapper;
 import com.ruoyi.web.vo.TickerVO;
@@ -35,10 +36,13 @@ public class TopTokenPriceService extends ServiceImpl<TopTokenPriceMapper, TopTo
         Optional<TopTokenPrice> optional = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopTokenPrice>()
                 .eq(TopTokenPrice::getSymbol, token)));
         if (optional.isPresent()) {
-            return optional.get().getPrice();
+            BigDecimal price = optional.get().getPrice();
+            if (price.compareTo(BigDecimal.ZERO) == 0) {
+                throw new ServiceException("无法获取价格", 500);
+            }
+            return price;
         }
-        return BigDecimal.ZERO;
-
+        throw new ServiceException("无法获取价格", 500);
     }
 
     /**
