@@ -78,13 +78,13 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         }
         String orderNo = UUID.fastUUID().toString();
         topPowerOrder.setOrderNo(orderNo);
-        Long mebId = account.getMebId();
+        Long mebId = account.getUserId();
         // 扣减用户购买算力的钱
         topAccountService.processAccount(
             Arrays.asList(
                 AccountRequest.builder()
                     .uniqueId(orderNo.concat("_" + mebId).concat("_" + Account.TxType.PURCHASE.typeCode))
-                    .mebId(mebId)
+                    .userId(mebId)
                     .token(symbol)
                     .fee(BigDecimal.ZERO)
                     .balanceChanged(payTokenAmount.negate())

@@ -111,7 +111,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 log.warn("user not exist,user address is:{}",from);
                 throw new ServiceException("user not exist");
             }
-            Integer userId = topUserOptional.get().getId();
+            Long userId = topUserOptional.get().getId();
             topTransaction.setUserId(userId);
 
             String status = transactionReceipt.getStatus();
@@ -227,7 +227,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                         Arrays.asList(
                                 AccountRequest.builder()
                                         .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.RECHARGE_IN.typeCode))
-                                        .mebId(mebId)
+                                        .userId(mebId)
                                         .token(topTransaction.getSymbol())
                                         .fee(BigDecimal.ZERO)
                                         .balanceChanged(topTransaction.getTokenAmount())

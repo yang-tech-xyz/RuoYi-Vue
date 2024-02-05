@@ -59,7 +59,7 @@ public class TopTransaction extends BaseEntity
     private BigInteger height;
 
     @ApiModelProperty(name = "用户id")
-    private Integer userId;
+    private Long userId;
 
     @ApiModelProperty(name = "用户id")
     private Long blockConfirm;
