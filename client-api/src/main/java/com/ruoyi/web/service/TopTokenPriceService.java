@@ -1,15 +1,21 @@
 package com.ruoyi.web.service;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.entity.TopTokenPrice;
 import com.ruoyi.web.mapper.TopTokenMapper;
 import com.ruoyi.web.mapper.TopTokenPriceMapper;
+import com.ruoyi.web.vo.TickerVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -19,8 +25,8 @@ public class TopTokenPriceService extends ServiceImpl<TopTokenPriceMapper, TopTo
     @Autowired
     private TopTokenMapper topTokenMapper;
 
-    /*@Autowired
-    private GateIOFeign gateIOFeign;*/
+    @Autowired
+    private RestTemplate restTemplate;
 
     /**
      * 查询币种价格
@@ -39,14 +45,16 @@ public class TopTokenPriceService extends ServiceImpl<TopTokenPriceMapper, TopTo
      * 刷新币种价格
      */
     public void refPrice() {
-       /* List<TopToken> tokens = topTokenMapper.selectList(new LambdaQueryWrapper<TopToken>());
+        List<TopToken> tokens = topTokenMapper.selectList(new LambdaQueryWrapper<TopToken>());
         for (TopToken token : tokens) {
             try {
                 Optional<TopTokenPrice> optional = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopTokenPrice>()
                         .eq(TopTokenPrice::getSymbol, token.getSymbol())));
                 BigDecimal price = BigDecimal.ONE;
                 if (!token.getSymbol().equals("USDT")) {
-                    List<TickerVO> tickerVOS = gateIOFeign.getTickers(token.getSymbol() + "_" + "USDT");
+                    //https://api.gateio.ws/api/v4/spot/tickers?currency_pair=GT_USDT
+                    String result = restTemplate.getForObject("https://api.gateio.ws/api/v4/spot/tickers?currency_pair=" + token.getSymbol() + "_" + "USDT", String.class);
+                    List<TickerVO> tickerVOS = JSONArray.parseArray(result, TickerVO.class);
                     price = tickerVOS.get(0).getLast();
                 }
                 if (optional.isPresent()) {
@@ -68,6 +76,6 @@ public class TopTokenPriceService extends ServiceImpl<TopTokenPriceMapper, TopTo
             } catch (Exception ex) {
                 log.error("token price error:{}", token.getSymbol(), ex);
             }
-        }*/
+        }
     }
 }
