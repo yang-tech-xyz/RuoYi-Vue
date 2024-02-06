@@ -19,7 +19,7 @@ public class TopStoreOrderController {
     private TopStoreOrderService service;
 
     @Operation(summary = "存单信息")
-    @PostMapping("/info")
+    @GetMapping("/info")
     public AjaxResult info() {
         return AjaxResult.success(service.info(RequestUtil.getWalletAddress()));
     }
