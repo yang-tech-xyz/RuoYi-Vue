@@ -94,3 +94,46 @@ ALTER TABLE `ry-vue`.top_transaction ADD update_time DATETIME NULL;
 ALTER TABLE `ry-vue`.top_transaction ADD create_by varchar(100) NULL;
 ALTER TABLE `ry-vue`.top_transaction ADD update_by varchar(100) NULL;
 ALTER TABLE `ry-vue`.top_transaction ADD block_confirm int NULL COMMENT '多少个高度后确认交易成功';
+
+
+CREATE TABLE `ry-vue`.top_power_config (
+	id int auto_increment primary key NOT NULL COMMENT '主键',
+	price DECIMAL(20,10) NULL COMMENT '算力购买价格.默认1000U',
+	period INT NULL COMMENT '产出周期,默认360天',
+	output_symbol varchar(100) NULL COMMENT '产出币种,默认BTC',
+	output_ratio decimal(20,10) NULL COMMENT '产出比例',
+	create_time datetime NULL,
+	update_time datetime NULL,
+	create_by varchar(100) NULL,
+	update_by varchar(100) NULL
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci
+COMMENT='算力配置表';
+
+CREATE TABLE `ry-vue`.top_power_order (
+	id bigint primary key auto_increment NOT NULL COMMENT 'id',
+	amount decimal(20,10) NULL COMMENT '购买金额,价格乘以购买数量等于购买金额',
+	`number` int NULL COMMENT '购买台数',
+	output_symbol varchar(100) NULL,
+	period int NULL COMMENT '产出周期,默认值360天',
+	output_ratio decimal(20,10) NULL,
+	expected_total_output decimal(20,10) NULL COMMENT '预估总产出',
+	create_time datetime NULL,
+	update_time datetime NULL,
+	create_by varchar(100) NULL,
+	update_by varchar(100) NULL
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_0900_ai_ci
+COMMENT='算力订单表';
+
+ALTER TABLE `ry-vue`.top_power_order ADD end_time datetime NULL COMMENT '退出日期';
+
+INSERT INTO `ry-vue`.top_power_config
+(id, price, period, output_symbol, output_ratio, create_time, update_time, create_by, update_by)
+VALUES(1, 1000.0000000000, 360, 'BTC', 200.0000000000, '2024-02-02 00:00:00', '2024-02-02 00:00:00', 'sys', 'sys');
+
+ALTER TABLE `ry-vue`.top_power_order ADD order_no varchar(100) NULL COMMENT '订单编号';

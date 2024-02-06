@@ -1,6 +1,6 @@
 package com.ruoyi.web.vo;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -8,19 +8,19 @@ import java.math.BigDecimal;
 @Data
 public class AccountVO {
 
-    @ApiModelProperty("会员ID")
+    @Schema(name="会员ID")
     private Long mebId;
 
-    @ApiModelProperty("代币")
+    @Schema(name="代币")
     private String symbol;
 
-    @ApiModelProperty("可用金额")
+    @Schema(name="可用金额")
     private BigDecimal availableBalance;
 
-    @ApiModelProperty("锁仓金额")
+    @Schema(name="锁仓金额")
     private BigDecimal lockupBalance;
 
-    @ApiModelProperty("冻结金额")
+    @Schema(name="冻结金额")
     private BigDecimal frozenBalance;
 
 }

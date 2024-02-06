@@ -36,7 +36,6 @@ import org.web3j.protocol.http.HttpService;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -111,7 +110,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 log.warn("user not exist,user address is:{}",from);
                 throw new ServiceException("user not exist");
             }
-            Integer userId = topUserOptional.get().getId();
+            Long userId = topUserOptional.get().getId();
             topTransaction.setUserId(userId);
 
             String status = transactionReceipt.getStatus();
@@ -163,7 +162,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.info("address is:{}",address.toString());
             Uint256 amount = (Uint256) refMethod.invoke(null,value,0,Uint256.class);
             BigDecimal pow = new BigDecimal(10).pow(topToken.getDecimals());
-            BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow,10, RoundingMode.FLOOR);
+            BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow,10,1);
             topTransaction.setTokenAmount(tokenAmount);
             topTransaction.setHeight(transaction.getBlockNumber());
 
@@ -227,7 +226,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                         Arrays.asList(
                                 AccountRequest.builder()
                                         .uniqueId(UUID.fastUUID().toString().concat("_" + mebId).concat("_" + Account.TxType.RECHARGE_IN.typeCode))
-                                        .mebId(mebId)
+                                        .userId(mebId)
                                         .token(topTransaction.getSymbol())
                                         .fee(BigDecimal.ZERO)
                                         .balanceChanged(topTransaction.getTokenAmount())
