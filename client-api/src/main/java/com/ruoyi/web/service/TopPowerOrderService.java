@@ -58,6 +58,9 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         topPowerOrder.setPeriod(topPowerConfig.getPeriod());
         topPowerOrder.setOutputRatio(topPowerConfig.getOutputRatio());
         topPowerOrder.setEndTime(LocalDateTime.now().plusDays(topPowerOrder.getPeriod()+1));
+        topPowerOrder.setCreateTime(LocalDateTime.now());
+        topPowerOrder.setUpdateTime(LocalDateTime.now());
+        topPowerOrder.setExpectedTotalOutput(buyPowerNeedPayUsdt.multiply(topPowerConfig.getOutputRatio()));
         String symbol = buyPowerBody.getSymbol();
         // 查询symbol的价格.
         BigDecimal tokenPrice = topTokenPriceService.getPrice(symbol);
@@ -76,13 +79,15 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         }
         String orderNo = UUID.fastUUID().toString();
         topPowerOrder.setOrderNo(orderNo);
-        Long mebId = account.getUserId();
+        Long userId = account.getUserId();
+        topPowerOrder.setCreateBy(userId.toString());
+        topPowerOrder.setUpdateBy(userId.toString());
         // 扣减用户购买算力的钱
         topAccountService.processAccount(
             Arrays.asList(
                 AccountRequest.builder()
-                    .uniqueId(orderNo.concat("_" + mebId).concat("_" + Account.TxType.PURCHASE.typeCode))
-                    .userId(mebId)
+                    .uniqueId(orderNo.concat("_" + userId).concat("_" + Account.TxType.PURCHASE.typeCode))
+                    .userId(userId)
                     .token(symbol)
                     .fee(BigDecimal.ZERO)
                     .balanceChanged(payTokenAmount.negate())

@@ -69,6 +69,7 @@ public class TopUserController
 
         TopUserEntity topUserEntity = new TopUserEntity();
         BeanUtils.copyProperties(loginBody,topUserEntity);
+        topUserEntity.setWallet(topUserEntity.getWallet().toLowerCase());
         topUserEntity.setCreateTime(LocalDateTime.now());
         topUserEntity.setUpdateTime(LocalDateTime.now());
         topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
