@@ -9,7 +9,6 @@ import com.ruoyi.web.entity.TopPowerOrder;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.exception.ServiceException;
-import com.ruoyi.web.mapper.TopPowerConfigMapper;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
 import com.ruoyi.web.vo.BuyPowerBody;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +62,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         // 查询symbol的价格.
         BigDecimal tokenPrice = topTokenPriceService.getPrice(symbol);
         // 计算用户需要的token的数量
-        BigDecimal payTokenAmount = buyPowerNeedPayUsdt.divide(tokenPrice, 10, RoundingMode.CEILING);
+        BigDecimal payTokenAmount = buyPowerNeedPayUsdt.divide(tokenPrice, 10, 2);
         String wallet = buyPowerBody.getWallet().toLowerCase();
         Optional<TopUserEntity> topUserOptional = topUserService.getByWallet(wallet);
         if(!topUserOptional.isPresent()){

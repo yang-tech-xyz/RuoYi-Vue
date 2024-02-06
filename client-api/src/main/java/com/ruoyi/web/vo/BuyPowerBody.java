@@ -18,13 +18,13 @@ public class BuyPowerBody extends SignBaseEntity
     /**
      * 用户钱包地址
      */
-    @Schema(name="使用的token",example = "SUI")
+    @Schema(description="使用的token",example = "SUI")
     private String symbol;
 
     /**
      * 用户签名后信息
      */
-    @Schema(name="购买的数量",example = "2")
+    @Schema(description="购买的数量",example = "2")
     private BigDecimal number;
 
 }
