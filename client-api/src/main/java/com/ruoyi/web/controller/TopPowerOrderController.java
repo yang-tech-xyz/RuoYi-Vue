@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Slf4j
 @RequestMapping("/power")
-@Tag(description = "TopPowerOrderController", name = "token信息")
+@Tag(description = "TopPowerOrderController", name = "订单操作")
 @RestController
 public class TopPowerOrderController
 {

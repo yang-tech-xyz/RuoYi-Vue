@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -116,16 +118,16 @@ public class TestController extends BaseController
 @ApiModel(value = "UserEntity", description = "用户实体")
 class UserEntity
 {
-    @ApiModelProperty("用户ID")
+    @Schema(name="用户ID")
     private Integer userId;
 
-    @ApiModelProperty("用户名称")
+    @Schema(name="用户名称")
     private String username;
 
-    @ApiModelProperty("用户密码")
+    @Schema(name="用户密码")
     private String password;
 
-    @ApiModelProperty("用户手机")
+    @Schema(name="用户手机")
     private String mobile;
 
     public UserEntity()

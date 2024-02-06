@@ -5,12 +5,12 @@ import com.ruoyi.web.dto.StoreOrderDTO;
 import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.service.TopStoreOrderService;
 import com.ruoyi.web.utils.RequestUtil;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = "存币生息订单", value = "存币生息订单")
+@Tag(description = "存币生息订单", name = "存币生息订单")
 @RestController
 @RequestMapping("topStoreOrder")
 public class TopStoreOrderController {
@@ -18,25 +18,25 @@ public class TopStoreOrderController {
     @Autowired
     private TopStoreOrderService service;
 
-    @ApiOperation("存单信息")
+    @Operation(summary = "存单信息")
     @PostMapping("/info")
     public AjaxResult info() {
         return AjaxResult.success(service.info(RequestUtil.getWalletAddress()));
     }
 
-    @ApiOperation("存单")
+    @Operation(summary = "存单")
     @PostMapping("/order")
     public AjaxResult order(@RequestBody StoreOrderDTO dto) {
         return AjaxResult.success(service.order(RequestUtil.getWalletAddress(), dto));
     }
 
-    @ApiOperation("赎回:[到期可以赎回]")
+    @Operation(summary = "赎回:[到期可以赎回]")
     @PostMapping("/redeem")
     public AjaxResult redeem() {
         return AjaxResult.success(service.redeem(RequestUtil.getWalletAddress()));
     }
 
-    @ApiOperation("查询订单")
+    @Operation(summary = "查询订单")
     @GetMapping("/getPage")
     public AjaxResult getPage(@ModelAttribute StoreOrderPageDTO dto) {
         return AjaxResult.success(service.getPage(RequestUtil.getWalletAddress(), dto));

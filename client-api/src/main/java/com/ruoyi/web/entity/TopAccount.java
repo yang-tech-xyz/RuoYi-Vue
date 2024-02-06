@@ -1,11 +1,17 @@
 package com.ruoyi.web.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.io.Serializable;
-import lombok.*;
-import com.baomidou.mybatisplus.annotation.*;
-import io.swagger.annotations.ApiModelProperty;
 
 @Data
 @NoArgsConstructor
@@ -13,43 +19,43 @@ import io.swagger.annotations.ApiModelProperty;
 @TableName(value = "top_account")
 public class TopAccount implements Serializable {
     
-    @ApiModelProperty("主键")
+    @Schema(description="主键")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @ApiModelProperty("会员ID")
+    @Schema(description="会员ID")
     @TableField(value = "user_id")
     private Long userId;
     
-    @ApiModelProperty("代币")
+    @Schema(description="代币")
     @TableField(value = "symbol")
     private String symbol;
     
-    @ApiModelProperty("可用金额")
+    @Schema(description="可用金额")
     @TableField(value = "available_balance")
     private BigDecimal availableBalance;
     
-    @ApiModelProperty("锁仓金额")
+    @Schema(description="锁仓金额")
     @TableField(value = "lockup_balance")
     private BigDecimal lockupBalance;
     
-    @ApiModelProperty("冻结金额")
+    @Schema(description="冻结金额")
     @TableField(value = "frozen_balance")
     private BigDecimal frozenBalance;
     
-    @ApiModelProperty("创建日期")
+    @Schema(description="创建日期")
     @TableField(value = "created_date")
     private LocalDateTime createdDate;
     
-    @ApiModelProperty("创建人")
+    @Schema(description="创建人")
     @TableField(value = "created_by")
     private String createdBy;
     
-    @ApiModelProperty("更新日期")
+    @Schema(description="更新日期")
     @TableField(value = "updated_date")
     private LocalDateTime updatedDate;
     
-    @ApiModelProperty("更新人")
+    @Schema(description="更新人")
     @TableField(value = "updated_by")
     private String updatedBy;
     

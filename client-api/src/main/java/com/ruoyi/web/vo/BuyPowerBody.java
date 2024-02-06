@@ -1,8 +1,7 @@
 package com.ruoyi.web.vo;
 
 import com.ruoyi.common.SignBaseEntity;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -12,20 +11,20 @@ import java.math.BigDecimal;
  * 用户钱包注册信息
  * @author ruoyi
  */
-@ApiModel("购买订单请求")
+@Schema(description = "购买订单请求")
 @Data
 public class BuyPowerBody extends SignBaseEntity
 {
     /**
      * 用户钱包地址
      */
-    @ApiModelProperty(value="使用的token",example = "SUI")
+    @Schema(name="使用的token",example = "SUI")
     private String symbol;
 
     /**
      * 用户签名后信息
      */
-    @ApiModelProperty(value="购买的数量",example = "2")
+    @Schema(name="购买的数量",example = "2")
     private BigDecimal number;
 
 }

@@ -36,7 +36,6 @@ import org.web3j.protocol.http.HttpService;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
@@ -163,7 +162,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.info("address is:{}",address.toString());
             Uint256 amount = (Uint256) refMethod.invoke(null,value,0,Uint256.class);
             BigDecimal pow = new BigDecimal(10).pow(topToken.getDecimals());
-            BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow,10, RoundingMode.FLOOR);
+            BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow,10,1);
             topTransaction.setTokenAmount(tokenAmount);
             topTransaction.setHeight(transaction.getBlockNumber());
 

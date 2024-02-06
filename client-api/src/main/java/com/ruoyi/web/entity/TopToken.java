@@ -1,7 +1,7 @@
 package com.ruoyi.web.entity;
 
 import com.ruoyi.common.BaseEntity;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -19,14 +19,14 @@ public class TopToken extends BaseEntity
     private Integer id;
 
     /** token 名称 */
-    @ApiModelProperty(name = "token 名称")
+    @Schema(name = "token 名称")
     private String symbol;
 
     /** 小数位 */
-    @ApiModelProperty(name = "小数位")
+    @Schema(name = "小数位")
     private Integer decimals;
 
     /** 是否上线: 0,上线,1下线 */
-    @ApiModelProperty(name = "是否上线: 0,上线,1下线")
+    @Schema(name = "是否上线: 0,上线,1下线")
     private Long online;
 }
