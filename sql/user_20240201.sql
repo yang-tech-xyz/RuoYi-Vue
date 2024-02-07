@@ -68,32 +68,28 @@ COMMENT='币种-链关系配置表';
 
 ALTER TABLE `ry-vue`.top_chain ADD receive_addres varchar(100) NOT NULL COMMENT '项目方收款地址';
 
-CREATE TABLE `ry-vue`.top_transaction (
-	id bigint auto_increment primary key NOT NULL COMMENT 'id',
-	hash varchar(100) NULL COMMENT '事务hash值',
-	chain_id int NULL COMMENT '链id',
-	token_id INT NULL COMMENT '链id',
-	rpc_endpoint varchar(100) NULL COMMENT '链RPC地址'
-)
-ENGINE=InnoDB
-DEFAULT CHARSET=utf8mb4
-COLLATE=utf8mb4_0900_ai_ci
-COMMENT='用户充值提现信息表';
+-- `ry-vue`.top_transaction definition
 
-ALTER TABLE `ry-vue`.top_transaction ADD status varchar(100) NULL COMMENT '事务状态';
-ALTER TABLE `ry-vue`.top_transaction ADD symbol varchar(100) NULL COMMENT 'token标记';
-ALTER TABLE `ry-vue`.top_transaction ADD amount decimal(20,10) NULL COMMENT '充值数量';
-CREATE UNIQUE INDEX top_transaction_hash_IDX USING BTREE ON `ry-vue`.top_transaction (hash);
-ALTER TABLE `ry-vue`.top_transaction ADD is_confirm tinyint NULL COMMENT '确认是否充值成功,0，充值成功，1：充值失败';
-ALTER TABLE `ry-vue`.top_transaction ADD height BIGINT NULL COMMENT '事务区块高度';
-ALTER TABLE `ry-vue`.top_transaction ADD user_id int NULL COMMENT '用户id';
-
-
-ALTER TABLE `ry-vue`.top_transaction ADD create_time DATETIME NULL;
-ALTER TABLE `ry-vue`.top_transaction ADD update_time DATETIME NULL;
-ALTER TABLE `ry-vue`.top_transaction ADD create_by varchar(100) NULL;
-ALTER TABLE `ry-vue`.top_transaction ADD update_by varchar(100) NULL;
-ALTER TABLE `ry-vue`.top_transaction ADD block_confirm int NULL COMMENT '多少个高度后确认交易成功';
+CREATE TABLE `top_transaction` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'id',
+  `hash` varchar(100) DEFAULT NULL COMMENT '事务hash值',
+  `chain_id` int DEFAULT NULL COMMENT '链id',
+  `token_id` int DEFAULT NULL COMMENT '链id',
+  `rpc_endpoint` varchar(100) DEFAULT NULL COMMENT '链RPC地址',
+  `status` varchar(100) DEFAULT NULL COMMENT '事务状态',
+  `symbol` varchar(100) DEFAULT NULL COMMENT 'token标记',
+  `token_amount` decimal(20,10) DEFAULT NULL COMMENT '充值数量',
+  `is_confirm` bigint DEFAULT NULL COMMENT '确认是否充值成功,0，充值成功，1：充值失败',
+  `height` bigint DEFAULT NULL COMMENT '事务区块高度',
+  `user_id` int DEFAULT NULL COMMENT '用户id',
+  `create_time` datetime DEFAULT NULL,
+  `update_time` datetime DEFAULT NULL,
+  `create_by` varchar(100) DEFAULT NULL,
+  `update_by` varchar(100) DEFAULT NULL,
+  `block_confirm` int DEFAULT NULL COMMENT '多少个高度后确认交易成功',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `top_transaction_hash_IDX` (`hash`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='用户充值提现信息表';
 
 
 CREATE TABLE `ry-vue`.top_power_config (

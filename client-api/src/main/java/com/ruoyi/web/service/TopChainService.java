@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @Service
 public class TopChainService extends ServiceImpl<TopChainMapper, TopChain> {
-    public Optional<TopChain> getOptByChainId(Integer chainId) {
+    public Optional<TopChain> getOptByChainId(Long chainId) {
         LambdaQueryWrapper<TopChain> query = Wrappers.lambdaQuery();
         query.eq(TopChain::getChainId,chainId);
         return this.getOneOpt(query);

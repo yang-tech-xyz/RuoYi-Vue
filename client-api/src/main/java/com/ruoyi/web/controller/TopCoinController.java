@@ -2,6 +2,8 @@ package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.service.TopTokenService;
+import com.ruoyi.web.utils.UnsignMessageUtils;
+import com.ruoyi.web.vo.ClaimBody;
 import com.ruoyi.web.vo.RechargeBody;
 import com.ruoyi.web.vo.TopTokenChainVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.SignatureException;
 import java.util.List;
 
 /**
@@ -48,6 +51,20 @@ public class TopCoinController
         return topTokenService.recharge(rechargeBody);
     }
 
-
-
+    /**
+     * 提币
+     */
+    @Operation(summary = "提币")
+    @PostMapping("/claim")
+    public AjaxResult claim(@RequestBody ClaimBody claimBody)throws Exception{
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(claimBody.getSignMsg(),claimBody.getContent(),claimBody.getWallet());
+            if(!validateResult){
+                return AjaxResult.error("validate sign error!");
+            }
+        } catch (SignatureException e) {
+            throw new RuntimeException(e);
+        }
+        return topTokenService.claim(claimBody);
+    }
 }

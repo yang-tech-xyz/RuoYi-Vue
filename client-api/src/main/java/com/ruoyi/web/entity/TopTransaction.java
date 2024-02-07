@@ -30,7 +30,7 @@ public class TopTransaction extends BaseEntity
 
     /** rpc 节点url */
     @Schema(name = "节点id")
-    private Integer chainId;
+    private Long chainId;
 
     /** 在多少个区块确认之后 才确认充值成功 */
     @Schema(name = "币种id")

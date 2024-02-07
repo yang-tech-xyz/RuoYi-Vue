@@ -16,7 +16,7 @@ public class WalletRegisterBody extends SignBaseEntity
     /**
      * 邀请码
      */
-    @Schema(name = "邀請碼")
+    @Schema(description = "邀请码",example = "111")
     private String invitedCode;
 
 }

@@ -33,6 +33,7 @@ public interface Account {
         STORE_IN("STORE_IN", "理财存币"),
         PURCHASE("PURCHASE", "支付"),
         RECHARGE_IN("RECHARGE_IN", "充值"),
+        CLAIM("CLAIM", "提现"),
         STORE_REDEEM("STORE_REDEEM", "理财赎回"),
         STORE_REDEEM_INTEREST("STORE_REDEEM_INTEREST", "理财赎回利息"),
 
