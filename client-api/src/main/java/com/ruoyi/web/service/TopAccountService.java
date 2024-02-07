@@ -10,6 +10,7 @@ import com.ruoyi.web.entity.TopAccount;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.mapper.TopAccountMapper;
 import com.ruoyi.web.mapper.TopUserMapper;
+import com.ruoyi.web.utils.StringUtils;
 import com.ruoyi.web.vo.AccountVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,10 +77,11 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
     /**
      * 获取用户所有资产
      */
-    public List<AccountVO> getAccounts(String walletAddress) {
+    public List<AccountVO> getAccounts(String walletAddress, String symbol) {
         TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
         List<TopAccount> accounts = baseMapper.selectList(new LambdaQueryWrapper<TopAccount>()
-                .eq(TopAccount::getUserId, user.getId()));
+                .eq(TopAccount::getUserId, user.getId())
+                .eq(StringUtils.isNotBlank(symbol), TopAccount::getSymbol, symbol));
         return accounts.stream().map(account -> {
             AccountVO vo = new AccountVO();
             vo.setMebId(account.getUserId());

@@ -14,7 +14,7 @@ public class TokenPriceTask {
     /**
      * 每3秒执行一次
      */
-//    @Scheduled(initialDelay = 1000, fixedDelay = 3000)
+    @Scheduled(initialDelay = 1000, fixedDelay = 3000)
     public void refPrice() {
         service.refPrice();
     }

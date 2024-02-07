@@ -1,13 +1,11 @@
 package com.ruoyi.web.controller;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.AjaxResult;
-import com.ruoyi.web.vo.WalletRegisterBody;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.utils.UnsignMessageUtils;
+import com.ruoyi.web.vo.WalletRegisterBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
@@ -23,14 +21,13 @@ import java.util.Optional;
 
 /**
  * 登录验证
- * 
+ *
  * @author ruoyi
  */
 @RequestMapping("/topUser")
 @Tag(description = "TopUserController", name = "用户信息")
 @RestController
-public class TopUserController
-{
+public class TopUserController {
     @Autowired
     private TopUserService topUserService;
 
@@ -44,12 +41,11 @@ public class TopUserController
     @Operation(summary = "注册用户", description = "需要授权")
 //    @TransactionVerifyCheck
     @PostMapping("/register")
-    public AjaxResult register(@RequestBody WalletRegisterBody loginBody)
-    {
+    public AjaxResult register(@RequestBody WalletRegisterBody loginBody) {
         AjaxResult ajax = AjaxResult.success();
         try {
-            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(),loginBody.getContent(),loginBody.getWallet());
-            if(!validateResult){
+            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(), loginBody.getContent(), loginBody.getWallet());
+            if (!validateResult) {
                 return AjaxResult.error("validate sign error!");
             }
         } catch (SignatureException e) {
@@ -57,21 +53,22 @@ public class TopUserController
         }
         //check the user wallet is existed.
         Optional<TopUserEntity> userOpt = topUserService.getByWallet(loginBody.getWallet());
-        if(userOpt.isPresent()){
+        if (userOpt.isPresent()) {
             return AjaxResult.error("wallet is exist");
         }
 
         //检查邀请码用户是否存在
         Optional<TopUserEntity> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
-        if(!inviteOpt.isPresent()){
+        if (!inviteOpt.isPresent()) {
             return AjaxResult.error("invite code is not exist");
         }
 
         TopUserEntity topUserEntity = new TopUserEntity();
-        BeanUtils.copyProperties(loginBody,topUserEntity);
+        BeanUtils.copyProperties(loginBody, topUserEntity);
         topUserEntity.setWallet(topUserEntity.getWallet().toLowerCase());
         topUserEntity.setCreateTime(LocalDateTime.now());
         topUserEntity.setUpdateTime(LocalDateTime.now());
+        topUserEntity.setInvitedUserId(inviteOpt.get().getId());
         topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
         // 生成邀请码.
         topUserEntity.setInvitedCode(NumbersUtils.createInvite());

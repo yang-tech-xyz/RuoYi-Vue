@@ -52,7 +52,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         //通过购买数量,计算需要的金额.
         BigDecimal price = topPowerConfig.getPrice();
         BigDecimal buyNumbers = buyPowerBody.getNumber();
-        topPowerOrder.setNumber(buyNumbers);
+        topPowerOrder.setNumber(buyNumbers.intValue());
         // 购买矿机需要的U的数量
         BigDecimal buyPowerNeedPayUsdt = buyNumbers.multiply(price);
         topPowerOrder.setAmount(buyPowerNeedPayUsdt);
@@ -82,6 +82,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         String orderNo = UUID.fastUUID().toString();
         topPowerOrder.setOrderNo(orderNo);
         Long userId = account.getUserId();
+        topPowerOrder.setUserId(userId);
         topPowerOrder.setCreateBy(userId.toString());
         topPowerOrder.setUpdateBy(userId.toString());
         // 扣减用户购买算力的钱
@@ -109,7 +110,8 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
      * 处理订单
      */
     public void process(List<UserVO> userVOList, LocalDate processDate) {
-        for (UserVO userVO : userVOList) {
+        for (int i = 0; i < userVOList.size(); i++) {
+            UserVO userVO = userVOList.get(i);
             userVO.setPowerOrders(baseMapper.selectOrderList(userVO.getId(), processDate));
         }
     }

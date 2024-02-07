@@ -11,9 +11,7 @@
     </select>
 
     <select id="selectProcessVO" resultType="com.ruoyi.web.vo.UserVO">
-        select
-            tu.*,
-            (select _tu.id from top_user _tu where _tu.invited_code = tu.invited_user_code) as invitedUserId
+        select tu.*
         from top_user tu
         order by tu.id
     </select>
