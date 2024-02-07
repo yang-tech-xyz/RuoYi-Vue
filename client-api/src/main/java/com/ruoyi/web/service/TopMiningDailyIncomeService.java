@@ -17,6 +17,7 @@ public class TopMiningDailyIncomeService extends ServiceImpl<TopMiningDailyIncom
 
     /**
      * 用户挖矿天收益
+     * 1.
      */
     @Transactional(rollbackFor = Exception.class)
     public void process(List<UserVO> userVOList, LocalDate processDate) {
