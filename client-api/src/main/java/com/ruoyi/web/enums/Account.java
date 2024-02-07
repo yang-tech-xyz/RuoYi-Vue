@@ -36,6 +36,8 @@ public interface Account {
         CLAIM("CLAIM", "提现"),
         STORE_REDEEM("STORE_REDEEM", "理财赎回"),
         STORE_REDEEM_INTEREST("STORE_REDEEM_INTEREST", "理财赎回利息"),
+        POWER_DAILY_INCOME("POWER_DAILY_INCOME", "挖矿天收益"),
+        POWER_SHARING_INCOME("POWER_SHARING_INCOME", "挖矿邀请收益"),
 
         ;
         public final String typeCode;

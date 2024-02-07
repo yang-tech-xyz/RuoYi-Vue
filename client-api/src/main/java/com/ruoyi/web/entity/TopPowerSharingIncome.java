@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(value = "top_mining_daily_income")
-public class TopMiningDailyIncome implements Serializable {
+@TableName(value = "top_power_sharing_income")
+public class TopPowerSharingIncome implements Serializable {
 
     @Schema(description = "主键")
     @TableId(value = "id", type = IdType.AUTO)
@@ -28,29 +28,37 @@ public class TopMiningDailyIncome implements Serializable {
     @TableField(value = "user_id")
     private Long userId;
 
-    @Schema(description = "订单号")
-    @TableField(value = "order_no")
-    private String orderNo;
+    @Schema(description = "贡献人ID")
+    @TableField(value = "provider_user_id")
+    private Long providerUserId;
 
-    @Schema(description = "存入金额")
-    @TableField(value = "amount")
-    private BigDecimal amount;
+    @Schema(description = "贡献人层级")
+    @TableField(value = "provider_level")
+    private Integer providerLevel;
 
-    @Schema(description = "BTC价格")
-    @TableField(value = "price")
-    private BigDecimal price;
+    @Schema(description = "收益币种")
+    @TableField(value = "income_symbol")
+    private String incomeSymbol;
 
-    @Schema(description = "比列")
-    @TableField(value = "rate")
-    private BigDecimal rate;
+    @Schema(description = "贡献人收益金额")
+    @TableField(value = "provider_income")
+    private BigDecimal providerIncome;
 
-    @Schema(description = "收益")
+    @Schema(description = "收益比例")
+    @TableField(value = "income_rate")
+    private BigDecimal incomeRate;
+
+    @Schema(description = "转收益币种收益")
     @TableField(value = "income")
     private BigDecimal income;
 
     @Schema(description = "收益日期")
     @TableField(value = "income_date")
     private LocalDate incomeDate;
+
+    @Schema(description = "是否处理")
+    @TableField(value = "process_enabled")
+    private Boolean processEnabled;
 
     @Schema(description = "创建日期")
     @TableField(value = "created_date")

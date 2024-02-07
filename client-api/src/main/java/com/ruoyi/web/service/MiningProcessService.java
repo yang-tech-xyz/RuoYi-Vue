@@ -1,7 +1,8 @@
 package com.ruoyi.web.service;
 
-import com.ruoyi.web.mapper.TopUserMapper;
-import com.ruoyi.web.vo.UserVO;
+import com.ruoyi.web.mapper.TopTokenPriceMapper;
+import com.ruoyi.web.vo.TokenPriceVO;
+import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,16 +16,22 @@ import java.util.List;
 public class MiningProcessService {
 
     @Autowired
-    private TopUserMapper userMapper;
+    private TopUserService userService;
+
+    @Autowired
+    private TopTokenPriceMapper priceMapper;
 
     @Autowired
     private TopPowerOrderService powerOrderService;
 
     @Autowired
-    private TopMiningDailyIncomeService dailyIncomeService;
+    private TopPowerDailyIncomeService dailyIncomeService;
 
     @Autowired
-    private TopMiningSharingIncomeService sharingIncomeService;
+    private TopPowerSharingIncomeService sharingIncomeService;
+
+    @Autowired
+    private TopPowerIncomeService incomeService;
 
 
     /**
@@ -37,9 +44,12 @@ public class MiningProcessService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void process(LocalDate processDate) {
-        List<UserVO> userVOList = userMapper.selectProcessVO();
+        List<TokenPriceVO> priceVOList = priceMapper.selectListVO();
+        List<UserProcessVO> userVOList = userService.getUserVOList();
+        userService.process(userVOList);
         powerOrderService.process(userVOList, processDate);
-        dailyIncomeService.process(userVOList, processDate);
-        sharingIncomeService.process(userVOList, processDate);
+        dailyIncomeService.process(userVOList, priceVOList, processDate);
+        sharingIncomeService.process(userVOList, priceVOList, processDate);
+        incomeService.process(userVOList, processDate);
     }
 }

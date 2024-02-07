@@ -2,7 +2,7 @@ package com.ruoyi.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.web.entity.TopUserEntity;
-import com.ruoyi.web.vo.UserVO;
+import com.ruoyi.web.vo.UserProcessVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +13,6 @@ public interface TopUserMapper extends BaseMapper<TopUserEntity> {
 
     TopUserEntity selectByWalletAddress(@Param("walletAddress") String walletAddress);
 
-    List<UserVO> selectProcessVO();
+    List<UserProcessVO> selectUserVOList();
 
 }
