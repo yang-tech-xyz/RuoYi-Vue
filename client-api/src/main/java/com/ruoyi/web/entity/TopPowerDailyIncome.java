@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,66 +18,67 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(value = "top_mining_sharing_income")
-public class TopMiningSharingIncome implements Serializable {
+@TableName(value = "top_power_daily_income")
+public class TopPowerDailyIncome implements Serializable {
 
-    @Schema(description = "主键")
+    @ApiModelProperty("主键")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @Schema(description = "用户ID")
+    @ApiModelProperty("用户ID")
     @TableField(value = "user_id")
     private Long userId;
 
-    @Schema(description = "贡献人ID")
-    @TableField(value = "provider_user_id")
-    private Long providerUserId;
+    @ApiModelProperty("订单号")
+    @TableField(value = "order_no")
+    private String orderNo;
 
-    @Schema(description = "贡献人层级")
-    @TableField(value = "provider_level")
-    private Integer providerLevel;
+    @ApiModelProperty("存入金额")
+    @TableField(value = "amount")
+    private BigDecimal amount;
 
-    @Schema(description = "贡献人投资金额")
-    @TableField(value = "provider_amount")
-    private BigDecimal providerAmount;
-
-    @Schema(description = "贡献人收益金额")
-    @TableField(value = "provider_income")
-    private BigDecimal providerIncome;
-
-    @Schema(description = "收益币种")
+    @ApiModelProperty("收益币种")
     @TableField(value = "income_symbol")
     private String incomeSymbol;
 
-    @Schema(description = "收益币种价格")
+    @ApiModelProperty("币种价格")
     @TableField(value = "income_price")
     private BigDecimal incomePrice;
 
-    @Schema(description = "收益比例")
+    @ApiModelProperty("比列")
     @TableField(value = "income_rate")
     private BigDecimal incomeRate;
 
-    @Schema(description = "收益")
+    @ApiModelProperty("收益金额USD")
+    @TableField(value = "income_usd")
+    private BigDecimal incomeUsd;
+
+    @ApiModelProperty("币种收益金额")
     @TableField(value = "income")
     private BigDecimal income;
 
-    @Schema(description = "收益日期")
+    @ApiModelProperty("收益日期")
     @TableField(value = "income_date")
     private LocalDate incomeDate;
 
-    @Schema(description = "创建日期")
+    @Schema(description = "是否处理")
+    @TableField(value = "process_enabled")
+    private Boolean processEnabled;
+
+
+    @ApiModelProperty("创建日期")
     @TableField(value = "created_date")
     private LocalDateTime createdDate;
 
-    @Schema(description = "创建人")
+    @ApiModelProperty("创建人")
     @TableField(value = "created_by")
     private String createdBy;
 
-    @Schema(description = "更新日期")
+    @ApiModelProperty("更新日期")
     @TableField(value = "updated_date")
     private LocalDateTime updatedDate;
 
-    @Schema(description = "更新人")
+    @ApiModelProperty("更新人")
     @TableField(value = "updated_by")
     private String updatedBy;
 

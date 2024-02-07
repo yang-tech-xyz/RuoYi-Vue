@@ -11,7 +11,7 @@ import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
 import com.ruoyi.web.vo.BuyPowerBody;
-import com.ruoyi.web.vo.UserVO;
+import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -109,10 +109,11 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
     /**
      * 处理订单
      */
-    public void process(List<UserVO> userVOList, LocalDate processDate) {
+    public void process(List<UserProcessVO> userVOList, LocalDate processDate) {
         for (int i = 0; i < userVOList.size(); i++) {
-            UserVO userVO = userVOList.get(i);
+            UserProcessVO userVO = userVOList.get(i);
             userVO.setPowerOrders(baseMapper.selectOrderList(userVO.getId(), processDate));
+            userVO.setPowerNumber(userVO.getPowerOrders().stream().map(TopPowerOrder::getNumber).mapToInt(num -> num).sum());
         }
     }
 }

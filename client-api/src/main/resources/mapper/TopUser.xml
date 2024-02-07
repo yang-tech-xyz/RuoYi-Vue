@@ -10,8 +10,9 @@
         where wallet = #{walletAddress}
     </select>
 
-    <select id="selectProcessVO" resultType="com.ruoyi.web.vo.UserVO">
-        select tu.*
+    <select id="selectUserVOList" resultType="com.ruoyi.web.vo.UserProcessVO">
+        select
+            tu.*
         from top_user tu
         order by tu.id
     </select>
