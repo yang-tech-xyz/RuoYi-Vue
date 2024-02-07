@@ -24,7 +24,7 @@ public class TopTokenChainVO extends BaseEntity
 
     /** 小数位 */
     @Schema(description = "小数位")
-    private Long decimal;
+    private Long decimals;
 
     /** 是否上线: 0,上线,1下线 */
     @Schema(description = "是否上线: 0,上线,1下线")
