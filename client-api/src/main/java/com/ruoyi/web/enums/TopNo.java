@@ -3,6 +3,7 @@ package com.ruoyi.web.enums;
 public enum TopNo {
 
     STORE_NO("STORE_NO_", 1),
+    PROCESS_NO("PROCESS_NO_", 2),
 
 
     ;

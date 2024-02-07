@@ -88,7 +88,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setIncome(order.getAmount().multiply(order.getPrice()).multiply(order.getRate()));
         order.setStoreDate(LocalDateTime.now());
         order.setReleaseDate(LocalDate.now().plusDays(store.getPeriod() * 30));
-        order.setStatus(Status._1.value);
+        order.setStatus(Status._1._value);
         order.setCreatedBy(user.getId().toString());
         order.setCreatedDate(LocalDateTime.now());
         order.setUpdatedBy(user.getId().toString());
@@ -134,7 +134,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         LocalDate now = LocalDate.now();
         List<TopStoreOrder> storeOrders = baseMapper.selectList(new LambdaQueryWrapper<TopStoreOrder>()
                 .eq(TopStoreOrder::getUserId, user.getId())
-                .eq(TopStoreOrder::getStatus, Status._1.value)
+                .eq(TopStoreOrder::getStatus, Status._1._value)
                 .ge(TopStoreOrder::getReleaseDate, now));
         if (storeOrders.isEmpty()) {
             throw new ServiceException("没有可赎回的订单", 500);
@@ -142,13 +142,13 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         List<AccountRequest> requests = new ArrayList<>();
         for (TopStoreOrder storeOrder : storeOrders) {
             TopStoreOrder lock = baseMapper.lockByOrderNo(storeOrder.getOrderNo());
-            if (!Objects.equals(lock.getStatus(), Status._1.value)) {
+            if (!Objects.equals(lock.getStatus(), Status._1._value)) {
                 continue;
             }
             if (storeOrder.getReleaseDate().isBefore(now)) {
                 continue;
             }
-            lock.setStatus(Status._2.value);
+            lock.setStatus(Status._2._value);
             lock.setRedeemDate(LocalDateTime.now());
             baseMapper.updateById(lock);
             requests.add(
