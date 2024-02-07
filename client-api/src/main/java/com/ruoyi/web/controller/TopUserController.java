@@ -68,8 +68,8 @@ public class TopUserController {
         topUserEntity.setWallet(topUserEntity.getWallet().toLowerCase());
         topUserEntity.setCreateTime(LocalDateTime.now());
         topUserEntity.setUpdateTime(LocalDateTime.now());
-        topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
         topUserEntity.setInvitedUserId(inviteOpt.get().getId());
+        topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
         // 生成邀请码.
         topUserEntity.setInvitedCode(NumbersUtils.createInvite());
         topUserService.save(topUserEntity);
