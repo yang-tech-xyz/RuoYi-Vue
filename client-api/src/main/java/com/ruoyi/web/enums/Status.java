@@ -7,10 +7,10 @@ public enum Status {
     _2(2),
 
     ;
-    public final Integer value;
+    public final Integer _value;
 
 
     Status(Integer value) {
-        this.value = value;
+        this._value = value;
     }
 }
