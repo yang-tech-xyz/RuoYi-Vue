@@ -121,10 +121,10 @@ token:
 
 # MyBatis配置
 mybatis-plus:
-  mapper-locations: "classpath:mapper/**/*.xml"
+  # 搜索指定包别名
   typeAliasesPackage: com.ruoyi.**.mapper
-  configuration:
-    mapUnderscoreToCamelCase: true
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath*:mapper/**/*Mapper.xml
   # 加载全局的配置文件
   configLocation: classpath:mybatis/mybatis-config.xml
 
