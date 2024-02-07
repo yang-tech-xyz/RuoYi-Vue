@@ -18,9 +18,10 @@ import java.util.Optional;
 public interface TopTokenMapper extends BaseMapper<TopToken>
 {
 
-    @Select("select tt.id,tt.symbol ,tt.decimals,tt.online ,ttc.erc20_address,ttc.chain_id,tt.create_time ,tt.update_time ,tt.create_by ,tt.update_by " +
+    @Select("select tt.id,tt.symbol ,tt.decimals,tt.online ,ttc.erc20_address,ttc.chain_id,tt.create_time ,tt.update_time ,tt.create_by ,tt.update_by,tc.receive_address " +
             "from top_token tt \n" +
             "left join top_token_chain ttc on tt.id = ttc.token_id \n" +
+            "left join top_chain tc on tc.chain_id = ttc.chain_id \n" +
             "where tt.online = 0\n" +
             "and ttc.chain_id = #{chainId}\n")
     List<TopTokenChainVO> queryTokensByChainId(String chainId);
