@@ -26,7 +26,7 @@ public class TopTokenPriceService extends ServiceImpl<TopTokenPriceMapper, TopTo
     @Autowired
     private TopTokenMapper topTokenMapper;
 
-//    @Autowired
+    @Autowired
     private RestTemplate restTemplate;
 
     /**
