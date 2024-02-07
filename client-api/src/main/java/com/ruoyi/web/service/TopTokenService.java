@@ -98,19 +98,18 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             TopChain topChain = topChainOpt.get();
             String rpcEndpoint = topChain.getRpcEndpoint();
             topTransaction.setRpcEndpoint(rpcEndpoint);
+            String receiveAddress = topChain.getReceiveAddress();
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
             String hash = rechargeBody.getHash();
             topTransaction.setHash(hash);
             //通过hash获取交易
-            Optional<TransactionReceipt> transactionReceiptOptional = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
-            if (!transactionReceiptOptional.isPresent()) {
-                log.warn("get transactionReceiptOptional error! hash value:{}", hash);
-                return AjaxResult.error("get transactionReceiptOptional error!");
+            Optional<Transaction> transactionOptional = web3j.ethGetTransactionByHash(hash).send().getTransaction();
+            if (!transactionOptional.isPresent()) {
+                return AjaxResult.error("get transaction error!");
             }
-            log.info("transactionReceiptOptional is:{}", transactionReceiptOptional);
-            // 获取用户信息
-            TransactionReceipt transactionReceipt = transactionReceiptOptional.get();
-            String from = transactionReceipt.getFrom();
+            Transaction transaction = transactionOptional.get();
+            String from = transaction.getFrom();
+
             Optional<TopUserEntity> topUserOptional = topUserService.getByWallet(from);
             if (!topUserOptional.isPresent()) {
                 log.warn("user not exist,user address is:{}", from);
@@ -118,22 +117,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             }
             Long userId = topUserOptional.get().getId();
             topTransaction.setUserId(userId);
-
-            String status = transactionReceipt.getStatus();
-            topTransaction.setStatus(status);
-
-            log.info("transactionReceiptOptional status is:{}", status);
-            if (!"0x1".equals(status)) {
-                return AjaxResult.error("transaction not success!");
-            }
-            if (transactionReceipt.getLogs().size() == 0) {
-                throw new ServiceException("transaction have no logs");
-            }
-            Optional<Transaction> transactions = web3j.ethGetTransactionByHash(hash).send().getTransaction();
-            if (!transactions.isPresent()) {
-                return AjaxResult.error("get transaction error!");
-            }
-            Transaction transaction = transactions.get();
+            // 设置充值状态为未成功.事务成功状态为0x1
+            topTransaction.setStatus("0x0");
 
             // 获取币种信息
             Optional<TopToken> topTokenOpt = this.queryTokenBySymbol(rechargeBody.getTokenSymbol());
@@ -150,9 +135,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             }
             String erc20AddressConfig = topTokenChainVOOptional.get().getErc20Address();
             String erc20Address = transaction.getTo();
+            // 如果该币种不是对应的这个erc20的地址.则该笔充值为伪造的充值.
             if (!erc20AddressConfig.equalsIgnoreCase(erc20Address)) {
-                log.warn("erc20 address error! erc20AddressConfig is:{},erc20Address is:{}", erc20AddressConfig, erc20Address);
-                return AjaxResult.error("recharge chain error");
+                log.error("erc20 address error! erc20AddressConfig is:{},erc20Address is:{}", erc20AddressConfig, erc20Address);
+                return AjaxResult.error("recharge chain erc20 address not match error");
             }
             String jsonString = JSONObject.toJSONString(transaction);
             log.info("jsonString is:{}", jsonString);
@@ -165,7 +151,11 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Method refMethod = TypeDecoder.class.getDeclaredMethod("decode", String.class, int.class, Class.class);
             refMethod.setAccessible(true);
             Address address = (Address) refMethod.invoke(null, to, 0, Address.class);
-            log.info("address is:{}", address.toString());
+            log.info("address is transfer address???:{}", address.getValue());
+            // TODO 检查项目方的地址
+            if(!receiveAddress.equalsIgnoreCase(address.getValue())){
+                return AjaxResult.error("the address is not the project wallet address");
+            }
             Uint256 amount = (Uint256) refMethod.invoke(null, value, 0, Uint256.class);
             BigDecimal pow = new BigDecimal(10).pow(topToken.getDecimals());
             BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow, 10, 1);
@@ -190,6 +180,28 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         return ajax;
     }
 
+    private boolean validateTransactionReceipt(String hash,Web3j web3j)throws Exception{
+        Optional<TransactionReceipt> transactionReceiptOptional = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
+        if (!transactionReceiptOptional.isPresent()) {
+            log.error("get transactionReceiptOptional error! hash value:{}", hash);
+            return false;
+//            throw new ServiceException("get transactionReceiptOptional error!");
+        }
+        log.info("transactionReceiptOptional is:{}", transactionReceiptOptional);
+        // 获取用户信息
+        TransactionReceipt transactionReceipt = transactionReceiptOptional.get();
+        String status = transactionReceipt.getStatus();
+        if (!"0x1".equals(status)) {
+            log.error("transaction not success!");
+            return false;
+        }
+        if (transactionReceipt.getLogs().size() == 0) {
+            log.error("transaction have no logs");
+            return false;
+        }
+        return true;
+    }
+
     public Optional<TopTokenChainVO> queryTokenByTokenIdAndChainId(Integer tokenId, Long chainId) {
         return this.baseMapper.queryTokenByTokenIdAndChainId(tokenId, chainId);
     }
@@ -206,6 +218,53 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         });
     }
 
+//    @Transactional(rollbackFor = Exception.class)
+//    public boolean confirmRechargeToken(String hash) {
+//        try {
+//            Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(hash);
+//            if (!topTransactionOptional.isPresent()) {
+//                throw new ServiceException("transaction not exist!");
+//            }
+//            TopTransaction topTransaction = topTransactionOptional.get();
+//            // 重复检查transaction是否已经确认交易.
+//            if (topTransaction.getIsConfirm() == 0) {
+//                throw new ServiceException("transaction had been confirmed!");
+//            }
+//            String rpcEndpoint = topTransaction.getRpcEndpoint();
+//            Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+//            //获取当前的区块高度
+//            EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
+//            BigInteger currentHeight = ethBlockNumber.getBlockNumber();
+//            BigInteger topTransactionHeight = topTransaction.getHeight();
+//            //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
+//            if (currentHeight.compareTo(topTransactionHeight.add(BigInteger.valueOf(topTransaction.getBlockConfirm()))) == 1) {
+//                topTransaction.setIsConfirm(0);
+//                Long userId = topTransaction.getUserId().longValue();
+//                accountService.processAccount(
+//                        Arrays.asList(
+//                                AccountRequest.builder()
+//                                        .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.RECHARGE_IN.typeCode))
+//                                        .userId(userId)
+//                                        .token(topTransaction.getSymbol())
+//                                        .fee(BigDecimal.ZERO)
+//                                        .balanceChanged(topTransaction.getTokenAmount())
+//                                        .balanceTxType(Account.Balance.AVAILABLE)
+//                                        .txType(Account.TxType.RECHARGE_IN)
+//                                        .remark("充值")
+//                                        .build()
+//                        )
+//                );
+//                topTransactionService.updateConfirm(topTransaction);
+//            } else {
+//                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
+//            }
+//            return true;
+//        } catch (Exception e) {
+//            log.error("confirmRechargeToken error:", e);
+//            throw new ServiceException(e);
+//        }
+//    }
+
     @Transactional(rollbackFor = Exception.class)
     public boolean confirmRechargeToken(String hash) {
         try {
@@ -214,24 +273,22 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 throw new ServiceException("transaction not exist!");
             }
             TopTransaction topTransaction = topTransactionOptional.get();
-            // 重复检查transaction是否已经确认交易.
+            // 重复检查transaction是否已经确认交易.已经充值的transaction防止用户重复充值
             if (topTransaction.getIsConfirm() == 0) {
                 throw new ServiceException("transaction had been confirmed!");
             }
             String rpcEndpoint = topTransaction.getRpcEndpoint();
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
-            //获取当前的区块高度
-            EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
-            BigInteger currentHeight = ethBlockNumber.getBlockNumber();
-            BigInteger topTransactionHeight = topTransaction.getHeight();
+
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
-            if (currentHeight.compareTo(topTransactionHeight.add(BigInteger.valueOf(topTransaction.getBlockConfirm()))) == 1) {
+            if (validateTransactionReceipt(hash,web3j)) {
                 topTransaction.setIsConfirm(0);
+                topTransaction.setStatus("0x1");
                 Long userId = topTransaction.getUserId().longValue();
                 accountService.processAccount(
                         Arrays.asList(
                                 AccountRequest.builder()
-                                        .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.RECHARGE_IN.typeCode))
+                                        .uniqueId(hash.concat("_" + userId).concat("_" + Account.TxType.RECHARGE_IN.typeCode))
                                         .userId(userId)
                                         .token(topTransaction.getSymbol())
                                         .fee(BigDecimal.ZERO)
@@ -242,16 +299,25 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                         .build()
                         )
                 );
+
                 topTransactionService.updateConfirm(topTransaction);
             } else {
-                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
+                //获取当前的区块高度
+                EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
+                BigInteger currentHeight = ethBlockNumber.getBlockNumber();
+                BigInteger topTransactionHeight = topTransaction.getHeight();
+                // 如果已经超过了确认高度,则不再重复进行确认操作.承认这笔操作失败.
+                if (currentHeight.compareTo(topTransactionHeight.add(BigInteger.valueOf(topTransaction.getBlockConfirm()))) < 0){
+                    systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
+                    topTransaction.setIsConfirm(2);
+                    topTransactionService.updateById(topTransaction);
+                }
             }
             return true;
         } catch (Exception e) {
             log.error("confirmRechargeToken error:", e);
             throw new ServiceException(e);
         }
-
     }
 
     @Transactional
