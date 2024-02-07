@@ -8,43 +8,43 @@ import java.math.BigDecimal;
 @Data
 public class AccountTxVO {
 
-    @Schema(name="主键")
+    @Schema(description="主键")
     private Long id;
 
-    @Schema(name="会员ID")
+    @Schema(description="会员ID")
     private Long userId;
 
-    @Schema(name="资产ID")
+    @Schema(description="资产ID")
     private Long accountId;
 
-    @Schema(name="代币")
+    @Schema(description="代币")
     private String symbol;
 
-    @Schema(name="交易金额")
+    @Schema(description="交易金额")
     private BigDecimal amount;
 
-    @Schema(name="手续费")
+    @Schema(description="手续费")
     private BigDecimal fee;
 
-    @Schema(name="变动之前")
+    @Schema(description="变动之前")
     private BigDecimal balanceBefore;
 
-    @Schema(name="变动之后")
+    @Schema(description="变动之后")
     private BigDecimal balanceAfter;
 
-    @Schema(name="流水号")
+    @Schema(description="流水号")
     private String transactionNo;
 
-    @Schema(name="资产类型(available = 可用, frozen = 冻结,lockup = 限制)")
+    @Schema(description="资产类型(available = 可用, frozen = 冻结,lockup = 限制)")
     private String balanceType;
 
-    @Schema(name="流水类型")
+    @Schema(description="流水类型")
     private String txType;
 
-    @Schema(name="第三方号")
+    @Schema(description="第三方号")
     private String refNo;
 
-    @Schema(name="备注")
+    @Schema(description="备注")
     private String remark;
 
 }
