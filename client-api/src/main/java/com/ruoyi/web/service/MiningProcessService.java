@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 @Slf4j
@@ -20,13 +18,13 @@ public class MiningProcessService {
     private TopUserMapper userMapper;
 
     @Autowired
+    private TopPowerOrderService powerOrderService;
+
+    @Autowired
     private TopMiningDailyIncomeService dailyIncomeService;
 
     @Autowired
     private TopMiningSharingIncomeService sharingIncomeService;
-
-    @Autowired
-    private TopPowerOrderService powerOrderService;
 
 
     /**
@@ -41,6 +39,7 @@ public class MiningProcessService {
     public void process(LocalDate processDate) {
         List<UserVO> userVOList = userMapper.selectProcessVO();
         powerOrderService.process(userVOList, processDate);
-
+        dailyIncomeService.process(userVOList, processDate);
+        sharingIncomeService.process(userVOList, processDate);
     }
 }
