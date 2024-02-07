@@ -25,40 +25,40 @@ public class TopTransaction extends BaseEntity
     private Long id;
 
     /** 链类型 */
-    @Schema(name = "链hash")
+    @Schema(description = "链hash")
     private String hash;
 
     /** rpc 节点url */
-    @Schema(name = "节点id")
+    @Schema(description = "节点id")
     private Long chainId;
 
     /** 在多少个区块确认之后 才确认充值成功 */
-    @Schema(name = "币种id")
+    @Schema(description = "币种id")
     private Integer tokenId;
 
     /** 链id */
-    @Schema(name = "链rpc节点")
+    @Schema(description = "链rpc节点")
     private String rpcEndpoint;
 
-    @Schema(name = "事务状态")
+    @Schema(description = "事务状态")
     private String status;
 
-    @Schema(name = "token标记")
+    @Schema(description = "token标记")
     private String symbol;
 
-    @Schema(name = "充值数量")
+    @Schema(description = "充值数量")
     private BigDecimal tokenAmount;
 
-    @Schema(name = "充值是否成功标价,0:充值成功,1:充值失败")
+    @Schema(description = "充值是否成功标价,0:充值成功,1:充值失败")
     private Integer isConfirm;
 
-    @Schema(name = "事务区块高度")
+    @Schema(description = "事务区块高度")
     private BigInteger height;
 
-    @Schema(name = "用户id")
+    @Schema(description = "用户id")
     private Long userId;
 
-    @Schema(name = "用户id")
+    @Schema(description = "用户id")
     private Long blockConfirm;
 
 

@@ -24,13 +24,13 @@ public class ClaimBody extends SignBaseEntity
     /**
      * 用户签名后信息
      */
-    @Schema(name="链id", example= "11155111")
+    @Schema(description="链id", example= "11155111")
     private Long chainId;
 
     /**
      * 币种标记
      */
-    @Schema(name="币种标记", example= "SUI")
+    @Schema(description="币种标记", example= "SUI")
     private String symbol;
 
 

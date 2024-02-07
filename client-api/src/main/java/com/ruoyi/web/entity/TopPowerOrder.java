@@ -28,36 +28,36 @@ public class TopPowerOrder extends BaseEntity {
     /**
      * 链类型
      */
-    @Schema(name = "购买金额,价格乘以购买数量等于购买金额")
+    @Schema(description = "购买金额,价格乘以购买数量等于购买金额")
     private BigDecimal amount;
 
-    @Schema(name = "产出周期")
+    @Schema(description = "产出周期")
     private Integer period;
 
     /**
      * rpc 节点url
      */
-    @Schema(name = "购买台数")
+    @Schema(description = "购买台数")
     private BigDecimal number;
 
     /**
      * 在多少个区块确认之后 才确认充值成功
      */
-    @Schema(name = "产出币种")
+    @Schema(description = "产出币种")
     private String outputSymbol;
 
     /**
      * 链id
      */
-    @Schema(name = "产出比例")
+    @Schema(description = "产出比例")
     private BigDecimal outputRatio;
 
-    @Schema(name = "预计总产出")
+    @Schema(description = "预计总产出")
     private BigDecimal expectedTotalOutput;
 
-    @Schema(name = "退出时间")
+    @Schema(description = "退出时间")
     private LocalDate endTime;
 
-    @Schema(name = "訂單編號")
+    @Schema(description = "訂單編號")
     private String orderNo;
 }

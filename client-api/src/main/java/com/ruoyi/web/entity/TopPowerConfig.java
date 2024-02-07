@@ -24,19 +24,19 @@ public class TopPowerConfig extends BaseEntity
     private Long id;
 
     /** 链类型 */
-    @Schema(name = "算力购买价格")
+    @Schema(description = "算力购买价格")
     private BigDecimal price;
 
     /** rpc 节点url */
-    @Schema(name = "算力周期")
+    @Schema(description = "算力周期")
     private Integer period;
 
     /** 在多少个区块确认之后 才确认充值成功 */
-    @Schema(name = "产出币种")
+    @Schema(description = "产出币种")
     private String outputSymbol;
 
     /** 链id */
-    @Schema(name = "产出比例")
+    @Schema(description = "产出比例")
     private BigDecimal outputRatio;
 
 
