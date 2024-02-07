@@ -34,6 +34,9 @@ public class TopUserEntity {
     @Schema(description = "邀请人的邀请码")
     private String invitedUserCode;
 
+    @Schema(description = "邀请人的ID")
+    private Long invitedUserId;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;

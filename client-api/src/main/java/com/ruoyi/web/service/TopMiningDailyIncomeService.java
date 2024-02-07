@@ -21,6 +21,9 @@ public class TopMiningDailyIncomeService extends ServiceImpl<TopMiningDailyIncom
      */
     @Transactional(rollbackFor = Exception.class)
     public void process(List<UserVO> userVOList, LocalDate processDate) {
+        for (int i = 0; i < userVOList.size(); i++) {
+            UserVO userVO = userVOList.get(i);
 
+        }
     }
 }

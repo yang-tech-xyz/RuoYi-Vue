@@ -110,7 +110,8 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
      * 处理订单
      */
     public void process(List<UserVO> userVOList, LocalDate processDate) {
-        for (UserVO userVO : userVOList) {
+        for (int i = 0; i < userVOList.size(); i++) {
+            UserVO userVO = userVOList.get(i);
             userVO.setPowerOrders(baseMapper.selectOrderList(userVO.getId(), processDate));
         }
     }
