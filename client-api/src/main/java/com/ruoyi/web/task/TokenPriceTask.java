@@ -16,7 +16,7 @@ public class TokenPriceTask {
      */
     @Scheduled(initialDelay = 1000, fixedDelay = 3000)
     public void refPrice() {
-        service.refPrice();
+        //service.refPrice();
     }
 
 }
