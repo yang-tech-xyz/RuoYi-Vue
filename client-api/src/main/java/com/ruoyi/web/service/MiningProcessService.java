@@ -1,6 +1,7 @@
 package com.ruoyi.web.service;
 
 import com.ruoyi.web.mapper.TopUserMapper;
+import com.ruoyi.web.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -23,6 +25,9 @@ public class MiningProcessService {
     @Autowired
     private TopMiningSharingIncomeService sharingIncomeService;
 
+    @Autowired
+    private TopPowerOrderService powerOrderService;
+
 
     /**
      * 执行总线任务
@@ -34,8 +39,8 @@ public class MiningProcessService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void process(LocalDate processDate) {
-        LocalDateTime processDateTime = LocalDateTime.of(processDate, LocalTime.MIN);
-
+        List<UserVO> userVOList = userMapper.selectProcessVO();
+        powerOrderService.process(userVOList, processDate);
 
     }
 }
