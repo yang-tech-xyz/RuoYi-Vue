@@ -66,9 +66,8 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         if (store.getStatus() != 1) {
             throw new ServiceException("状态错误", 500);
         }
-        if (dto.getAmount().compareTo(store.getMinOrderAmount()) < 0
-                || dto.getAmount().compareTo(store.getMaxOrderAmount()) > 0) {
-            throw new ServiceException("投注金额过小或过大", 500);
+        if (dto.getAmount() % store.getLimitOrderAmount() != 0) {
+            throw new ServiceException("投注金额不是倍数关系", 500);
         }
         BigDecimal tokenPrice = topTokenPriceService.getPrice(store.getSymbol());
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
@@ -83,7 +82,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setSymbol(store.getSymbol());
         order.setIncomeSymbol(store.getIncomeSymbol());
         order.setPrice(tokenPrice);
-        order.setAmount(dto.getAmount());
+        order.setAmount(new BigDecimal(dto.getAmount()));
         order.setRate(store.getRate());
         order.setIncome(order.getAmount().multiply(order.getPrice()).multiply(order.getRate()));
         order.setStoreDate(LocalDateTime.now());
@@ -102,7 +101,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                                 .userId(user.getId())
                                 .token(store.getSymbol())
                                 .fee(BigDecimal.ZERO)
-                                .balanceChanged(dto.getAmount().negate())
+                                .balanceChanged(order.getAmount().negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.STORE_IN)
                                 .remark("存单")

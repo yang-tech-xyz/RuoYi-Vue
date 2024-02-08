@@ -39,13 +39,9 @@ public class TopStore implements Serializable {
     @TableField(value = "income_symbol")
     private String incomeSymbol;
 
-    @Schema(description = "最小投资额")
-    @TableField(value = "min_order_amount")
-    private BigDecimal minOrderAmount;
-
-    @Schema(description = "最大投注额")
-    @TableField(value = "max_order_amount")
-    private BigDecimal maxOrderAmount;
+    @Schema(description = "最低倍数投资额")
+    @TableField(value = "limit_order_amount")
+    private Integer limitOrderAmount;
 
     @Schema(description = "收益利率")
     @TableField(value = "rate")
