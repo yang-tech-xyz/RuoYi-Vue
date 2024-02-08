@@ -3,6 +3,9 @@ package com.ruoyi.web.service;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.cron.timingwheel.SystemTimer;
 import cn.hutool.cron.timingwheel.TimerTask;
+import cn.hutool.crypto.Mode;
+import cn.hutool.crypto.Padding;
+import cn.hutool.crypto.symmetric.AES;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -19,6 +22,7 @@ import com.ruoyi.web.vo.TopTokenChainVO;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.abi.FunctionEncoder;
@@ -39,6 +43,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Numeric;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -72,6 +77,12 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Autowired
     private TopTokenService topTokenService;
+
+    @Autowired
+    private TopPowerConfigService topPowerConfigService;
+
+    @Value("${token.secret}")
+    private String secret;
 
     public List<TopTokenChainVO> queryTokensByChainId(String chainId) {
         return this.baseMapper.queryTokensByChainId(chainId);
@@ -157,7 +168,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 return AjaxResult.error("the address is not the project wallet address");
             }
             Uint256 amount = (Uint256) refMethod.invoke(null, value, 0, Uint256.class);
-            BigDecimal pow = new BigDecimal(10).pow(topToken.getDecimals());
+            BigInteger decimalOfContract = getDecimalOfContract(web3j, erc20AddressConfig, address.getValue());
+            // TODO 修改此处的小数位为合约的小数位.
+            BigDecimal pow = new BigDecimal(10).pow(decimalOfContract.intValue());
             BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow, 10, 1);
             topTransaction.setTokenAmount(tokenAmount);
             topTransaction.setHeight(transaction.getBlockNumber());
@@ -178,6 +191,27 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         }
 
         return ajax;
+    }
+
+    private BigInteger getDecimalOfContract(Web3j web3j,String contractAddress,String from) throws IOException {
+        // Define the function we want to invoke from the smart contract
+        Function function = new Function("decimals", Arrays.asList(),
+                Arrays.asList(new TypeReference<Uint256>() {}));
+
+
+        // Encode it for the contract to understand
+        String encodedFunction = FunctionEncoder.encode(function);
+
+
+        /*
+        Send the request and wait for the response using eth call since
+        it's a read only transaction with no cost associated
+        */
+        EthCall response = web3j.ethCall(
+                org.web3j.protocol.core.methods.request.Transaction.createEthCallTransaction(from, contractAddress, encodedFunction),
+                DefaultBlockParameterName.LATEST).send();
+
+        return Numeric.toBigInt(response.getValue());
     }
 
     private boolean validateTransactionReceipt(String hash,Web3j web3j)throws Exception{
@@ -316,6 +350,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             return true;
         } catch (Exception e) {
             log.error("confirmRechargeToken error:", e);
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
             throw new ServiceException(e);
         }
     }
@@ -337,6 +372,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException("account not exist");
         }
         BigDecimal amount = claimBody.getAmount();
+        // 检查账户中的资金是否充足
         if (account.getAvailableBalance().compareTo(amount) < 0) {
             log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), amount);
             throw new ServiceException("account exceed balance");
@@ -380,14 +416,27 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         }
         String rpcEndpoint = optByChainIdOptional.get().getRpcEndpoint();
         String to = wallet; //为了保护资金安全,转账只能转到用户注册的钱包地址
-        BigInteger tokenAmount = amount.multiply(new BigDecimal("10").pow(topToken.getDecimals())).toBigInteger();
+        Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+
+        BigInteger decimalOfContract = getDecimalOfContract(web3j, contractAddress, wallet);
+
+        BigInteger tokenAmount = amount.multiply(new BigDecimal("10").pow(decimalOfContract.intValue())).toBigInteger();
         // TODO get the privateKey;
-        transferToken(contractAddress,rpcEndpoint,"",to,tokenAmount);
+        TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
+        if(topPowerConfig==null){
+            throw new ServiceException("power config is not exist");
+        }
+        String curve = topPowerConfig.getCurve();
+        String iv = "1234567812345678";
+        String key = secret.substring(0,16);
+        AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
+        String s = aes.decryptStr(curve);
+        transferToken(web3j,contractAddress,s,to,tokenAmount);
         return AjaxResult.success("success");
     }
 
-    public void transferToken(String contractAddress,String endPoint,String privateKey,String to,BigInteger amount) throws Exception {
-        Web3j web3j = Web3j.build(new HttpService(endPoint));
+    public void transferToken(Web3j web3j,String contractAddress,String privateKey,String to,BigInteger amount) throws Exception {
+
         BigInteger bigInteger = new BigInteger(privateKey, 16);
         ECKeyPair ecKeyPair = ECKeyPair.create(bigInteger);
         Credentials credentials = Credentials.create(ecKeyPair);
