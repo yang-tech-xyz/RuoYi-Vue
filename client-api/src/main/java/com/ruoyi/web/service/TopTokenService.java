@@ -123,7 +123,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
             Optional<TopUserEntity> topUserOptional = topUserService.getByWallet(from);
             if (!topUserOptional.isPresent()) {
-                log.warn("user not exist,user address is:{}", from);
+                log.error("user not exist,user address is:{}", from);
                 throw new ServiceException("user not exist");
             }
             Long userId = topUserOptional.get().getId();
@@ -151,8 +151,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 log.error("erc20 address error! erc20AddressConfig is:{},erc20Address is:{}", erc20AddressConfig, erc20Address);
                 return AjaxResult.error("recharge chain erc20 address not match error");
             }
-            String jsonString = JSONObject.toJSONString(transaction);
-            log.info("jsonString is:{}", jsonString);
+//            String jsonString = JSONObject.toJSONString(transaction);
+            log.info("transaction is:{}", transaction);
             String inputData = transaction.getInput();
             log.info("input is:{}", inputData);
             String method = inputData.substring(0, 10);
@@ -173,7 +173,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             BigDecimal pow = new BigDecimal(10).pow(decimalOfContract.intValue());
             BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow, 10, 1);
             topTransaction.setTokenAmount(tokenAmount);
-            topTransaction.setHeight(transaction.getBlockNumber());
+            EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
+            BigInteger currentHeight = ethBlockNumber.getBlockNumber();
+            topTransaction.setHeight(currentHeight);
 
             log.info("tokenAmount is:{}", tokenAmount);
             topTransaction.setIsConfirm(1);
