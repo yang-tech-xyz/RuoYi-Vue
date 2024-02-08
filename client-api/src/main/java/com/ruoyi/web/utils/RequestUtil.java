@@ -1,5 +1,6 @@
 package com.ruoyi.web.utils;
 
+import com.ruoyi.web.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
@@ -16,15 +17,15 @@ public class RequestUtil {
             RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
             HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
             if (null == request.getHeader("walletAddress")) {
-                return null;
+                throw new ServiceException("未登录", 500);
             }
             String walletAddress = String.valueOf(request.getHeader("walletAddress"));
             if (StringUtils.isBlank(walletAddress)) {
-                return null;
+                throw new ServiceException("未登录", 500);
             }
             return walletAddress.toLowerCase();
         } catch (Exception ex) {
+            throw ex;
         }
-        return null;
     }
 }
