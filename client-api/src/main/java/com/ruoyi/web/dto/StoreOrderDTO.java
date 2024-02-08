@@ -13,8 +13,8 @@ public class StoreOrderDTO {
     @NotNull
     private Long storeId;
 
-    @Schema(description = "投注金额")
+    @Schema(description = "投注金额:USD")
     @NotNull
-    private BigDecimal amount;
+    private Integer amount;
 
 }

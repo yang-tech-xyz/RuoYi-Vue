@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -71,6 +72,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
             throw new ServiceException("币种价格无法获取", 500);
         }
+        if (dto.getAmount() % store.getLimitOrderAmount() != 0) {
+            throw new ServiceException("请存入整数倍", 500);
+        }
         TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
         TopStoreOrder order = new TopStoreOrder();
@@ -80,10 +84,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setSymbol(store.getSymbol());
         order.setIncomeSymbol(store.getIncomeSymbol());
         order.setPrice(tokenPrice);
-        order.setAmount(dto.getAmount());
-
+        order.setAmount(new BigDecimal(dto.getAmount()).divide(order.getPrice(), 8, RoundingMode.DOWN));
         order.setRate(store.getRate());
-        order.setIncome(order.getAmount().multiply(order.getPrice()).multiply(order.getRate()));
+        order.setIncome(new BigDecimal(dto.getAmount()).multiply(order.getRate()));
         order.setStoreDate(LocalDateTime.now());
         order.setReleaseDate(LocalDate.now().plusDays(store.getPeriod() * 30));
         order.setStatus(Status._1._value);
