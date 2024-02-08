@@ -85,5 +85,16 @@ public class TopUserController {
         return ajax;
     }
 
+    @Operation(description = "获取个人分享数据")
+    @GetMapping("/getInviteInfo")
+    public AjaxResult getInviteInfo() {
+        return AjaxResult.success(topUserService.getInviteInfo(RequestUtil.getWalletAddress()));
+    }
+
+    @Operation(description = "我的分享")
+    @GetMapping("/getInviteList")
+    public AjaxResult getInviteList() {
+        return AjaxResult.success(topUserService.getInviteList(RequestUtil.getWalletAddress()));
+    }
 
 }

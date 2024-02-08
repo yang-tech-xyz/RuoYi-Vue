@@ -82,9 +82,16 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         List<TopAccount> accounts = baseMapper.selectList(new LambdaQueryWrapper<TopAccount>()
                 .eq(TopAccount::getUserId, user.getId())
                 .eq(StringUtils.isNotBlank(symbol), TopAccount::getSymbol, symbol));
+        if (StringUtils.isNotBlank(symbol) && accounts.isEmpty()) {
+            TopAccount account = new TopAccount();
+            account.setSymbol(symbol);
+            account.setAvailableBalance(BigDecimal.ZERO);
+            account.setLockupBalance(BigDecimal.ZERO);
+            account.setFrozenBalance(BigDecimal.ZERO);
+            accounts.add(account);
+        }
         return accounts.stream().map(account -> {
             AccountVO vo = new AccountVO();
-            vo.setMebId(account.getUserId());
             vo.setSymbol(account.getSymbol());
             vo.setAvailableBalance(account.getAvailableBalance());
             vo.setLockupBalance(account.getLockupBalance());

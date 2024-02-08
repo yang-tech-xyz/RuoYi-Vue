@@ -15,4 +15,13 @@
         order by tu.id
     </select>
 
+    <select id="selectInviteListById" resultType="com.ruoyi.web.vo.InviteVO">
+        select tu.wallet,
+               tu.create_time,
+               0 as power
+        from top_user tu
+        where tu.invited_user_id = #{id}
+        order by tu.id
+    </select>
+
 </mapper>
