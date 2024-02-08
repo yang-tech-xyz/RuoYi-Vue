@@ -59,15 +59,13 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
 
     /**
      * 存单
+     * 1.存入币种的金额，必须是100U的倍数
      */
     @Transactional(rollbackFor = Exception.class)
     public Boolean order(String walletAddress, StoreOrderDTO dto) {
         TopStore store = storeMapper.selectById(dto.getStoreId());
         if (store.getStatus() != 1) {
             throw new ServiceException("状态错误", 500);
-        }
-        if (dto.getAmount() % store.getLimitOrderAmount() != 0) {
-            throw new ServiceException("投注金额不是倍数关系", 500);
         }
         BigDecimal tokenPrice = topTokenPriceService.getPrice(store.getSymbol());
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
@@ -82,7 +80,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setSymbol(store.getSymbol());
         order.setIncomeSymbol(store.getIncomeSymbol());
         order.setPrice(tokenPrice);
-        order.setAmount(new BigDecimal(dto.getAmount()));
+        order.setAmount(dto.getAmount());
         order.setRate(store.getRate());
         order.setIncome(order.getAmount().multiply(order.getPrice()).multiply(order.getRate()));
         order.setStoreDate(LocalDateTime.now());
