@@ -3,10 +3,12 @@
 <mapper namespace="com.ruoyi.web.mapper.TopStoreMapper">
 
     <select id="selectValidList" resultType="com.ruoyi.web.vo.StoreVO">
-        select *
-        from top_store
-        where status = 1
-        order by id
+        select
+            ts.*,
+            (select _ttp.price from top_token_price _ttp where _ttp.symbol =ts.symbol ) as price
+        from top_store ts
+        where ts.status = 1
+        order by ts.id
     </select>
 
 </mapper>

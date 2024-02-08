@@ -81,6 +81,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setIncomeSymbol(store.getIncomeSymbol());
         order.setPrice(tokenPrice);
         order.setAmount(dto.getAmount());
+
         order.setRate(store.getRate());
         order.setIncome(order.getAmount().multiply(order.getPrice()).multiply(order.getRate()));
         order.setStoreDate(LocalDateTime.now());

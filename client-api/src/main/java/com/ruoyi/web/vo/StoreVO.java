@@ -23,13 +23,12 @@ public class StoreVO {
     @Schema(description = "收益币种")
     private String incomeSymbol;
 
-    @Schema(description = "最小投资额")
-    private BigDecimal minOrderAmount;
-
-    @Schema(description = "最大投注额")
-    private BigDecimal maxOrderAmount;
+    @Schema(description = "最低倍数投资额")
+    private Integer limitOrderAmount;
 
     @Schema(description = "收益利率")
     private BigDecimal rate;
+
+    private BigDecimal price = BigDecimal.ZERO;
 
 }
