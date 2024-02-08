@@ -2,7 +2,10 @@ package com.ruoyi.common;
 
 
 import com.ruoyi.web.utils.StringUtils;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -11,7 +14,7 @@ import java.util.Objects;
  * 
  * @author ruoyi
  */
-public class AjaxResult<T> extends HashMap<String, Object>
+public class AjaxResult<T> implements Serializable
 {
     private static final long serialVersionUID = 1L;
 
@@ -23,6 +26,18 @@ public class AjaxResult<T> extends HashMap<String, Object>
 
     /** 数据对象 */
     public static final String DATA_TAG = "data";
+
+    @Getter
+    @Setter
+    private int code;
+
+    @Getter
+    @Setter
+    private String msg;
+
+    @Getter
+    @Setter
+    private T data;
 
     /**
      * 初始化一个新创建的 AjaxResult 对象，使其表示一个空消息。
@@ -39,8 +54,8 @@ public class AjaxResult<T> extends HashMap<String, Object>
      */
     public AjaxResult(int code, String msg)
     {
-        super.put(CODE_TAG, code);
-        super.put(MSG_TAG, msg);
+        this.code=code;
+        this.msg=msg;
     }
 
     /**
@@ -52,12 +67,9 @@ public class AjaxResult<T> extends HashMap<String, Object>
      */
     public  AjaxResult(int code, String msg, T data)
     {
-        super.put(CODE_TAG, code);
-        super.put(MSG_TAG, msg);
-        if (StringUtils.isNotNull(data))
-        {
-            super.put(DATA_TAG, data);
-        }
+        this.code=code;
+        this.msg=msg;
+        this.data = data;
     }
 
     /**
@@ -169,36 +181,6 @@ public class AjaxResult<T> extends HashMap<String, Object>
     public static AjaxResult error(int code, String msg)
     {
         return new AjaxResult(code, msg, null);
-    }
-
-    /**
-     * 是否为成功消息
-     *
-     * @return 结果
-     */
-    public boolean isSuccess()
-    {
-        return Objects.equals(HttpStatus.SUCCESS, this.get(CODE_TAG));
-    }
-
-    /**
-     * 是否为警告消息
-     *
-     * @return 结果
-     */
-    public boolean isWarn()
-    {
-        return Objects.equals(HttpStatus.WARN, this.get(CODE_TAG));
-    }
-
-    /**
-     * 是否为错误消息
-     *
-     * @return 结果
-     */
-    public boolean isError()
-    {
-        return Objects.equals(HttpStatus.ERROR, this.get(CODE_TAG));
     }
 
 }

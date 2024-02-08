@@ -30,11 +30,11 @@ public class TopUserController {
     @Autowired
     private TopUserService topUserService;
 
-    @Operation(summary = "用户查询",description = "用户查询")
+    @Operation(summary = "用户查询", description = "用户查询")
     @GetMapping("")
-    public AjaxResult<TopUserEntity> queryUser(@RequestHeader("WalletAddress") String walletAddress){
+    public AjaxResult<TopUserEntity> queryUser(@RequestHeader(value = "WalletAddress", defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398") String walletAddress) {
         Optional<TopUserEntity> topUserEntityOptional = topUserService.getByWallet(walletAddress);
-        if(!topUserEntityOptional.isPresent()){
+        if (!topUserEntityOptional.isPresent()) {
             throw new ServiceException("user not exist!");
         }
         TopUserEntity topUserEntity = topUserEntityOptional.get();
