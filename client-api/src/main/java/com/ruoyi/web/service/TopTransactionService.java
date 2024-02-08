@@ -15,7 +15,7 @@ import java.util.Optional;
 public class TopTransactionService extends ServiceImpl<TopTransactionMapper, TopTransaction> {
     public List<TopTransaction> queryUnConfirm() {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getIsConfirm,1);
+        query.eq(TopTransaction::getIsConfirm,0);
         return this.list(query);
     }
 

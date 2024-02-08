@@ -178,7 +178,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setHeight(currentHeight);
 
             log.info("tokenAmount is:{}", tokenAmount);
-            topTransaction.setIsConfirm(1);
+            topTransaction.setIsConfirm(0);
             topTransaction.setCreateTime(LocalDateTime.now());
             topTransaction.setUpdateTime(LocalDateTime.now());
             topTransaction.setCreateBy(userId.toString());
@@ -310,7 +310,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             }
             TopTransaction topTransaction = topTransactionOptional.get();
             // 重复检查transaction是否已经确认交易.已经充值的transaction防止用户重复充值
-            if (topTransaction.getIsConfirm() == 0) {
+            if (topTransaction.getIsConfirm() == 1) {
                 throw new ServiceException("transaction had been confirmed!");
             }
             String rpcEndpoint = topTransaction.getRpcEndpoint();
@@ -318,7 +318,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
             if (validateTransactionReceipt(hash,web3j)) {
-                topTransaction.setIsConfirm(0);
+                topTransaction.setIsConfirm(1);
                 topTransaction.setStatus("0x1");
                 Long userId = topTransaction.getUserId().longValue();
                 accountService.processAccount(
