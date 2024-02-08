@@ -2,18 +2,17 @@ package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.NumbersUtils;
+import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.WalletRegisterBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 import java.time.LocalDateTime;
@@ -31,6 +30,16 @@ public class TopUserController {
     @Autowired
     private TopUserService topUserService;
 
+    @Operation(summary = "用户查询",description = "用户查询")
+    @GetMapping("")
+    public AjaxResult<TopUserEntity> queryUser(@RequestHeader("WalletAddress") String walletAddress){
+        Optional<TopUserEntity> topUserEntityOptional = topUserService.getByWallet(walletAddress);
+        if(!topUserEntityOptional.isPresent()){
+            throw new ServiceException("user not exist!");
+        }
+        TopUserEntity topUserEntity = topUserEntityOptional.get();
+        return AjaxResult.success(topUserEntity);
+    }
 
     /**
      * 用户注册
