@@ -8,9 +8,6 @@ import java.math.BigDecimal;
 @Data
 public class AccountVO {
 
-    @Schema(description="会员ID")
-    private Long mebId;
-
     @Schema(description="代币")
     private String symbol;
 

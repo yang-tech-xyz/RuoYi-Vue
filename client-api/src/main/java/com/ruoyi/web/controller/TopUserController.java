@@ -4,16 +4,14 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.NumbersUtils;
+import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.WalletRegisterBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 import java.time.LocalDateTime;
@@ -76,5 +74,16 @@ public class TopUserController {
         return ajax;
     }
 
+    @Operation(description = "获取个人分享数据")
+    @GetMapping("/getInviteInfo")
+    public AjaxResult getInviteInfo() {
+        return AjaxResult.success(topUserService.getInviteInfo(RequestUtil.getWalletAddress()));
+    }
+
+    @Operation(description = "我的分享")
+    @GetMapping("/getInviteList")
+    public AjaxResult getInviteList() {
+        return AjaxResult.success(topUserService.getInviteList(RequestUtil.getWalletAddress()));
+    }
 
 }
