@@ -1,7 +1,10 @@
 package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
+import com.ruoyi.web.entity.TopTransaction;
+import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.TopTokenService;
+import com.ruoyi.web.service.TopTransactionService;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.ClaimBody;
 import com.ruoyi.web.vo.RechargeBody;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 充值
@@ -30,6 +34,9 @@ public class TopCoinController
 
     @Autowired
     private TopTokenService topTokenService;
+
+    @Autowired
+    private TopTransactionService topTransactionService;
 
     @Operation(summary = "根据链id查询所有支持的token")
     @GetMapping("queryTokensByChainId")
@@ -48,6 +55,10 @@ public class TopCoinController
     @Operation(summary = "充值到账")
     @PostMapping("/recharge")
     public AjaxResult recharge(@RequestBody RechargeBody rechargeBody)throws Exception{
+        Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(rechargeBody.getHash());
+        if (topTransactionOptional.isPresent()) {
+            return AjaxResult.error("transaction has exist!");
+        }
         return topTokenService.recharge(rechargeBody);
     }
 

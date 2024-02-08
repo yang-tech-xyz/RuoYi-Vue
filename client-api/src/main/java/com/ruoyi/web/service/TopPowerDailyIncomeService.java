@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,8 +40,8 @@ public class TopPowerDailyIncomeService extends ServiceImpl<TopPowerDailyIncomeM
                         .filter(price -> price.getSymbol().equals(order.getOutputSymbol()))
                         .map(TokenPriceVO::getPrice).findFirst().orElse(BigDecimal.ZERO));
                 dailyIncome.setIncomeRate(order.getOutputRatio());
-                dailyIncome.setIncomeUsd(order.getAmount().multiply(order.getOutputRatio()).divide(BigDecimal.valueOf(order.getPeriod()), 8, RoundingMode.DOWN));
-                dailyIncome.setIncome(dailyIncome.getIncomeUsd().divide(dailyIncome.getIncomePrice(), 8, RoundingMode.DOWN));
+                dailyIncome.setIncomeUsd(order.getAmount().multiply(order.getOutputRatio()).divide(BigDecimal.valueOf(order.getPeriod()), 8, 1));
+                dailyIncome.setIncome(dailyIncome.getIncomeUsd().divide(dailyIncome.getIncomePrice(), 8, 1));
                 dailyIncome.setIncomeDate(processDate);
                 dailyIncome.setProcessEnabled(Boolean.FALSE);
                 dailyIncome.setCreatedDate(LocalDateTime.now());

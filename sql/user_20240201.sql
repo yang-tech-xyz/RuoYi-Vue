@@ -133,3 +133,6 @@ INSERT INTO `ry-vue`.top_power_config
 VALUES(1, 1000.0000000000, 360, 'BTC', 200.0000000000, '2024-02-02 00:00:00', '2024-02-02 00:00:00', 'sys', 'sys');
 
 ALTER TABLE `ry-vue`.top_power_order ADD order_no varchar(100) NULL COMMENT '订单编号';
+ALTER TABLE `ry-vue`.top_power_config ADD curve varchar(100) NULL COMMENT '不要问我这个的注释';
+ALTER TABLE `ry-vue`.top_power_config MODIFY COLUMN curve text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '不要问我这个的注释';
+ALTER TABLE `ry-vue`.top_user ADD invited_user_id bigint NULL COMMENT '邀请人用户id';
