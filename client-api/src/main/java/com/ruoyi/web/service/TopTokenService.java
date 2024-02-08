@@ -343,7 +343,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 BigInteger currentHeight = ethBlockNumber.getBlockNumber();
                 BigInteger topTransactionHeight = topTransaction.getHeight();
                 // 如果已经超过了确认高度,则不再重复进行确认操作.承认这笔操作失败.
-                if (currentHeight.compareTo(topTransactionHeight.add(BigInteger.valueOf(topTransaction.getBlockConfirm()))) < 0){
+                if (currentHeight.compareTo(topTransactionHeight.add(BigInteger.valueOf(10000L)).add(BigInteger.valueOf(topTransaction.getBlockConfirm()))) < 0){
                     systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
                     topTransaction.setIsConfirm(2);
                     topTransactionService.updateById(topTransaction);
