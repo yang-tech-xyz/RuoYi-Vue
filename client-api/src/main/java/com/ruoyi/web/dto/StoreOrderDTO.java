@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 @Data
 public class StoreOrderDTO {
 
-    @Schema(name="产品ID")
+    @Schema(description = "产品ID")
     @NotNull
     private Long storeId;
 
-    @Schema(name="投注金额")
+    @Schema(description = "投注金额")
     @NotNull
     private BigDecimal amount;
 

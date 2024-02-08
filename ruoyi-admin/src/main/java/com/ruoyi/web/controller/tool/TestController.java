@@ -118,16 +118,16 @@ public class TestController extends BaseController
 @ApiModel(value = "UserEntity", description = "用户实体")
 class UserEntity
 {
-    @Schema(name="用户ID")
+    @Schema(description="用户ID")
     private Integer userId;
 
-    @Schema(name="用户名称")
+    @Schema(description="用户名称")
     private String username;
 
-    @Schema(name="用户密码")
+    @Schema(description="用户密码")
     private String password;
 
-    @Schema(name="用户手机")
+    @Schema(description="用户手机")
     private String mobile;
 
     public UserEntity()
