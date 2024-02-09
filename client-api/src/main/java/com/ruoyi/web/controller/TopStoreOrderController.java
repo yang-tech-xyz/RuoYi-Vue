@@ -5,6 +5,8 @@ import com.ruoyi.web.dto.StoreOrderDTO;
 import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.service.TopStoreOrderService;
 import com.ruoyi.web.utils.RequestUtil;
+import com.ruoyi.web.vo.PageVO;
+import com.ruoyi.web.vo.StoreOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +40,7 @@ public class TopStoreOrderController {
 
     @Operation(summary = "查询订单")
     @GetMapping("/getPage")
-    public AjaxResult getPage(@ModelAttribute StoreOrderPageDTO dto) {
+    public AjaxResult<PageVO<StoreOrderVO>> getPage(@ModelAttribute StoreOrderPageDTO dto) {
         return AjaxResult.success(service.getPage(RequestUtil.getWalletAddress(), dto));
     }
 

@@ -49,7 +49,7 @@ public class StoreOrderVO {
     @Schema(description="领取时间")
     private LocalDateTime redeemDate;
 
-    @Schema(description="状态：1=收益中，2=已领取")
+    @Schema(description="状态：1=收益中，2=已赎回")
     private Integer status;
 
 

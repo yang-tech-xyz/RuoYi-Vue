@@ -6,7 +6,14 @@
         select *
         from top_power_order
         where user_id = #{userId}
-          and end_time <![CDATA[ > ]]> #{processDate}
+          and end_date <![CDATA[ > ]]> #{processDate}
+    </select>
+
+    <select id="selectPageVO" resultType="com.ruoyi.web.vo.PowerOrderVO">
+        select tpo.*
+        from top_user tu
+                 inner join top_power_order tpo on tu.id = tpo.user_id
+        where tu.wallet = #{walletAddress}
     </select>
 
 </mapper>

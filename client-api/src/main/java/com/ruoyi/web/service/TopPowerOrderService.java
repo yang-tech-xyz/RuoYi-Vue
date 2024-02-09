@@ -1,8 +1,11 @@
 package com.ruoyi.web.service;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.dto.AccountRequest;
+import com.ruoyi.web.dto.PowerOrderPageDTO;
 import com.ruoyi.web.entity.TopAccount;
 import com.ruoyi.web.entity.TopPowerConfig;
 import com.ruoyi.web.entity.TopPowerOrder;
@@ -12,6 +15,8 @@ import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
 import com.ruoyi.web.vo.BuyPowerBody;
+import com.ruoyi.web.vo.PageVO;
+import com.ruoyi.web.vo.PowerOrderVO;
 import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +65,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         topPowerOrder.setOutputSymbol(topPowerConfig.getOutputSymbol());
         topPowerOrder.setPeriod(topPowerConfig.getPeriod());
         topPowerOrder.setOutputRatio(topPowerConfig.getOutputRatio());
-        topPowerOrder.setEndTime(LocalDate.now().plusDays(topPowerOrder.getPeriod() + 1));
+        topPowerOrder.setEndDate(LocalDate.now().plusDays(topPowerOrder.getPeriod() + 1));
         topPowerOrder.setCreateTime(LocalDateTime.now());
         topPowerOrder.setUpdateTime(LocalDateTime.now());
         topPowerOrder.setExpectedTotalOutput(buyPowerNeedPayUsdt.multiply(topPowerConfig.getOutputRatio()));
@@ -117,5 +122,16 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
             userVO.setPowerOrders(baseMapper.selectOrderList(userVO.getId(), processDate));
             userVO.setPowerNumber(userVO.getPowerOrders().stream().map(TopPowerOrder::getNumber).mapToInt(num -> num).sum());
         }
+    }
+
+    public PageVO<PowerOrderVO> getPage(String walletAddress, PowerOrderPageDTO dto) {
+        IPage<PowerOrderVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+        iPage = baseMapper.selectPageVO(iPage, walletAddress);
+        PageVO<PowerOrderVO> pageVO = new PageVO<>();
+        pageVO.setPageNum(dto.getPageNum());
+        pageVO.setPageSize(dto.getPageSize());
+        pageVO.setTotal(iPage.getTotal());
+        pageVO.setList(iPage.getRecords());
+        return pageVO;
     }
 }

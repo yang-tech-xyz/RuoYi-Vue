@@ -43,7 +43,7 @@ create table QRTZ_TRIGGERS (
     trigger_state        varchar(16)     not null            comment '触发器状态',
     trigger_type         varchar(8)      not null            comment '触发器的类型',
     start_time           bigint(13)      not null            comment '开始时间',
-    end_time             bigint(13)      null                comment '结束时间',
+    end_date             bigint(13)      null                comment '结束时间',
     calendar_name        varchar(200)    null                comment '日程表名称',
     misfire_instr        smallint(2)     null                comment '补偿执行的策略',
     job_data             blob            null                comment '存放持久化job对象',

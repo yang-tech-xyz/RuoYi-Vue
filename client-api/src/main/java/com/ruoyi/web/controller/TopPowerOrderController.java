@@ -1,21 +1,18 @@
 package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
+import com.ruoyi.web.dto.PowerOrderPageDTO;
 import com.ruoyi.web.service.TopPowerOrderService;
-import com.ruoyi.web.service.TopTokenService;
+import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
-import com.ruoyi.web.vo.BuyPowerBody;
-import com.ruoyi.web.vo.RechargeBody;
-import com.ruoyi.web.vo.TopTokenChainVO;
+import com.ruoyi.web.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
-import java.util.List;
 
 /**
  * 充值
@@ -30,7 +27,7 @@ public class TopPowerOrderController
 {
 
     @Autowired
-    private TopPowerOrderService topPowerOrderService;
+    private TopPowerOrderService service;
 
     @Operation(summary = "购买算力,需要用户签名")
     @PostMapping("buyOrder")
@@ -43,8 +40,14 @@ public class TopPowerOrderController
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
-        topPowerOrderService.buyOrder(buyPowerBody);
+        service.buyOrder(buyPowerBody);
         return AjaxResult.success("success");
+    }
+
+    @Operation(summary = "查询订单")
+    @GetMapping("/getPage")
+    public AjaxResult<PageVO<PowerOrderVO>> getPage(@ModelAttribute PowerOrderPageDTO dto) {
+        return AjaxResult.success(service.getPage(RequestUtil.getWalletAddress(), dto));
     }
 
 
