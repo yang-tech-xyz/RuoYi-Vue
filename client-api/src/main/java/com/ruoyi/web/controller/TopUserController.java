@@ -7,6 +7,7 @@ import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.MiningProcessService;
 import com.ruoyi.web.service.TopTaskProcessService;
+import com.ruoyi.web.service.TopUserInviteService;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.utils.RequestUtil;
@@ -33,8 +34,12 @@ import java.util.Optional;
 @Tag(description = "TopUserController", name = "用户信息")
 @RestController
 public class TopUserController {
+
     @Autowired
     private TopUserService topUserService;
+
+    @Autowired
+    private TopUserInviteService inviteService;
 
     @Operation(summary = "用户查询", description = "用户查询")
     @GetMapping("")
@@ -88,6 +93,8 @@ public class TopUserController {
         // 生成邀请码.
         topUserEntity.setInvitedCode(NumbersUtils.createInvite());
         topUserService.save(topUserEntity);
+        // 绑定邀请数据
+        inviteService.process(topUserEntity.getId(), topUserEntity.getInvitedUserId());
         return ajax;
     }
 

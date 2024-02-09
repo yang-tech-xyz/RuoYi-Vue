@@ -36,4 +36,11 @@
         where tu.wallet = #{walletAddress}
     </select>
 
+    <select id="selectParent" resultType="com.ruoyi.web.entity.TopUserEntity">
+        select
+            tu.*
+        from top_user tu
+        where tu.id = #{parentId}
+    </select>
+
 </mapper>
