@@ -97,6 +97,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
                                 .balanceChanged(payTokenAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.PURCHASE)
+                                .refNo(orderNo)
                                 .remark("支付")
                                 .build()
                 )
