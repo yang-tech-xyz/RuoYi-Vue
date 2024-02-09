@@ -10,7 +10,9 @@
     </select>
 
     <select id="selectPageVO" resultType="com.ruoyi.web.vo.PowerOrderVO">
-        select tpo.*
+        select
+            tpo.*,
+            (select sum(_tpd.income) from top_power_daily_income _tpd where _tpd.order_no = tpo.order_no) as income
         from top_user tu
                  inner join top_power_order tpo on tu.id = tpo.user_id
         where tu.wallet = #{walletAddress}

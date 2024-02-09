@@ -16,6 +16,9 @@ public class StoreOrderVO {
     @Schema(description="产品ID")
     private Long storeId;
 
+    @Schema(description = "产品周期（月）,每月限定30天")
+    private Integer period;
+
     @Schema(description="用户ID")
     private Long userId;
 

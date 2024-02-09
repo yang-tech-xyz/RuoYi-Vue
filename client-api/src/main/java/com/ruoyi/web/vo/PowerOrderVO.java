@@ -39,4 +39,7 @@ public class PowerOrderVO {
     @Schema(description = "退出日期")
     private LocalDate endDate;
 
+    @Schema(description = "累计收益")
+    private BigDecimal income;
+
 }
