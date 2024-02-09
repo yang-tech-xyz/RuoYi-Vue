@@ -47,6 +47,8 @@ user:
 
 # Spring配置
 spring:
+  application:
+    name: clientApi
   main:
     allow-circular-references: true
   # 资源信息

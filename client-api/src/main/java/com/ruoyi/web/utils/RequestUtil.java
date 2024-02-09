@@ -2,11 +2,14 @@ package com.ruoyi.web.utils;
 
 import com.ruoyi.web.exception.ServiceException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+
+@Slf4j
 public class RequestUtil {
 
     /**
@@ -25,6 +28,7 @@ public class RequestUtil {
             }
             return walletAddress.toLowerCase();
         } catch (Exception ex) {
+            log.error("get user wallet address error!",ex);
             throw ex;
         }
     }
