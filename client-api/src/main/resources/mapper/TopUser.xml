@@ -20,8 +20,8 @@
                tu.wallet,
                tu.create_time,
                0 as power
-        from top_user tu
-        where tu.invited_user_id = #{id}
+        from top_user tu inner join top_user_invite ti on tu.id = ti.invite_user_id
+        where ti.user_id = #{id}
         order by tu.id
     </select>
 
