@@ -6,7 +6,7 @@
         select *
         from top_power_order
         where user_id = #{userId}
-          and end_time <![CDATA[ < ]]> #{processDate}
+          and end_time <![CDATA[ > ]]> #{processDate}
     </select>
 
 </mapper>
