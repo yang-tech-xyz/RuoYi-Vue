@@ -1,7 +1,11 @@
 package com.ruoyi.web.controller;
 
+import cn.hutool.core.util.IdUtil;
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.enums.TopNo;
+import com.ruoyi.web.service.MiningProcessService;
+import com.ruoyi.web.service.TopTaskProcessService;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.utils.RequestUtil;
@@ -11,9 +15,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -74,16 +80,35 @@ public class TopUserController {
         return ajax;
     }
 
-    @Operation(description = "获取个人分享数据")
+    @Operation(summary = "获取个人分享数据")
     @GetMapping("/getInviteInfo")
     public AjaxResult getInviteInfo() {
         return AjaxResult.success(topUserService.getInviteInfo(RequestUtil.getWalletAddress()));
     }
 
-    @Operation(description = "我的分享")
+    @Operation(summary = "我的分享")
     @GetMapping("/getInviteList")
     public AjaxResult getInviteList() {
         return AjaxResult.success(topUserService.getInviteList(RequestUtil.getWalletAddress()));
+    }
+
+    @Autowired
+    private TopTaskProcessService taskProcessService;
+
+    @Autowired
+    private MiningProcessService processService;
+
+    @GetMapping("/process")
+    public AjaxResult process(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+                              @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+        while (!start.isAfter(end)) {
+            String processNo = TopNo.PROCESS_NO._code + IdUtil.getSnowflake(TopNo.PROCESS_NO._workId).nextIdStr();
+            taskProcessService.start(processNo, start);
+            processService.process(start);
+            taskProcessService.end(processNo);
+            start = start.plusDays(1);
+        }
+        return AjaxResult.success();
     }
 
 }
