@@ -16,7 +16,7 @@
     </select>
 
     <select id="selectInviteListById" resultType="com.ruoyi.web.vo.InviteVO">
-        select tu.grade,
+        select ti.`level`,
                tu.wallet,
                tu.create_time,
                0 as power
