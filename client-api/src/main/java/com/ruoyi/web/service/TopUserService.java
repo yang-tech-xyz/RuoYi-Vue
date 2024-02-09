@@ -51,7 +51,7 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUserEntity> {
      * 查询用户邀请数据
      */
     public InviteInfoVO getInviteInfo(String walletAddress) {
-        return new InviteInfoVO();
+        return baseMapper.selectInviteInfo(walletAddress);
     }
 
     public List<InviteVO> getInviteList(String walletAddress) {

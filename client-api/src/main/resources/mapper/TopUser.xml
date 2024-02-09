@@ -24,4 +24,15 @@
         order by tu.id
     </select>
 
+    <select id="selectInviteInfo" resultType="com.ruoyi.web.vo.InviteInfoVO">
+        select
+            tu.grade,
+            tu.invited_code,
+            (select _tu.wallet from top_user _tu where _tu.id = tu.invited_user_id) as invitedUserWallet,
+            0 as totalAmount,
+            0 as totalInviteUser
+        from top_user tu
+        where tu.wallet = #{walletAddress}
+    </select>
+
 </mapper>
