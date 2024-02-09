@@ -27,6 +27,9 @@ public class TopUserEntity {
     @Schema(description = "钱包地址")
     private String wallet;
 
+    @Schema(description = "等级")
+    private Integer grade;
+
     @Schema(description = "邀请码")
     private String invitedCode;
 
