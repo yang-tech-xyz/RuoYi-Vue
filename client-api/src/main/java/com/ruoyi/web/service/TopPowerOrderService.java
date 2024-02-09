@@ -1,6 +1,6 @@
 package com.ruoyi.web.service;
 
-import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.TopAccount;
@@ -8,6 +8,7 @@ import com.ruoyi.web.entity.TopPowerConfig;
 import com.ruoyi.web.entity.TopPowerOrder;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.enums.Account;
+import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
 import com.ruoyi.web.vo.BuyPowerBody;
@@ -79,7 +80,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         if (account.getAvailableBalance().compareTo(payTokenAmount) < 0) {
             log.warn("account have no enough money,account info:{}", account);
         }
-        String orderNo = UUID.fastUUID().toString();
+        String orderNo = TopNo.POWER_NO._code + IdUtil.getSnowflake(TopNo.POWER_NO._workId).nextIdStr();
         topPowerOrder.setOrderNo(orderNo);
         Long userId = account.getUserId();
         topPowerOrder.setUserId(userId);
