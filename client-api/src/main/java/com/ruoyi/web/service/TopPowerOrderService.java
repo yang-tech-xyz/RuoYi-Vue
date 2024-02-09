@@ -66,6 +66,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         topPowerOrder.setPeriod(topPowerConfig.getPeriod());
         topPowerOrder.setOutputRatio(topPowerConfig.getOutputRatio());
         topPowerOrder.setEndDate(LocalDate.now().plusDays(topPowerOrder.getPeriod() + 1));
+        topPowerOrder.setOrderDate(LocalDate.now());
         topPowerOrder.setCreateTime(LocalDateTime.now());
         topPowerOrder.setUpdateTime(LocalDateTime.now());
         topPowerOrder.setExpectedTotalOutput(buyPowerNeedPayUsdt.multiply(topPowerConfig.getOutputRatio()));
