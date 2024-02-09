@@ -5,12 +5,15 @@ import com.ruoyi.web.dto.StoreOrderDTO;
 import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.service.TopStoreOrderService;
 import com.ruoyi.web.utils.RequestUtil;
+import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.PageVO;
 import com.ruoyi.web.vo.StoreOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.SignatureException;
 
 @Tag(description = "存币生息订单", name = "存币生息订单")
 @RestController
@@ -29,6 +32,14 @@ public class TopStoreOrderController {
     @Operation(summary = "存单")
     @PostMapping("/order")
     public AjaxResult order(@RequestBody StoreOrderDTO dto) {
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(dto.getSignMsg(),dto.getContent(),dto.getWallet());
+            if(!validateResult){
+                return AjaxResult.error("validate sign error!");
+            }
+        } catch (SignatureException e) {
+            throw new RuntimeException(e);
+        }
         return AjaxResult.success(service.order(RequestUtil.getWalletAddress(), dto));
     }
 
