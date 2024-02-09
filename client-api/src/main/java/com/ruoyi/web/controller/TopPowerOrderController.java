@@ -1,8 +1,12 @@
 package com.ruoyi.web.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.AjaxResult;
+import com.ruoyi.web.entity.TopPowerOrder;
+import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.service.TopPowerOrderService;
 import com.ruoyi.web.service.TopTokenService;
+import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.BuyPowerBody;
 import com.ruoyi.web.vo.RechargeBody;
@@ -10,18 +14,22 @@ import com.ruoyi.web.vo.TopTokenChainVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 充值
  * 
  * @author ruoyi
  */
+@RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/power")
 @Tag(description = "TopPowerOrderController", name = "订单操作")
@@ -29,8 +37,9 @@ import java.util.List;
 public class TopPowerOrderController
 {
 
-    @Autowired
-    private TopPowerOrderService topPowerOrderService;
+    private final TopPowerOrderService topPowerOrderService;
+
+    private final TopUserService topUserService;
 
     @Operation(summary = "购买算力,需要用户签名")
     @PostMapping("buyOrder")
@@ -47,5 +56,16 @@ public class TopPowerOrderController
         return AjaxResult.success("success");
     }
 
+    @Operation(summary = "查询用户的算力订单")
+    @GetMapping("getPowerOrderList")
+    public AjaxResult<Page<TopPowerOrder>> getPowerOrderList(@ParameterObject Page page,@RequestHeader(value = "WalletAddress", defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398") String walletAddress){
+        Optional<TopUserEntity> topUserEntityOptional = topUserService.getByWallet(walletAddress);
+        if(!topUserEntityOptional.isPresent()){
+            log.error("user not exist ,wallet is:{}",walletAddress);
+            return AjaxResult.error("user not exist");
+        }
+        Long userId = topUserEntityOptional.get().getId();
+        return AjaxResult.success(topPowerOrderService.getPowerOrderList(page,userId));
+    }
 
 }

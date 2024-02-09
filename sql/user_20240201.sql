@@ -109,17 +109,21 @@ COLLATE=utf8mb4_0900_ai_ci
 COMMENT='算力配置表';
 
 CREATE TABLE `ry-vue`.top_power_order (
-	id bigint primary key auto_increment NOT NULL COMMENT 'id',
-	amount decimal(20,10) NULL COMMENT '购买金额,价格乘以购买数量等于购买金额',
-	`number` int NULL COMMENT '购买台数',
-	output_symbol varchar(100) NULL,
-	period int NULL COMMENT '产出周期,默认值360天',
-	output_ratio decimal(20,10) NULL,
-	expected_total_output decimal(20,10) NULL COMMENT '预估总产出',
-	create_time datetime NULL,
+	id bigint auto_increment NOT NULL COMMENT 'id',
+	user_id bigint NOT NULL COMMENT '用户ID',
+	order_no varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '订单编号',
+	amount decimal(20,10) NOT NULL COMMENT '购买金额,价格乘以购买数量等于购买金额',
+	`number` int NOT NULL COMMENT '购买台数',
+	output_symbol varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '产出币种',
+	period int NOT NULL COMMENT '产出周期,默认值360天',
+	output_ratio decimal(20,10) NOT NULL COMMENT '产出率',
+	expected_total_output decimal(20,10) NOT NULL COMMENT '预估总产出',
+	end_time datetime NOT NULL COMMENT '退出日期',
+	create_by varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+	create_time datetime NOT NULL,
+	update_by varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
 	update_time datetime NULL,
-	create_by varchar(100) NULL,
-	update_by varchar(100) NULL
+	CONSTRAINT `PRIMARY` PRIMARY KEY (id)
 )
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
