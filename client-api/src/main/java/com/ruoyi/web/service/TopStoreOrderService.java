@@ -106,6 +106,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                                 .balanceChanged(order.getAmount().negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.STORE_IN)
+                                .refNo(orderNo)
                                 .remark("存单")
                                 .build()
                 )

@@ -3,7 +3,8 @@ package com.ruoyi.web.enums;
 public enum TopNo {
 
     STORE_NO("STORE_NO_", 1),
-    PROCESS_NO("PROCESS_NO_", 2),
+    POWER_NO("POWER_NO_", 2),
+    PROCESS_NO("PROCESS_NO_", 9),
 
 
     ;

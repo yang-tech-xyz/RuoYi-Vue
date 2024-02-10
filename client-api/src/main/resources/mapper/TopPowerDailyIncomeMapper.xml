@@ -10,7 +10,7 @@
 
     <select id="selectProcessIncomeByUserId" resultType="com.ruoyi.web.vo.DailyIncomeProcessVO">
         SELECT
-            income_symbol,
+            income_symbol as symbol,
             sum( income ) AS income
         FROM
             top_power_daily_income

@@ -16,6 +16,9 @@ public class StoreOrderVO {
     @Schema(description="产品ID")
     private Long storeId;
 
+    @Schema(description = "产品周期（月）,每月限定30天")
+    private Integer period;
+
     @Schema(description="用户ID")
     private Long userId;
 
@@ -49,7 +52,7 @@ public class StoreOrderVO {
     @Schema(description="领取时间")
     private LocalDateTime redeemDate;
 
-    @Schema(description="状态：1=收益中，2=已领取")
+    @Schema(description="状态：1=收益中，2=已赎回")
     private Integer status;
 
 

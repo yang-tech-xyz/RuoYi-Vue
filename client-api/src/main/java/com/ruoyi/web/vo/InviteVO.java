@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 @Data
 public class InviteVO {
 
+    private Integer level;
+
     private String wallet;
 
     private BigDecimal power;

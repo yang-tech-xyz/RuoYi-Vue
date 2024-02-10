@@ -1,10 +1,6 @@
 package com.ruoyi.web.service;
 
 import cn.hutool.core.lang.UUID;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.TopAccount;
@@ -64,7 +60,8 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         topPowerOrder.setOutputSymbol(topPowerConfig.getOutputSymbol());
         topPowerOrder.setPeriod(topPowerConfig.getPeriod());
         topPowerOrder.setOutputRatio(topPowerConfig.getOutputRatio());
-        topPowerOrder.setEndTime(LocalDate.now().plusDays(topPowerOrder.getPeriod() + 1));
+        topPowerOrder.setEndDate(LocalDate.now().plusDays(topPowerOrder.getPeriod() + 1));
+        topPowerOrder.setOrderDate(LocalDate.now());
         topPowerOrder.setCreateTime(LocalDateTime.now());
         topPowerOrder.setUpdateTime(LocalDateTime.now());
         topPowerOrder.setExpectedTotalOutput(buyPowerNeedPayUsdt.multiply(topPowerConfig.getOutputRatio()));
@@ -84,7 +81,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         if (account.getAvailableBalance().compareTo(payTokenAmount) < 0) {
             log.warn("account have no enough money,account info:{}", account);
         }
-        String orderNo = UUID.fastUUID().toString();
+        String orderNo = TopNo.POWER_NO._code + IdUtil.getSnowflake(TopNo.POWER_NO._workId).nextIdStr();
         topPowerOrder.setOrderNo(orderNo);
         Long userId = account.getUserId();
         topPowerOrder.setUserId(userId);
@@ -101,6 +98,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
                                 .balanceChanged(payTokenAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.PURCHASE)
+                                .refNo(orderNo)
                                 .remark("支付")
                                 .build()
                 )

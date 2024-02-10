@@ -56,15 +56,19 @@ public class TopPowerOrder implements Serializable {
     @TableField(value = "expected_total_output")
     private BigDecimal expectedTotalOutput;
 
-    @Schema(description = "退出日期")
-    @TableField(value = "end_time")
-    private LocalDate endTime;
+    @Schema(description = "订单日期")
+    @TableField(value = "order_date")
+    private LocalDate orderDate;
 
-    @Schema(description = "${column.comment}")
+    @Schema(description = "退出日期")
+    @TableField(value = "end_date")
+    private LocalDate endDate;
+
+    @Schema(description = "创建时间")
     @TableField(value = "create_by")
     private String createBy;
 
-    @Schema(description = "${column.comment}")
+    @Schema(description = "创建人")
     @TableField(value = "create_time")
     private LocalDateTime createTime;
 

@@ -14,8 +14,12 @@
     </select>
 
     <select id="selectPageVO" resultType="com.ruoyi.web.vo.StoreOrderVO">
-        select tso.*
-        from top_user tu inner join top_store_order tso on tu.id = tso.user_id
+        select
+            tso.*,
+            ts.period
+        from top_user tu
+            inner join top_store_order tso on tu.id = tso.user_id
+            inner join top_store ts on ts.id = tso.store_id
         <where>
             tu.wallet = #{walletAddress}
         </where>

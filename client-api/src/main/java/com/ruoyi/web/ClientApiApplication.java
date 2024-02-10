@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.TimeZone;
+
 /**
  * 启动程序
  *
@@ -16,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 public class ClientApiApplication {
     public static void main(String[] args) {
         // System.setProperty("spring.devtools.restart.enabled", "false");
+        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         SpringApplication.run(ClientApiApplication.class, args);
         System.out.println("(♥◠‿◠)ﾉﾞ  若依启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
                 " .-------.       ____     __        \n" +
