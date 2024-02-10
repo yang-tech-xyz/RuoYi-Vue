@@ -74,12 +74,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         // 计算用户需要的token的数量
         BigDecimal payTokenAmount = buyPowerNeedPayUsdt.divide(tokenPrice, 10, 2);
         String wallet = buyPowerBody.getWallet().toLowerCase();
-        Optional<TopUserEntity> topUserOptional = topUserService.getByWallet(wallet);
-        if (!topUserOptional.isPresent()) {
-            log.warn("user not exist,wallet is:{}", wallet);
-            throw new ServiceException("user not exist,wallet");
-        }
-        TopUserEntity topUserEntity = topUserOptional.get();
+        TopUserEntity topUserEntity = topUserService.getByWallet(wallet);
         TopAccount account = topAccountService.getAccount(topUserEntity.getId().longValue(), symbol);
         if (account.getAvailableBalance().compareTo(payTokenAmount) < 0) {
             log.warn("account have no enough money,account info:{}", account);

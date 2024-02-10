@@ -1,5 +1,6 @@
 package com.ruoyi.web.service;
 
+import cn.hutool.core.lang.UUID;
 import cn.hutool.cron.timingwheel.SystemTimer;
 import cn.hutool.cron.timingwheel.TimerTask;
 import cn.hutool.crypto.Mode;
@@ -15,6 +16,7 @@ import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.enums.TransactionType;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopTokenMapper;
+import com.ruoyi.web.vo.InternalTransferBody;
 import com.ruoyi.web.vo.WithdrawBody;
 import com.ruoyi.web.vo.RechargeBody;
 import com.ruoyi.web.vo.TopTokenChainVO;
@@ -51,6 +53,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static com.github.xiaoymin.knife4j.spring.gateway.enums.GroupOrderStrategy.order;
 
 @Slf4j
 @Service
@@ -120,12 +124,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Transaction transaction = transactionOptional.get();
             String from = transaction.getFrom();
 
-            Optional<TopUserEntity> topUserOptional = topUserService.getByWallet(from);
-            if (!topUserOptional.isPresent()) {
-                log.error("user not exist,user address is:{}", from);
-                throw new ServiceException("user not exist");
-            }
-            Long userId = topUserOptional.get().getId();
+            TopUserEntity topUserEntity = topUserService.getByWallet(from);
+            Long userId = topUserEntity.getId();
             topTransaction.setUserId(userId);
             // 设置充值状态为未成功.事务成功状态为0x1
             topTransaction.setStatus("0x0");
@@ -391,12 +391,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
         String wallet = withdrawBody.getWallet();
-        Optional<TopUserEntity> topUserEntity = topUserService.getByWallet(wallet);
-        if (!topUserEntity.isPresent()) {
-            log.error("user not exist,wallet is:{}", wallet);
-            throw new ServiceException("user not exist");
-        }
-        Long userId = topUserEntity.get().getId();
+        TopUserEntity topUserEntity = topUserService.getByWallet(wallet);
+        Long userId = topUserEntity.getId();
         String symbol = withdrawBody.getSymbol();
         TopAccount account = accountService.getAccount(userId, symbol);
         if (account == null) {
@@ -518,5 +514,51 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         Object transactionHash = ethSendTransaction.getTransactionHash();
         log.info("transactionHash is:{}",transactionHash.toString());
         return transactionHash.toString();
+    }
+
+    @Transactional
+    public void internalTransferBody(InternalTransferBody internalTransferBody) {
+        String receiveAddress = internalTransferBody.getReceiveAddress();
+        TopUserEntity receiveUserEntity = topUserService.getByWallet(receiveAddress);
+        Long receiveUserId = receiveUserEntity.getId();
+        String sendWallet = internalTransferBody.getWallet();
+        TopUserEntity sendUser = topUserService.getByWallet(sendWallet);
+        Long sendUserId = sendUser.getId();
+        String symbol = internalTransferBody.getSymbol();
+        BigDecimal amount = internalTransferBody.getAmount();
+
+        // 从发出用户转出资金
+        UUID uuid = UUID.fastUUID();
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(uuid.toString().concat("_" + sendUserId).concat("_" + Account.TxType.INTERNAL_TRANSFER.typeCode))
+                                .userId(sendUserId)
+                                .token(symbol)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(amount.negate())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.INTERNAL_TRANSFER)
+                                .refNo(uuid.toString())
+                                .remark("转出")
+                                .build()
+                )
+        );
+        // 转入
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(uuid.toString().concat("_" + receiveUserId).concat("_" + Account.TxType.INTERNAL_TRANSFER.typeCode))
+                                .userId(receiveUserId)
+                                .token(symbol)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(amount)
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.INTERNAL_TRANSFER)
+                                .refNo(uuid.toString())
+                                .remark("转入")
+                                .build()
+                )
+        );
     }
 }

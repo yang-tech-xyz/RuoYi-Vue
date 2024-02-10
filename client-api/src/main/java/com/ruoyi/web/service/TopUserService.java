@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.vo.InviteInfoVO;
 import com.ruoyi.web.vo.InviteVO;
 import com.ruoyi.web.vo.UserProcessVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,9 +17,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class TopUserService extends ServiceImpl<TopUserMapper, TopUserEntity> {
-    public Optional<TopUserEntity> getByWallet(String walletAddress) {
+    public TopUserEntity getByWallet(String walletAddress) {
+        LambdaQueryWrapper<TopUserEntity> queryWallet = Wrappers.lambdaQuery();
+        queryWallet.eq(TopUserEntity::getWallet, walletAddress);
+        Optional<TopUserEntity> topUserEntityOptional = this.getOneOpt(queryWallet);
+        if(!topUserEntityOptional.isPresent()){
+            log.error("user not exist,the wallet is:{}",walletAddress);
+            throw new ServiceException("user not exist!");
+        }
+        return topUserEntityOptional.get();
+    }
+
+    public Optional<TopUserEntity> getByWalletOptional(String walletAddress) {
         LambdaQueryWrapper<TopUserEntity> queryWallet = Wrappers.lambdaQuery();
         queryWallet.eq(TopUserEntity::getWallet, walletAddress);
         return this.getOneOpt(queryWallet);
@@ -55,7 +69,7 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUserEntity> {
     }
 
     public List<InviteVO> getInviteList(String walletAddress) {
-        Optional<TopUserEntity> optional = getByWallet(walletAddress);
+        Optional<TopUserEntity> optional = getByWalletOptional(walletAddress);
         if (optional.isEmpty()) {
             return new ArrayList<>();
         }

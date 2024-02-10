@@ -32,6 +32,8 @@ public interface Account {
 
         STORE_IN("STORE_IN", "理财存币"),
         PURCHASE("PURCHASE", "支付"),
+        INTERNAL_TRANSFER("INTERNAL_TRANSFER", "内部转账"),
+        EXCHANGE("EXCHANGE", "交易"),
         RECHARGE_IN("RECHARGE_IN", "充值"),
         WITHDRAW("WITHDRAW", "提现"),
         STORE_REDEEM("STORE_REDEEM", "理财赎回"),

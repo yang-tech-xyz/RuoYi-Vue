@@ -53,12 +53,8 @@ public class TopPowerOrderController
     @Operation(summary = "查询用户的算力订单")
     @GetMapping("getPowerOrderList")
     public AjaxResult<Page<TopPowerOrder>> getPowerOrderList(@ParameterObject Page page,@RequestHeader(value = "WalletAddress", defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398") String walletAddress){
-        Optional<TopUserEntity> topUserEntityOptional = topUserService.getByWallet(walletAddress);
-        if(!topUserEntityOptional.isPresent()){
-            log.error("user not exist ,wallet is:{}",walletAddress);
-            return AjaxResult.error("user not exist");
-        }
-        Long userId = topUserEntityOptional.get().getId();
+        TopUserEntity topUserEntity = topUserService.getByWallet(walletAddress);
+        Long userId = topUserEntity.getId();
         return AjaxResult.success(topPowerOrderService.getPowerOrderList(page,userId));
     }
 

@@ -6,6 +6,7 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.TopTokenService;
 import com.ruoyi.web.service.TopTransactionService;
 import com.ruoyi.web.utils.UnsignMessageUtils;
+import com.ruoyi.web.vo.InternalTransferBody;
 import com.ruoyi.web.vo.WithdrawBody;
 import com.ruoyi.web.vo.RechargeBody;
 import com.ruoyi.web.vo.TopTokenChainVO;
@@ -78,5 +79,17 @@ public class TopCoinController
             throw new ServiceException("签名错误");
         }
         return topTokenService.withdraw(withdrawBody);
+    }
+
+    @Operation(summary = "内部转账")
+    @PostMapping("internalTransfer")
+    public void internalTransfer(@RequestBody InternalTransferBody internalTransferBody){
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(internalTransferBody.getSignMsg(),internalTransferBody.getContent(),internalTransferBody.getWallet());
+        } catch (SignatureException e) {
+            log.error("签名错误",e);
+            throw new ServiceException("签名错误");
+        }
+        topTokenService.internalTransferBody(internalTransferBody);
     }
 }
