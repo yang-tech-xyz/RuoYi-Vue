@@ -1,12 +1,10 @@
 package com.ruoyi.web.service;
 
-import cn.hutool.core.lang.UUID;
 import cn.hutool.cron.timingwheel.SystemTimer;
 import cn.hutool.cron.timingwheel.TimerTask;
 import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
-import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,9 +12,10 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.*;
 import com.ruoyi.web.enums.Account;
+import com.ruoyi.web.enums.TransactionType;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopTokenMapper;
-import com.ruoyi.web.vo.ClaimBody;
+import com.ruoyi.web.vo.WithdrawBody;
 import com.ruoyi.web.vo.RechargeBody;
 import com.ruoyi.web.vo.TopTokenChainVO;
 import jakarta.annotation.PostConstruct;
@@ -184,6 +183,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setCreateBy(userId.toString());
             topTransaction.setUpdateBy(userId.toString());
             topTransaction.setBlockConfirm(topChain.getBlockConfirm());
+            topTransaction.setType(TransactionType.Recharge);
             topTransactionService.save(topTransaction);
 
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
@@ -248,9 +248,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     @PostConstruct
     public void initCountDown() {
         //查询未确认的hash
-        List<TopTransaction> topTransactionList = topTransactionService.queryUnConfirm();
-        topTransactionList.stream().forEach(t -> {
+        List<TopTransaction> topRechargeTransactionList = topTransactionService.queryRechargeUnConfirm();
+        topRechargeTransactionList.stream().forEach(t -> {
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(t.getHash()), 10000));
+        });
+        List<TopTransaction> topWithdrawTransactionList = topTransactionService.queryWithdrawUnConfirm();
+        topWithdrawTransactionList.stream().forEach(t -> {
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 10000));
         });
     }
 
@@ -338,16 +342,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
                 topTransactionService.updateConfirm(topTransaction);
             } else {
-                //获取当前的区块高度
-                EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
-                BigInteger currentHeight = ethBlockNumber.getBlockNumber();
-                BigInteger topTransactionHeight = topTransaction.getHeight();
-                // 如果已经超过了确认高度,则不再重复进行确认操作.承认这笔操作失败.
-                if (currentHeight.compareTo(topTransactionHeight.add(BigInteger.valueOf(10000L)).add(BigInteger.valueOf(topTransaction.getBlockConfirm()))) < 0){
-                    systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
-                    topTransaction.setIsConfirm(2);
-                    topTransactionService.updateById(topTransaction);
-                }
+                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
             }
             return true;
         } catch (Exception e) {
@@ -356,44 +351,63 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException(e);
         }
     }
+    @Transactional(rollbackFor = Exception.class)
+    public boolean confirmWithdrawToken(String hash) {
+        try {
+            Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(hash);
+            if (!topTransactionOptional.isPresent()) {
+                throw new ServiceException("transaction not exist!");
+            }
+            TopTransaction topTransaction = topTransactionOptional.get();
+            // 重复检查transaction是否已经确认交易.已经充值的transaction防止用户重复提现
+            if (topTransaction.getIsConfirm() == 1) {
+                throw new ServiceException("transaction had been confirmed!");
+            }
+            String rpcEndpoint = topTransaction.getRpcEndpoint();
+            Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+
+            //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
+            if (validateTransactionReceipt(hash,web3j)) {
+                topTransaction.setIsConfirm(1);
+                topTransaction.setStatus("0x1");
+                Long userId = topTransaction.getUserId().longValue();
+
+                topTransactionService.updateConfirm(topTransaction);
+            } else {
+                //获取当前的区块高度
+                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(hash), 10000));
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("confirmRechargeToken error:", e);
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(hash), 10000));
+            throw new ServiceException(e);
+        }
+    }
 
     @Transactional
-    public AjaxResult claim(ClaimBody claimBody)throws Exception {
+    public AjaxResult withdraw(WithdrawBody withdrawBody)throws Exception {
+        TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
-        String wallet = claimBody.getWallet();
+        String wallet = withdrawBody.getWallet();
         Optional<TopUserEntity> topUserEntity = topUserService.getByWallet(wallet);
         if (!topUserEntity.isPresent()) {
             log.error("user not exist,wallet is:{}", wallet);
             throw new ServiceException("user not exist");
         }
         Long userId = topUserEntity.get().getId();
-        String symbol = claimBody.getSymbol();
+        String symbol = withdrawBody.getSymbol();
         TopAccount account = accountService.getAccount(userId, symbol);
         if (account == null) {
             log.error("account not exist,userId is:{},symbol is:{}", userId, symbol);
             throw new ServiceException("account not exist");
         }
-        BigDecimal amount = claimBody.getAmount();
+        BigDecimal amount = withdrawBody.getAmount();
         // 检查账户中的资金是否充足
         if (account.getAvailableBalance().compareTo(amount) < 0) {
             log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), amount);
             throw new ServiceException("account exceed balance");
         }
-        //扣除用户的资金
-        accountService.processAccount(
-                Arrays.asList(
-                        AccountRequest.builder()
-                                .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.CLAIM.typeCode))
-                                .userId(userId)
-                                .token(symbol)
-                                .fee(BigDecimal.ZERO)
-                                .balanceChanged(amount.negate())
-                                .balanceTxType(Account.Balance.AVAILABLE)
-                                .txType(Account.TxType.CLAIM)
-                                .remark("提现")
-                                .build()
-                )
-        );
 
         // 链上转账
         Optional<TopToken> topTokenOptional = topTokenService.queryTokenBySymbol(symbol);
@@ -403,7 +417,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         }
         TopToken topToken = topTokenOptional.get();
         Integer topTokenId = topToken.getId();
-        Long chainId = claimBody.getChainId();
+        Long chainId = withdrawBody.getChainId();
         Optional<TopTokenChainVO> topTokenChainVOOptional = this.queryTokenByTokenIdAndChainId(topTokenId, chainId);
         if(!topTokenChainVOOptional.isPresent()){
             log.error("token chain config is not exist,tokenId is:{},chainId is:{}",topTokenId,chainId);
@@ -416,7 +430,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.error("chain is not exist,chainId is:{}",chainId);
             throw new ServiceException("chain is not exist");
         }
-        String rpcEndpoint = optByChainIdOptional.get().getRpcEndpoint();
+        TopChain topChain = optByChainIdOptional.get();
+        String rpcEndpoint = topChain.getRpcEndpoint();
         String to = wallet; //为了保护资金安全,转账只能转到用户注册的钱包地址
         Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
 
@@ -433,11 +448,47 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String key = secret.substring(0,16);
         AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
         String s = aes.decryptStr(curve);
-        transferToken(web3j,contractAddress,s,to,tokenAmount);
+        String transactionHash = transferToken(web3j,contractAddress,s,to,tokenAmount);
+
+        //扣除用户的资金
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(transactionHash.toString().concat("_" + userId).concat("_" + Account.TxType.WITHDRAW.typeCode))
+                                .userId(userId)
+                                .token(symbol)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(amount.negate())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.WITHDRAW)
+                                .remark("提现")
+                                .build()
+                )
+        );
+        topTransaction.setHash(transactionHash);
+        topTransaction.setChainId(chainId);
+        topTransaction.setTokenId(topTokenId);
+        topTransaction.setRpcEndpoint(rpcEndpoint);
+        topTransaction.setStatus("0x1");
+        topTransaction.setUserId(userId);
+        topTransaction.setSymbol(symbol);
+        topTransaction.setTokenAmount(amount);
+        topTransaction.setIsConfirm(0);
+        EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
+        BigInteger currentHeight = ethBlockNumber.getBlockNumber();
+        topTransaction.setHeight(currentHeight);
+        topTransaction.setCreateTime(LocalDateTime.now());
+        topTransaction.setUpdateTime(LocalDateTime.now());
+        topTransaction.setCreateBy(userId.toString());
+        topTransaction.setUpdateBy(userId.toString());
+        topTransaction.setBlockConfirm(topChain.getBlockConfirm());
+        topTransaction.setType(TransactionType.Withdraw);
+        topTransactionService.save(topTransaction);
+        systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
         return AjaxResult.success("success");
     }
 
-    public void transferToken(Web3j web3j,String contractAddress,String privateKey,String to,BigInteger amount) throws Exception {
+    public String transferToken(Web3j web3j,String contractAddress,String privateKey,String to,BigInteger amount) throws Exception {
 
         BigInteger bigInteger = new BigInteger(privateKey, 16);
         ECKeyPair ecKeyPair = ECKeyPair.create(bigInteger);
@@ -464,5 +515,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
         Object transactionHash = ethSendTransaction.getTransactionHash();
         log.info("transactionHash is:{}",transactionHash.toString());
+        return transactionHash.toString();
     }
 }

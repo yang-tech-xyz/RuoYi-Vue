@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  */
 @Data
 @Schema(description = "提币")
-public class ClaimBody extends SignBaseEntity
+public class WithdrawBody extends SignBaseEntity
 {
     /**
      * 用户钱包地址

@@ -130,6 +130,9 @@ DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_0900_ai_ci
 COMMENT='算力订单表';
 
+ALTER TABLE `ry-vue`.top_transaction ADD `type` varchar(100) NULL COMMENT '事务类型,recharge充值,withdraw提现';
+
+
 ALTER TABLE `ry-vue`.top_power_order ADD end_time datetime NULL COMMENT '退出日期';
 
 INSERT INTO `ry-vue`.top_power_config

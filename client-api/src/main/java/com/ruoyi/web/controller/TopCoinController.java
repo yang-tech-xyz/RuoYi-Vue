@@ -6,7 +6,7 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.TopTokenService;
 import com.ruoyi.web.service.TopTransactionService;
 import com.ruoyi.web.utils.UnsignMessageUtils;
-import com.ruoyi.web.vo.ClaimBody;
+import com.ruoyi.web.vo.WithdrawBody;
 import com.ruoyi.web.vo.RechargeBody;
 import com.ruoyi.web.vo.TopTokenChainVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,16 +66,17 @@ public class TopCoinController
      * 提币
      */
     @Operation(summary = "提币")
-    @PostMapping("/claim")
-    public AjaxResult claim(@RequestBody ClaimBody claimBody)throws Exception{
+    @PostMapping("/withdraw")
+    public AjaxResult claim(@RequestBody WithdrawBody withdrawBody)throws Exception{
         try {
-            boolean validateResult = UnsignMessageUtils.validate(claimBody.getSignMsg(),claimBody.getContent(),claimBody.getWallet());
+            boolean validateResult = UnsignMessageUtils.validate(withdrawBody.getSignMsg(),withdrawBody.getContent(),withdrawBody.getWallet());
             if(!validateResult){
                 return AjaxResult.error("validate sign error!");
             }
         } catch (SignatureException e) {
-            throw new RuntimeException(e);
+            log.error("签名错误",e);
+            throw new ServiceException("签名错误");
         }
-        return topTokenService.claim(claimBody);
+        return topTokenService.withdraw(withdrawBody);
     }
 }

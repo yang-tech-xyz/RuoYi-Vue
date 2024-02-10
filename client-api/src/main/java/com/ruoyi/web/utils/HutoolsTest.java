@@ -8,7 +8,7 @@ import cn.hutool.crypto.symmetric.AES;
 
 public class HutoolsTest {
     public static void main(String[] args) {
-        String text = "0x58eef556f93ba37d103e48867fd69e4b477f19e6df2d485d89aee0e0d3c3cbec";
+        String text = "58eef556f93ba37d103e48867fd69e4b477f19e6df2d485d89aee0e0d3c3cbec";
         // key：AES模式下，key必须为16位
         String key = "abcdefghijklmnopqrstuvwxyz".substring(0,16);
         // iv：偏移量，ECB模式不需要，CBC模式下必须为16位

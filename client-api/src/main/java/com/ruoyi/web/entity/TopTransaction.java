@@ -3,6 +3,7 @@ package com.ruoyi.web.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.ruoyi.common.BaseEntity;
+import com.ruoyi.web.enums.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -61,5 +62,6 @@ public class TopTransaction extends BaseEntity
     @Schema(description = "用户id")
     private Long blockConfirm;
 
-
+    @Schema(description = "事务类型,recharge充值,withdraw提现")
+    private TransactionType type;
 }
