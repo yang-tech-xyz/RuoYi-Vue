@@ -1,6 +1,9 @@
 package com.ruoyi.web.service;
 
-import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.TopAccount;
@@ -8,9 +11,9 @@ import com.ruoyi.web.entity.TopPowerConfig;
 import com.ruoyi.web.entity.TopPowerOrder;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.enums.Account;
+import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
-import com.ruoyi.web.vo.AccountTxVO;
 import com.ruoyi.web.vo.BuyPowerBody;
 import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
@@ -120,7 +123,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         }
     }
 
-    public Page<TopPowerOrder> getPowerOrderList(Page page,Long userId) {
+    public Page<TopPowerOrder> getPowerOrderList(Page page, Long userId) {
         LambdaQueryWrapper<TopPowerOrder> wrapper = Wrappers.lambdaQuery();
         wrapper.eq(TopPowerOrder::getUserId,userId);
         return this.baseMapper.selectPage(page, wrapper);
