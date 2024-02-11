@@ -12,9 +12,11 @@ import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
+import com.ruoyi.web.vo.BTCAddressBody;
 import com.ruoyi.web.vo.WalletRegisterBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,6 +32,7 @@ import java.util.Optional;
  *
  * @author ruoyi
  */
+@Slf4j
 @RequestMapping("/topUser")
 @Tag(description = "TopUserController", name = "用户信息")
 @RestController
@@ -58,14 +61,14 @@ public class TopUserController {
 //    @TransactionVerifyCheck
     @PostMapping("/register")
     public AjaxResult register(@RequestBody WalletRegisterBody loginBody) {
-        AjaxResult ajax = AjaxResult.success();
         try {
-            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(), loginBody.getContent(), loginBody.getWallet());
-            if (!validateResult) {
+            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(),loginBody.getContent(),loginBody.getWallet());
+            if(!validateResult){
                 return AjaxResult.error("validate sign error!");
             }
         } catch (SignatureException e) {
-            throw new RuntimeException(e);
+            log.error("签名错误",e);
+            throw new ServiceException("签名错误");
         }
         //check the user wallet is existed.
         Optional<TopUserEntity> byWalletOptional = topUserService.getByWalletOptional(loginBody.getWallet());
@@ -91,7 +94,27 @@ public class TopUserController {
         topUserService.save(topUserEntity);
         // 绑定邀请数据
         inviteService.process(topUserEntity.getId(), topUserEntity.getInvitedUserId());
-        return ajax;
+        return AjaxResult.success("Success");
+    }
+
+    @Operation(summary = "设置用户的BTC提现地址")
+    @PostMapping("updateWithdrawBTCAddress")
+    public AjaxResult<String> updateWithdrawBTCAddress(@RequestBody BTCAddressBody btcAddressBody){
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(btcAddressBody.getSignMsg(),btcAddressBody.getContent(),btcAddressBody.getWallet());
+            if(!validateResult){
+                return AjaxResult.error("validate sign error!");
+            }
+        } catch (SignatureException e) {
+            log.error("签名错误",e);
+            throw new ServiceException("签名错误");
+        }
+        String btcTransferAddress = btcAddressBody.getBtcTransferAddress();
+
+        TopUserEntity topUserEntity = topUserService.getByWallet(btcAddressBody.getWallet());
+        topUserEntity.setBtcTransferAddress(btcTransferAddress);
+        topUserService.updateById(topUserEntity);
+        return AjaxResult.success("Success");
     }
 
     @Operation(summary = "获取个人分享数据")

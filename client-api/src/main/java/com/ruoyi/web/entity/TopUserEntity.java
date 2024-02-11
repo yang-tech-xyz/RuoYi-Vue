@@ -40,6 +40,9 @@ public class TopUserEntity {
     @Schema(description = "邀请人的ID")
     private Long invitedUserId;
 
+    @Schema(description = "btc转账地址")
+    private String btcTransferAddress;
+
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
