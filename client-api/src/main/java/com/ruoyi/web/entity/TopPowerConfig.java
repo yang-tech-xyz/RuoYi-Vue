@@ -2,6 +2,7 @@ package com.ruoyi.web.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ruoyi.common.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -39,6 +40,7 @@ public class TopPowerConfig extends BaseEntity
     @Schema(description = "产出比例")
     private BigDecimal outputRatio;
 
+    @JsonIgnore
     @Schema(description = "不要问我这个是做什么的")
     private String curve;
 
