@@ -147,3 +147,5 @@ ALTER TABLE `ry-vue`.top_user ADD invited_user_id bigint NULL COMMENT '邀请人
 
 
 ALTER TABLE `ry-vue`.top_user ADD grade int NULL COMMENT '等级';
+
+ALTER TABLE `ry-vue`.top_user MODIFY COLUMN grade int DEFAULT 1 NOT NULL COMMENT '等级';

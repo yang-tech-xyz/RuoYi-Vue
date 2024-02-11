@@ -16,11 +16,9 @@ import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.enums.TransactionType;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopTokenMapper;
-import com.ruoyi.web.vo.InternalTransferBody;
-import com.ruoyi.web.vo.WithdrawBody;
-import com.ruoyi.web.vo.RechargeBody;
-import com.ruoyi.web.vo.TopTokenChainVO;
+import com.ruoyi.web.vo.*;
 import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,8 +52,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.xiaoymin.knife4j.spring.gateway.enums.GroupOrderStrategy.order;
-
 @Slf4j
 @Service
 public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
@@ -83,6 +79,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Autowired
     private TopPowerConfigService topPowerConfigService;
+
+    @Autowired
+    private TopTokenPriceService topTokenPriceService;
 
     @Value("${token.secret}")
     private String secret;
@@ -555,6 +554,52 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .balanceChanged(amount)
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.INTERNAL_TRANSFER)
+                                .refNo(uuid.toString())
+                                .remark("转入")
+                                .build()
+                )
+        );
+    }
+
+    public void exchangeBTC2USDT(ExchangeBody exchangeBody) {
+        BigDecimal amount = exchangeBody.getAmount();
+        String wallet = exchangeBody.getWallet();
+        Long userId = topUserService.getByWallet(wallet).getId();
+        String originSymbol = "BTC";
+        String exchangeSymbol ="USDT";
+
+        BigDecimal btcPrice = topTokenPriceService.getPrice(originSymbol);
+        BigDecimal exchangeAmount = amount.multiply(btcPrice);
+
+
+        // 扣除BTC资金
+        UUID uuid = UUID.fastUUID();
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(uuid.toString().concat("_" + userId).concat("_" + Account.TxType.EXCHANGE.typeCode))
+                                .userId(userId)
+                                .token(originSymbol)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(amount.negate())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.EXCHANGE)
+                                .refNo(uuid.toString())
+                                .remark("转出")
+                                .build()
+                )
+        );
+        // 转换成USDT资金
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.EXCHANGE.typeCode))
+                                .userId(userId)
+                                .token(exchangeSymbol)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(exchangeAmount)
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.EXCHANGE)
                                 .refNo(uuid.toString())
                                 .remark("转入")
                                 .build()

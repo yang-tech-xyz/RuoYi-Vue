@@ -6,10 +6,7 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.TopTokenService;
 import com.ruoyi.web.service.TopTransactionService;
 import com.ruoyi.web.utils.UnsignMessageUtils;
-import com.ruoyi.web.vo.InternalTransferBody;
-import com.ruoyi.web.vo.WithdrawBody;
-import com.ruoyi.web.vo.RechargeBody;
-import com.ruoyi.web.vo.TopTokenChainVO;
+import com.ruoyi.web.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -83,7 +80,7 @@ public class TopCoinController
 
     @Operation(summary = "内部转账")
     @PostMapping("internalTransfer")
-    public void internalTransfer(@RequestBody InternalTransferBody internalTransferBody){
+    public AjaxResult internalTransfer(@RequestBody InternalTransferBody internalTransferBody){
         try {
             boolean validateResult = UnsignMessageUtils.validate(internalTransferBody.getSignMsg(),internalTransferBody.getContent(),internalTransferBody.getWallet());
         } catch (SignatureException e) {
@@ -91,5 +88,19 @@ public class TopCoinController
             throw new ServiceException("签名错误");
         }
         topTokenService.internalTransferBody(internalTransferBody);
+        return AjaxResult.success("Success");
+    }
+
+    @Operation(summary = "BTC市价兑换USDT")
+    @PostMapping("exchangeBTC2USDT")
+    public AjaxResult  exchangeBTC2USDT(@RequestBody ExchangeBody exchangeBody){
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(),exchangeBody.getContent(),exchangeBody.getWallet());
+        } catch (SignatureException e) {
+            log.error("签名错误",e);
+            throw new ServiceException("签名错误");
+        }
+        topTokenService.exchangeBTC2USDT(exchangeBody);
+        return AjaxResult.success("Success");
     }
 }
