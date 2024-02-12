@@ -399,10 +399,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.error("account not exist,userId is:{},symbol is:{}", userId, symbol);
             throw new ServiceException("account not exist");
         }
-        BigDecimal amount = withdrawBody.getAmount();
+        BigDecimal withdrawAmount = withdrawBody.getAmount();
         // 检查账户中的资金是否充足
-        if (account.getAvailableBalance().compareTo(amount) < 0) {
-            log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), amount);
+        if (account.getAvailableBalance().compareTo(withdrawAmount) < 0) {
+            log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), withdrawAmount);
             throw new ServiceException("account exceed balance");
         }
 
@@ -434,9 +434,21 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
         BigInteger decimalOfContract = getDecimalOfContract(web3j, contractAddress, wallet);
 
-        BigInteger tokenAmount = amount.multiply(new BigDecimal("10").pow(decimalOfContract.intValue())).toBigInteger();
-        // TODO get the privateKey;
+
         TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
+        BigDecimal feeRatio = topPowerConfig.getFeeRatio();
+        if(feeRatio==null){
+            throw new ServiceException("fee ratio is null");
+        }
+        BigDecimal fee = withdrawAmount.multiply(feeRatio);
+        // 实际到账金额应该减去手续费
+//        BigDecimal transferAmount = withdrawAmount.subtract(fee);
+        BigDecimal transferAmount = withdrawAmount;
+
+
+
+        BigInteger tokenAmount = transferAmount.multiply(new BigDecimal("10").pow(decimalOfContract.intValue())).toBigInteger();
+        // TODO get the privateKey;
         if(topPowerConfig==null){
             throw new ServiceException("power config is not exist");
         }
@@ -454,8 +466,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .uniqueId(transactionHash.toString().concat("_" + userId).concat("_" + Account.TxType.WITHDRAW.typeCode))
                                 .userId(userId)
                                 .token(symbol)
-                                .fee(BigDecimal.ZERO)
-                                .balanceChanged(amount.negate())
+                                .fee(fee.negate())
+                                .balanceChanged(withdrawAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.WITHDRAW)
                                 .refNo(transactionHash.toString())
@@ -470,7 +482,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topTransaction.setStatus("0x1");
         topTransaction.setUserId(userId);
         topTransaction.setSymbol(symbol);
-        topTransaction.setTokenAmount(amount);
+        topTransaction.setTokenAmount(withdrawAmount);
         topTransaction.setIsConfirm(0);
         EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
         BigInteger currentHeight = ethBlockNumber.getBlockNumber();
@@ -526,7 +538,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         }
         BigDecimal fee = withdrawAmount.multiply(feeRatio);
         // 实际到账金额应该减去手续费
-        BigDecimal transferAmount = withdrawAmount.subtract(fee);
+//        BigDecimal transferAmount = withdrawAmount.subtract(fee);
+        BigDecimal transferAmount = withdrawAmount;
         // 检查账户中的资金是否充足
         if (account.getAvailableBalance().compareTo(withdrawAmount) < 0) {
             log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), withdrawAmount);
