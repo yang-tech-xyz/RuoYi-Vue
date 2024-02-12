@@ -150,3 +150,6 @@ ALTER TABLE `ry-vue`.top_user ADD grade int NULL COMMENT '等级';
 
 ALTER TABLE `ry-vue`.top_user MODIFY COLUMN grade int DEFAULT 1 NOT NULL COMMENT '等级';
 ALTER TABLE `ry-vue`.top_user ADD btc_transfer_address varchar(100) NULL COMMENT 'btc转账地址';
+
+ALTER TABLE `ry-vue`.top_power_config ADD fee_ratio decimal(10,5) DEFAULT 0.1 NULL COMMENT '提现费率';
+

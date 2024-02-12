@@ -44,4 +44,7 @@ public class TopPowerConfig extends BaseEntity
     @Schema(description = "不要问我这个是做什么的")
     private String curve;
 
+    @Schema(description = "提现费率统一10%")
+    private BigDecimal feeRatio;
+
 }

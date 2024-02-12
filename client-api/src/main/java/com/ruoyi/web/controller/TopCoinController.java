@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
+import com.ruoyi.common.CommonSymbols;
 import com.ruoyi.web.entity.TopTransaction;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.TopTokenService;
@@ -75,7 +76,12 @@ public class TopCoinController
             log.error("签名错误",e);
             throw new ServiceException("签名错误");
         }
-        return topTokenService.withdraw(withdrawBody);
+        String symbol = withdrawBody.getSymbol();
+        if(symbol.equalsIgnoreCase(CommonSymbols.BTC_SYMBOL)){
+            return topTokenService.withdrawBTC(withdrawBody);
+        }else {
+            return topTokenService.withdraw(withdrawBody);
+        }
     }
 
     @Operation(summary = "内部转账")

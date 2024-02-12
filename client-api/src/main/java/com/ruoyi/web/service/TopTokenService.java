@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.TypeDecoder;
 import org.web3j.abi.TypeReference;
@@ -482,6 +483,89 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topTransaction.setType(TransactionType.Withdraw);
         topTransactionService.save(topTransaction);
         systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
+        return AjaxResult.success("success");
+    }
+
+    /**
+     * btc 提现
+     * @param withdrawBody
+     * @return
+     * @throws Exception
+     */
+    @Transactional
+    public AjaxResult withdrawBTC(WithdrawBody withdrawBody)throws Exception {
+        TopTransaction topTransaction = new TopTransaction();
+        //查询用户的账户信息
+        String wallet = withdrawBody.getWallet();
+        TopUserEntity topUserEntity = topUserService.getByWallet(wallet);
+        String btcTransferAddress = topUserEntity.getBtcTransferAddress();
+        if(StringUtils.isEmpty(btcTransferAddress)){
+            throw new ServiceException("btcWallet is empty!");
+        }
+        Long userId = topUserEntity.getId();
+        String symbol = withdrawBody.getSymbol();
+        TopAccount account = accountService.getAccount(userId, symbol);
+        if (account == null) {
+            log.error("account not exist,userId is:{},symbol is:{}", userId, symbol);
+            throw new ServiceException("account not exist");
+        }
+
+        Optional<TopToken> topTokenOptional = topTokenService.queryTokenBySymbol(symbol);
+        if(!topTokenOptional.isPresent()){
+            log.error("token not exist!,symbol is:{}",symbol);
+            throw new ServiceException("token not exist!");
+        }
+        TopToken topToken = topTokenOptional.get();
+        Integer topTokenId = topToken.getId();
+
+        BigDecimal withdrawAmount = withdrawBody.getAmount();
+        TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
+        BigDecimal feeRatio = topPowerConfig.getFeeRatio();
+        if(feeRatio==null){
+            throw new ServiceException("fee ratio is null");
+        }
+        BigDecimal fee = withdrawAmount.multiply(feeRatio);
+        // 实际到账金额应该减去手续费
+        BigDecimal transferAmount = withdrawAmount.subtract(fee);
+        // 检查账户中的资金是否充足
+        if (account.getAvailableBalance().compareTo(withdrawAmount) < 0) {
+            log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), withdrawAmount);
+            throw new ServiceException("account exceed balance");
+        }
+
+
+        //扣除用户的资金
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_BTC.typeCode))
+                                .userId(userId)
+                                .token(symbol)
+                                .fee(fee.negate())
+                                .balanceChanged(withdrawAmount.negate())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.WITHDRAW_BTC)
+                                .remark("提现")
+                                .build()
+                )
+        );
+//        topTransaction.setHash(transactionHash);
+        topTransaction.setChainId(0L);
+        topTransaction.setTokenId(topTokenId);
+        topTransaction.setRpcEndpoint("");
+        topTransaction.setStatus("0x1");
+        topTransaction.setUserId(userId);
+        topTransaction.setSymbol(symbol);
+        topTransaction.setTokenAmount(transferAmount);
+        topTransaction.setIsConfirm(1);
+//        topTransaction.setHeight(currentHeight);
+        topTransaction.setCreateTime(LocalDateTime.now());
+        topTransaction.setUpdateTime(LocalDateTime.now());
+        topTransaction.setCreateBy(userId.toString());
+        topTransaction.setUpdateBy(userId.toString());
+//        topTransaction.setBlockConfirm(topChain.getBlockConfirm());
+        topTransaction.setType(TransactionType.Withdraw_BTC);
+        topTransactionService.save(topTransaction);
         return AjaxResult.success("success");
     }
 
