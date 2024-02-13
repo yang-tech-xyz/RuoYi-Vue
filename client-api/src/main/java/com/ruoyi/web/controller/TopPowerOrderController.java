@@ -8,6 +8,7 @@ import com.ruoyi.web.service.TopPowerOrderService;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.BuyPowerBody;
+import com.ruoyi.web.vo.TopPowerOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class TopPowerOrderController
 
     @Operation(summary = "查询用户的算力订单")
     @GetMapping("getPowerOrderList")
-    public AjaxResult<Page<TopPowerOrder>> getPowerOrderList(@ParameterObject Page page,@RequestHeader(value = "WalletAddress", defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398") String walletAddress){
+    public AjaxResult<Page<TopPowerOrderVO>> getPowerOrderList(@ParameterObject Page page, @RequestHeader(value = "WalletAddress", defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398") String walletAddress){
         TopUserEntity topUserEntity = topUserService.getByWallet(walletAddress);
         Long userId = topUserEntity.getId();
         return AjaxResult.success(topPowerOrderService.getPowerOrderList(page,userId));
