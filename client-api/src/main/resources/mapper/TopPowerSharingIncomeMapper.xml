@@ -4,7 +4,7 @@
 
     <update id="updateProcessEnabled">
         update top_power_sharing_income
-        set process_enabled = 0
+        set process_enabled = 1
         WHERE user_id = #{userId}
     </update>
 
