@@ -18,4 +18,13 @@
         where tu.wallet = #{walletAddress}
     </select>
 
+    <select id="selectPagePowerVO" resultType="com.ruoyi.web.vo.TopPowerOrderVO">
+        select
+            tpo.*,
+            (select ifnull(sum(_tpd.income),0) from top_power_daily_income _tpd where _tpd.order_no = tpo.order_no) as income
+        from top_user tu
+                 inner join top_power_order tpo on tu.id = tpo.user_id
+        where tu.id = #{userId}
+    </select>
+
 </mapper>

@@ -15,6 +15,7 @@ import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
 import com.ruoyi.web.vo.BuyPowerBody;
+import com.ruoyi.web.vo.TopPowerOrderVO;
 import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,9 +119,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         }
     }
 
-    public Page<TopPowerOrder> getPowerOrderList(Page page, Long userId) {
-        LambdaQueryWrapper<TopPowerOrder> wrapper = Wrappers.lambdaQuery();
-        wrapper.eq(TopPowerOrder::getUserId,userId);
-        return this.baseMapper.selectPage(page, wrapper);
+    public Page<TopPowerOrderVO> getPowerOrderList(Page page, Long userId) {
+        return this.baseMapper.selectPagePowerVO(page, userId);
     }
 }
