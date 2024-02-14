@@ -15,7 +15,7 @@
         FROM
             top_power_sharing_income
         WHERE
-            user_id = 1 and process_enabled = 0
+            user_id = #{userId} and process_enabled = 0
         GROUP BY
             income_symbol
     </select>
