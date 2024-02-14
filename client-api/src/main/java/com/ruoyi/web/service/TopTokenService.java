@@ -443,7 +443,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         BigDecimal fee = withdrawAmount.multiply(feeRatio);
         // 实际到账金额应该减去手续费
 //        BigDecimal transferAmount = withdrawAmount.subtract(fee);
-        BigDecimal transferAmount = withdrawAmount;
+        BigDecimal transferAmount = withdrawAmount.subtract(fee);
 
 
 
@@ -467,7 +467,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .userId(userId)
                                 .token(symbol)
                                 .fee(fee.negate())
-                                .balanceChanged(withdrawAmount.negate())
+                                .balanceChanged(transferAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.WITHDRAW)
                                 .refNo(transactionHash.toString())
@@ -539,7 +539,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         BigDecimal fee = withdrawAmount.multiply(feeRatio);
         // 实际到账金额应该减去手续费
 //        BigDecimal transferAmount = withdrawAmount.subtract(fee);
-        BigDecimal transferAmount = withdrawAmount;
+        BigDecimal transferAmount = withdrawAmount.subtract(fee);
         // 检查账户中的资金是否充足
         if (account.getAvailableBalance().compareTo(withdrawAmount) < 0) {
             log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), withdrawAmount);
@@ -555,7 +555,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .userId(userId)
                                 .token(symbol)
                                 .fee(fee.negate())
-                                .balanceChanged(withdrawAmount.negate())
+                                .balanceChanged(transferAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.WITHDRAW_BTC)
                                 .remark("提现")
