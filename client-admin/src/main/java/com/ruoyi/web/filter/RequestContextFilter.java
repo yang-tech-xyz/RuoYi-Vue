@@ -33,7 +33,7 @@ public class RequestContextFilter implements Filter {
     private void initializeRequestAttributes(HttpServletRequest request) {
         String url = request.getRequestURI();
         // swagger
-        if (StringUtils.equalsAny(url, "doc.html", "api-docs", "webjars")) {
+        if (StringUtils.containsAny(url, "doc.html", "api-docs", "webjars")) {
             return;
         }
         if (url.contains("public")) {
