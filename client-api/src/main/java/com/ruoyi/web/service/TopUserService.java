@@ -3,7 +3,7 @@ package com.ruoyi.web.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.vo.InviteInfoVO;
@@ -19,11 +19,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class TopUserService extends ServiceImpl<TopUserMapper, TopUserEntity> {
-    public TopUserEntity getByWallet(String walletAddress) {
-        LambdaQueryWrapper<TopUserEntity> queryWallet = Wrappers.lambdaQuery();
-        queryWallet.eq(TopUserEntity::getWallet, walletAddress);
-        Optional<TopUserEntity> topUserEntityOptional = this.getOneOpt(queryWallet);
+public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
+    public TopUser getByWallet(String walletAddress) {
+        LambdaQueryWrapper<TopUser> queryWallet = Wrappers.lambdaQuery();
+        queryWallet.eq(TopUser::getWallet, walletAddress);
+        Optional<TopUser> topUserEntityOptional = this.getOneOpt(queryWallet);
         if(!topUserEntityOptional.isPresent()){
             log.error("user not exist,the wallet is:{}",walletAddress);
             throw new ServiceException("user not exist!");
@@ -31,15 +31,15 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUserEntity> {
         return topUserEntityOptional.get();
     }
 
-    public Optional<TopUserEntity> getByWalletOptional(String walletAddress) {
-        LambdaQueryWrapper<TopUserEntity> queryWallet = Wrappers.lambdaQuery();
-        queryWallet.eq(TopUserEntity::getWallet, walletAddress);
+    public Optional<TopUser> getByWalletOptional(String walletAddress) {
+        LambdaQueryWrapper<TopUser> queryWallet = Wrappers.lambdaQuery();
+        queryWallet.eq(TopUser::getWallet, walletAddress);
         return this.getOneOpt(queryWallet);
     }
 
-    public Optional<TopUserEntity> getByInviteCode(String invitedCode) {
-        LambdaQueryWrapper<TopUserEntity> query = Wrappers.lambdaQuery();
-        query.eq(TopUserEntity::getInvitedCode, invitedCode);
+    public Optional<TopUser> getByInviteCode(String invitedCode) {
+        LambdaQueryWrapper<TopUser> query = Wrappers.lambdaQuery();
+        query.eq(TopUser::getInvitedCode, invitedCode);
         return this.getOneOpt(query);
     }
 
@@ -69,7 +69,7 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUserEntity> {
     }
 
     public List<InviteVO> getInviteList(String walletAddress) {
-        Optional<TopUserEntity> optional = getByWalletOptional(walletAddress);
+        Optional<TopUser> optional = getByWalletOptional(walletAddress);
         if (optional.isEmpty()) {
             return new ArrayList<>();
         }

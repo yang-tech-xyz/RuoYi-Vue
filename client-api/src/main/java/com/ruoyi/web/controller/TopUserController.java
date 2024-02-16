@@ -2,7 +2,7 @@ package com.ruoyi.web.controller;
 
 import cn.hutool.core.util.IdUtil;
 import com.ruoyi.common.AjaxResult;
-import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.MiningProcessService;
@@ -46,8 +46,8 @@ public class TopUserController {
 
     @Operation(summary = "用户查询", description = "用户查询")
     @GetMapping("")
-    public AjaxResult<TopUserEntity> queryUser(@RequestHeader(value = "WalletAddress", defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398") String walletAddress) {
-        TopUserEntity topUserEntity = topUserService.getByWallet(walletAddress);
+    public AjaxResult<TopUser> queryUser(@RequestHeader(value = "WalletAddress", defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398") String walletAddress) {
+        TopUser topUserEntity = topUserService.getByWallet(walletAddress);
         return AjaxResult.success(topUserEntity);
     }
 
@@ -71,18 +71,18 @@ public class TopUserController {
             throw new ServiceException("签名错误");
         }
         //check the user wallet is existed.
-        Optional<TopUserEntity> byWalletOptional = topUserService.getByWalletOptional(loginBody.getWallet());
+        Optional<TopUser> byWalletOptional = topUserService.getByWalletOptional(loginBody.getWallet());
         if (byWalletOptional.isPresent()) {
             return AjaxResult.error("wallet is exist");
         }
 
         //检查邀请码用户是否存在
-        Optional<TopUserEntity> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
+        Optional<TopUser> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
         if (!inviteOpt.isPresent()) {
             return AjaxResult.error("invite code is not exist");
         }
 
-        TopUserEntity topUserEntity = new TopUserEntity();
+        TopUser topUserEntity = new TopUser();
         BeanUtils.copyProperties(loginBody, topUserEntity);
         topUserEntity.setWallet(topUserEntity.getWallet().toLowerCase());
         topUserEntity.setGrade(0);
@@ -112,7 +112,7 @@ public class TopUserController {
         }
         String btcTransferAddress = btcAddressBody.getBtcTransferAddress();
 
-        TopUserEntity topUserEntity = topUserService.getByWallet(btcAddressBody.getWallet());
+        TopUser topUserEntity = topUserService.getByWallet(btcAddressBody.getWallet());
         topUserEntity.setBtcTransferAddress(btcTransferAddress);
         topUserService.updateById(topUserEntity);
         return AjaxResult.success("Success");

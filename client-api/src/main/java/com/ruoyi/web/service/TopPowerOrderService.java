@@ -1,15 +1,13 @@
 package com.ruoyi.web.service;
 
 import cn.hutool.core.util.IdUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.TopAccount;
 import com.ruoyi.web.entity.TopPowerConfig;
 import com.ruoyi.web.entity.TopPowerOrder;
-import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
@@ -27,7 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -75,7 +72,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         // 计算用户需要的token的数量
         BigDecimal payTokenAmount = buyPowerNeedPayUsdt.divide(tokenPrice, 10, 2);
         String wallet = buyPowerBody.getWallet().toLowerCase();
-        TopUserEntity topUserEntity = topUserService.getByWallet(wallet);
+        TopUser topUserEntity = topUserService.getByWallet(wallet);
         TopAccount account = topAccountService.getAccount(topUserEntity.getId().longValue(), symbol);
         if (account.getAvailableBalance().compareTo(payTokenAmount) < 0) {
             log.warn("account have no enough money,account info:{}", account);

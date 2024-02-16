@@ -2,8 +2,7 @@ package com.ruoyi.web.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.AjaxResult;
-import com.ruoyi.web.entity.TopPowerOrder;
-import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.service.TopPowerOrderService;
 import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.UnsignMessageUtils;
@@ -17,7 +16,6 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
-import java.util.Optional;
 
 /**
  * 充值
@@ -54,7 +52,7 @@ public class TopPowerOrderController
     @Operation(summary = "查询用户的算力订单")
     @GetMapping("getPowerOrderList")
     public AjaxResult<Page<TopPowerOrderVO>> getPowerOrderList(@ParameterObject Page page, @RequestHeader(value = "WalletAddress", defaultValue = "0x5ebacac108d665819398e5c37e12b0162d781398") String walletAddress){
-        TopUserEntity topUserEntity = topUserService.getByWallet(walletAddress);
+        TopUser topUserEntity = topUserService.getByWallet(walletAddress);
         Long userId = topUserEntity.getId();
         return AjaxResult.success(topPowerOrderService.getPowerOrderList(page,userId));
     }

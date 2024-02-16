@@ -123,7 +123,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Transaction transaction = transactionOptional.get();
             String from = transaction.getFrom();
 
-            TopUserEntity topUserEntity = topUserService.getByWallet(from);
+            TopUser topUserEntity = topUserService.getByWallet(from);
             Long userId = topUserEntity.getId();
             topTransaction.setUserId(userId);
             // 设置充值状态为未成功.事务成功状态为0x1
@@ -392,7 +392,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
         String wallet = withdrawBody.getWallet();
-        TopUserEntity topUserEntity = topUserService.getByWallet(wallet);
+        TopUser topUserEntity = topUserService.getByWallet(wallet);
         Long userId = topUserEntity.getId();
         String symbol = withdrawBody.getSymbol();
         TopAccount account = accountService.getAccount(userId, symbol);
@@ -510,7 +510,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
         String wallet = withdrawBody.getWallet();
-        TopUserEntity topUserEntity = topUserService.getByWallet(wallet);
+        TopUser topUserEntity = topUserService.getByWallet(wallet);
         String btcTransferAddress = topUserEntity.getBtcTransferAddress();
         if (StringUtils.isEmpty(btcTransferAddress)) {
             throw new ServiceException("btcWallet is empty!");
@@ -616,10 +616,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     @Transactional
     public void internalTransferBody(InternalTransferBody internalTransferBody) {
         String receiveAddress = internalTransferBody.getReceiveAddress();
-        TopUserEntity receiveUserEntity = topUserService.getByWallet(receiveAddress);
+        TopUser receiveUserEntity = topUserService.getByWallet(receiveAddress);
         Long receiveUserId = receiveUserEntity.getId();
         String sendWallet = internalTransferBody.getWallet();
-        TopUserEntity sendUser = topUserService.getByWallet(sendWallet);
+        TopUser sendUser = topUserService.getByWallet(sendWallet);
         Long sendUserId = sendUser.getId();
         String symbol = internalTransferBody.getSymbol();
         BigDecimal amount = internalTransferBody.getAmount();

@@ -12,7 +12,7 @@ import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.entity.TopStore;
 import com.ruoyi.web.entity.TopStoreOrder;
 import com.ruoyi.web.entity.TopToken;
-import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.enums.Status;
 import com.ruoyi.web.enums.TopNo;
@@ -76,7 +76,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
             throw new ServiceException("币种价格无法获取", 500);
         }
-        TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
+        TopUser user = userMapper.selectByWalletAddress(walletAddress);
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
         TopStoreOrder order = new TopStoreOrder();
         order.setStoreId(store.getId());

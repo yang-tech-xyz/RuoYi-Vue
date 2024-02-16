@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.web.mapper.TopUserMapper">
 
-    <select id="selectByWalletAddress" resultType="com.ruoyi.web.entity.TopUserEntity">
+    <select id="selectByWalletAddress" resultType="com.ruoyi.web.entity.TopUser">
         select *
         from top_user
         where wallet = #{walletAddress}
@@ -36,7 +36,7 @@
         where tu.wallet = #{walletAddress}
     </select>
 
-    <select id="selectParent" resultType="com.ruoyi.web.entity.TopUserEntity">
+    <select id="selectParent" resultType="com.ruoyi.web.entity.TopUser">
         select
             tu.*
         from top_user tu

@@ -1,7 +1,7 @@
 package com.ruoyi.web.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.entity.TopUserInvite;
 import com.ruoyi.web.mapper.TopUserInviteMapper;
 import com.ruoyi.web.mapper.TopUserMapper;
@@ -43,7 +43,7 @@ public class TopUserInviteService extends ServiceImpl<TopUserInviteMapper, TopUs
 
     public List<Long> getSpreadParent(Long parentId) {
         List<Long> parentList = new ArrayList<>();
-        TopUserEntity parent = userMapper.selectParent(parentId);
+        TopUser parent = userMapper.selectParent(parentId);
         if (null == parent) {
             return parentList;
         }

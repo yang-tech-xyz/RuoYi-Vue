@@ -7,7 +7,7 @@ import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.dto.AccountTxRequest;
 import com.ruoyi.web.dto.AccountTxRequestDetail;
 import com.ruoyi.web.entity.TopAccount;
-import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.mapper.TopAccountMapper;
 import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.utils.StringUtils;
@@ -78,7 +78,7 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
      * 获取用户所有资产
      */
     public List<AccountVO> getAccounts(String walletAddress, String symbol) {
-        TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
+        TopUser user = userMapper.selectByWalletAddress(walletAddress);
         List<TopAccount> accounts = baseMapper.selectList(new LambdaQueryWrapper<TopAccount>()
                 .eq(TopAccount::getUserId, user.getId())
                 .eq(StringUtils.isNotBlank(symbol), TopAccount::getSymbol, symbol));

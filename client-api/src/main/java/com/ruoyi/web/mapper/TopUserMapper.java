@@ -1,7 +1,7 @@
 package com.ruoyi.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.ruoyi.web.entity.TopUserEntity;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.vo.InviteInfoVO;
 import com.ruoyi.web.vo.InviteVO;
 import com.ruoyi.web.vo.UserProcessVO;
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface TopUserMapper extends BaseMapper<TopUserEntity> {
+public interface TopUserMapper extends BaseMapper<TopUser> {
 
-    TopUserEntity selectByWalletAddress(@Param("walletAddress") String walletAddress);
+    TopUser selectByWalletAddress(@Param("walletAddress") String walletAddress);
 
     List<UserProcessVO> selectUserVOList();
 
@@ -21,5 +21,5 @@ public interface TopUserMapper extends BaseMapper<TopUserEntity> {
 
     InviteInfoVO selectInviteInfo(@Param("walletAddress") String walletAddress);
 
-    TopUserEntity selectParent(@Param("parentId") Long parentId);
+    TopUser selectParent(@Param("parentId") Long parentId);
 }
