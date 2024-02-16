@@ -7,6 +7,7 @@ import com.ruoyi.web.dto.AdminAddDTO;
 import com.ruoyi.web.dto.AdminLoginDTO;
 import com.ruoyi.web.dto.AdminUpdateDTO;
 import com.ruoyi.web.entity.TopAdmin;
+import com.ruoyi.web.enums.Status;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopAdminMapper;
 import com.ruoyi.web.otp.OtpAuthenticator;
@@ -34,6 +35,9 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         TopAdmin admin = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopAdmin>()
                         .eq(TopAdmin::getAccount, dto.getAccount())))
                 .orElseThrow(() -> new ServiceException("账号或密码错误", 500));
+        if (!admin.getStatus().equals(Status._1._value)) {
+            throw new ServiceException("状态错误", 500);
+        }
         if (!passwordEncoder.matches(dto.getPassword(), admin.getPassword())) {
             throw new ServiceException("账号或密码错误", 500);
         }
