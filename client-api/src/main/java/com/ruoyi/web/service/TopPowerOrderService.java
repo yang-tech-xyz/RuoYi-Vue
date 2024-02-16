@@ -46,7 +46,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
     private TopAccountService topAccountService;
 
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void buyOrder(BuyPowerBody buyPowerBody) {
         TopPowerOrder topPowerOrder = new TopPowerOrder();
         List<TopPowerConfig> powerConfigs = topPowerConfigService.list();

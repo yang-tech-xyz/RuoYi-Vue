@@ -21,15 +21,14 @@ import java.util.Optional;
 
 /**
  * 充值
- * 
+ *
  * @author ruoyi
  */
 @Slf4j
 @RequestMapping("/token")
 @Tag(description = "TokenController", name = "token信息")
 @RestController
-public class TopCoinController
-{
+public class TopTokenController {
 
     @Autowired
     private TopTokenService topTokenService;
@@ -37,11 +36,17 @@ public class TopCoinController
     @Autowired
     private TopTransactionService topTransactionService;
 
+    @Operation(summary = "查询当前所有币种")
+    @GetMapping("/getList")
+    public AjaxResult<List<TokenVO>> getList() {
+        return AjaxResult.success(topTokenService.getList());
+    }
+
     @Operation(summary = "根据链id查询所有支持的token")
     @GetMapping("queryTokensByChainId")
-    public AjaxResult queryTokensByChainId(@Parameter String chainId){
-        List<TopTokenChainVO> list= topTokenService.queryTokensByChainId(chainId);
-        return AjaxResult.success("success",list);
+    public AjaxResult queryTokensByChainId(@Parameter String chainId) {
+        List<TopTokenChainVO> list = topTokenService.queryTokensByChainId(chainId);
+        return AjaxResult.success("success", list);
     }
 
 
@@ -53,7 +58,7 @@ public class TopCoinController
      */
     @Operation(summary = "充值到账")
     @PostMapping("/recharge")
-    public AjaxResult recharge(@RequestBody RechargeBody rechargeBody)throws Exception{
+    public AjaxResult recharge(@RequestBody RechargeBody rechargeBody) throws Exception {
         Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(rechargeBody.getHash());
         if (topTransactionOptional.isPresent()) {
             return AjaxResult.error("transaction has exist!");
@@ -66,31 +71,31 @@ public class TopCoinController
      */
     @Operation(summary = "提币")
     @PostMapping("/withdraw")
-    public AjaxResult claim(@RequestBody WithdrawBody withdrawBody)throws Exception{
+    public AjaxResult claim(@RequestBody WithdrawBody withdrawBody) throws Exception {
         try {
-            boolean validateResult = UnsignMessageUtils.validate(withdrawBody.getSignMsg(),withdrawBody.getContent(),withdrawBody.getWallet());
-            if(!validateResult){
+            boolean validateResult = UnsignMessageUtils.validate(withdrawBody.getSignMsg(), withdrawBody.getContent(), withdrawBody.getWallet());
+            if (!validateResult) {
                 return AjaxResult.error("validate sign error!");
             }
         } catch (SignatureException e) {
-            log.error("签名错误",e);
+            log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
         String symbol = withdrawBody.getSymbol();
-        if(symbol.equalsIgnoreCase(CommonSymbols.BTC_SYMBOL)){
+        if (symbol.equalsIgnoreCase(CommonSymbols.BTC_SYMBOL)) {
             return topTokenService.withdrawBTC(withdrawBody);
-        }else {
+        } else {
             return topTokenService.withdraw(withdrawBody);
         }
     }
 
     @Operation(summary = "内部转账")
     @PostMapping("internalTransfer")
-    public AjaxResult internalTransfer(@RequestBody InternalTransferBody internalTransferBody){
+    public AjaxResult internalTransfer(@RequestBody InternalTransferBody internalTransferBody) {
         try {
-            boolean validateResult = UnsignMessageUtils.validate(internalTransferBody.getSignMsg(),internalTransferBody.getContent(),internalTransferBody.getWallet());
+            boolean validateResult = UnsignMessageUtils.validate(internalTransferBody.getSignMsg(), internalTransferBody.getContent(), internalTransferBody.getWallet());
         } catch (SignatureException e) {
-            log.error("签名错误",e);
+            log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
         topTokenService.internalTransferBody(internalTransferBody);
@@ -99,11 +104,11 @@ public class TopCoinController
 
     @Operation(summary = "BTC市价兑换USDT")
     @PostMapping("exchangeBTC2USDT")
-    public AjaxResult  exchangeBTC2USDT(@RequestBody ExchangeBody exchangeBody){
+    public AjaxResult exchangeBTC2USDT(@RequestBody ExchangeBody exchangeBody) {
         try {
-            boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(),exchangeBody.getContent(),exchangeBody.getWallet());
+            boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(), exchangeBody.getContent(), exchangeBody.getWallet());
         } catch (SignatureException e) {
-            log.error("签名错误",e);
+            log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
         topTokenService.exchangeBTC2USDT(exchangeBody);

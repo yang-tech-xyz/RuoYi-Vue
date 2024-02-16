@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 public class StoreVO {
@@ -14,21 +15,31 @@ public class StoreVO {
     @Schema(description = "产品名称")
     private String name;
 
-    @Schema(description = "产品周期（月）,每月限定30天")
+    @Schema(description = "产品周期（月）,自然月")
     private Integer period;
 
-    @Schema(description = "存入币种")
-    private String symbol;
+    @Schema(description = "最低投资数量")
+    private BigDecimal limitMinAmount;
 
-    @Schema(description = "收益币种")
-    private String incomeSymbol;
+    @Schema(description = "展示利率")
+    private String displayRate;
 
-    @Schema(description = "最低倍数投资额")
-    private Integer limitOrderAmount;
-
-    @Schema(description = "收益利率")
+    @Schema(description = "实际利率")
     private BigDecimal rate;
 
-    private BigDecimal price = BigDecimal.ZERO;
+    @Schema(description = "状态：1=有效，2=无效")
+    private Integer status;
+
+    @Schema(description = "创建日期")
+    private LocalDateTime createdDate;
+
+    @Schema(description = "创建人")
+    private String createdBy;
+
+    @Schema(description = "更新日期")
+    private LocalDateTime updatedDate;
+
+    @Schema(description = "更新人")
+    private String updatedBy;
 
 }

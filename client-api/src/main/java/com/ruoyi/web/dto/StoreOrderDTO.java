@@ -2,7 +2,9 @@ package com.ruoyi.web.dto;
 
 import com.ruoyi.common.SignBaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -14,8 +16,13 @@ public class StoreOrderDTO extends SignBaseEntity {
     @NotNull
     private Long storeId;
 
-    @Schema(description = "投注金额:USD")
+    @Schema(description = "币种")
+    @NotBlank
+    private String symbol;
+
+    @Schema(description = "投入币种数量")
     @NotNull
-    private Integer amount;
+    @Positive
+    private BigDecimal amount;
 
 }

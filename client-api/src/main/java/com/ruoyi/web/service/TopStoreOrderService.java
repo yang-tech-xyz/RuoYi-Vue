@@ -1,8 +1,8 @@
 package com.ruoyi.web.service;
 
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,6 +11,7 @@ import com.ruoyi.web.dto.StoreOrderDTO;
 import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.entity.TopStore;
 import com.ruoyi.web.entity.TopStoreOrder;
+import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.entity.TopUserEntity;
 import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.enums.Status;
@@ -27,13 +28,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 
 @Service
 public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopStoreOrder> {
@@ -48,6 +45,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
     private TopAccountService accountService;
 
     @Autowired
+    private TopTokenService topTokenService;
+
+    @Autowired
     private TopTokenPriceService topTokenPriceService;
 
     /**
@@ -60,7 +60,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
 
     /**
      * 存单
-     * 1.存入币种的金额，必须是100U的倍数
+     * 1.存入币种数量
      */
     @Transactional(rollbackFor = Exception.class)
     public Boolean order(String walletAddress, StoreOrderDTO dto) {
@@ -68,12 +68,13 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         if (store.getStatus() != 1) {
             throw new ServiceException("状态错误", 500);
         }
-        BigDecimal tokenPrice = topTokenPriceService.getPrice(store.getSymbol());
+        TopToken token = topTokenService.getBySymbol(dto.getSymbol());
+        if (BooleanUtil.isFalse(token.getStoreEnabled())) {
+            throw new ServiceException("当前币种无法进行存单", 500);
+        }
+        BigDecimal tokenPrice = topTokenPriceService.getPrice(dto.getSymbol());
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
             throw new ServiceException("币种价格无法获取", 500);
-        }
-        if (dto.getAmount() % store.getLimitOrderAmount() != 0) {
-            throw new ServiceException("请存入整数倍", 500);
         }
         TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
@@ -81,14 +82,12 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setStoreId(store.getId());
         order.setUserId(user.getId());
         order.setOrderNo(orderNo);
-        order.setSymbol(store.getSymbol());
-        order.setIncomeSymbol(store.getIncomeSymbol());
+        order.setSymbol(dto.getSymbol());
+        order.setAmount(dto.getAmount());
         order.setPrice(tokenPrice);
-        order.setAmount(new BigDecimal(dto.getAmount()).divide(order.getPrice(), 8, RoundingMode.DOWN));
-        order.setRate(store.getRate());
-        order.setIncome(new BigDecimal(dto.getAmount()).multiply(order.getRate()));
-        order.setStoreDate(LocalDateTime.now());
-        order.setReleaseDate(LocalDate.now().plusDays(store.getPeriod() * 30));
+        order.setInvestAmount(order.getAmount().multiply(order.getPrice()));
+        order.setOrderDate(LocalDateTime.now());
+        order.setReleaseDate(LocalDate.now().plusMonths(store.getPeriod()));
         order.setStatus(Status._1._value);
         order.setCreatedBy(user.getId().toString());
         order.setCreatedDate(LocalDateTime.now());
@@ -101,7 +100,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                         AccountRequest.builder()
                                 .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_IN.typeCode))
                                 .userId(user.getId())
-                                .token(store.getSymbol())
+                                .token(order.getSymbol())
                                 .fee(BigDecimal.ZERO)
                                 .balanceChanged(order.getAmount().negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
@@ -123,67 +122,6 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         pageVO.setTotal(iPage.getTotal());
         pageVO.setList(iPage.getRecords());
         return pageVO;
-    }
-
-    /**
-     * 赎回
-     * 1.本金退回，利息发放
-     * 2.达到赎回时间以后的订单
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public Boolean redeem(String walletAddress) {
-        TopUserEntity user = userMapper.selectByWalletAddress(walletAddress);
-        LocalDate now = LocalDate.now();
-        List<TopStoreOrder> storeOrders = baseMapper.selectList(new LambdaQueryWrapper<TopStoreOrder>()
-                .eq(TopStoreOrder::getUserId, user.getId())
-                .eq(TopStoreOrder::getStatus, Status._1._value)
-                .ge(TopStoreOrder::getReleaseDate, now));
-        if (storeOrders.isEmpty()) {
-            throw new ServiceException("没有可赎回的订单", 500);
-        }
-        List<AccountRequest> requests = new ArrayList<>();
-        for (TopStoreOrder storeOrder : storeOrders) {
-            TopStoreOrder lock = baseMapper.lockByOrderNo(storeOrder.getOrderNo());
-            if (!Objects.equals(lock.getStatus(), Status._1._value)) {
-                continue;
-            }
-            if (storeOrder.getReleaseDate().isBefore(now)) {
-                continue;
-            }
-            lock.setStatus(Status._2._value);
-            lock.setRedeemDate(LocalDateTime.now());
-            baseMapper.updateById(lock);
-            requests.add(
-                    AccountRequest.builder()
-                            .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_REDEEM.typeCode))
-                            .userId(user.getId())
-                            .token(lock.getSymbol())
-                            .fee(BigDecimal.ZERO)
-                            .balanceChanged(lock.getAmount())
-                            .balanceTxType(Account.Balance.AVAILABLE)
-                            .txType(Account.TxType.STORE_REDEEM)
-                            .remark("本金赎回")
-                            .build()
-            );
-            requests.add(
-                    AccountRequest.builder()
-                            .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_REDEEM_INTEREST.typeCode))
-                            .userId(user.getId())
-                            .token(lock.getIncomeSymbol())
-                            .fee(BigDecimal.ZERO)
-                            .balanceChanged(lock.getIncome())
-                            .balanceTxType(Account.Balance.AVAILABLE)
-                            .txType(Account.TxType.STORE_REDEEM_INTEREST)
-                            .remark("赎回利息")
-                            .build()
-            );
-        }
-        if (!requests.isEmpty()) {
-            accountService.processAccount(
-                    requests
-            );
-        }
-        return true;
     }
 
 }

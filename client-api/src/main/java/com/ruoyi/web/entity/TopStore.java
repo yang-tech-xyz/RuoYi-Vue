@@ -27,23 +27,19 @@ public class TopStore implements Serializable {
     @TableField(value = "name")
     private String name;
 
-    @Schema(description = "产品周期（月）,每月限定30天")
+    @Schema(description = "产品周期（月）,自然月")
     @TableField(value = "period")
     private Integer period;
 
-    @Schema(description = "存入币种")
-    @TableField(value = "symbol")
-    private String symbol;
+    @Schema(description = "最低投资数量")
+    @TableField(value = "limit_min_amount")
+    private BigDecimal limitMinAmount;
 
-    @Schema(description = "收益币种")
-    @TableField(value = "income_symbol")
-    private String incomeSymbol;
+    @Schema(description = "展示利率")
+    @TableField(value = "display_rate")
+    private String displayRate;
 
-    @Schema(description = "最低倍数投资额")
-    @TableField(value = "limit_order_amount")
-    private Integer limitOrderAmount;
-
-    @Schema(description = "收益利率")
+    @Schema(description = "实际利率")
     @TableField(value = "rate")
     private BigDecimal rate;
 

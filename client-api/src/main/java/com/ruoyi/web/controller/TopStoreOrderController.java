@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
 
-@Tag(description = "存币生息订单", name = "存币生息订单")
+@Tag(description = "理财订单", name = "理财订单")
 @RestController
 @RequestMapping("topStoreOrder")
 public class TopStoreOrderController {
@@ -23,30 +23,18 @@ public class TopStoreOrderController {
     @Autowired
     private TopStoreOrderService service;
 
-    @Operation(summary = "存单信息")
-    @GetMapping("/info")
-    public AjaxResult info() {
-        return AjaxResult.success(service.info(RequestUtil.getWalletAddress()));
-    }
-
     @Operation(summary = "存单")
     @PostMapping("/order")
     public AjaxResult order(@RequestBody StoreOrderDTO dto) {
         try {
-            boolean validateResult = UnsignMessageUtils.validate(dto.getSignMsg(),dto.getContent(),dto.getWallet());
-            if(!validateResult){
+            boolean validateResult = UnsignMessageUtils.validate(dto.getSignMsg(), dto.getContent(), dto.getWallet());
+            if (!validateResult) {
                 return AjaxResult.error("validate sign error!");
             }
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
         return AjaxResult.success(service.order(RequestUtil.getWalletAddress(), dto));
-    }
-
-    @Operation(summary = "赎回:[到期可以赎回]")
-    @PostMapping("/redeem")
-    public AjaxResult redeem() {
-        return AjaxResult.success(service.redeem(RequestUtil.getWalletAddress()));
     }
 
     @Operation(summary = "查询订单")

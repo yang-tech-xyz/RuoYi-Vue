@@ -18,7 +18,6 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopTokenMapper;
 import com.ruoyi.web.vo.*;
 import jakarta.annotation.PostConstruct;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -163,7 +162,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Address address = (Address) refMethod.invoke(null, to, 0, Address.class);
             log.info("address is transfer address???:{}", address.getValue());
             // TODO 检查项目方的地址
-            if(!receiveAddress.equalsIgnoreCase(address.getValue())){
+            if (!receiveAddress.equalsIgnoreCase(address.getValue())) {
                 return AjaxResult.error("the address is not the project wallet address");
             }
             Uint256 amount = (Uint256) refMethod.invoke(null, value, 0, Uint256.class);
@@ -195,10 +194,11 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         return ajax;
     }
 
-    private BigInteger getDecimalOfContract(Web3j web3j,String contractAddress,String from) throws IOException {
+    private BigInteger getDecimalOfContract(Web3j web3j, String contractAddress, String from) throws IOException {
         // Define the function we want to invoke from the smart contract
         Function function = new Function("decimals", Arrays.asList(),
-                Arrays.asList(new TypeReference<Uint256>() {}));
+                Arrays.asList(new TypeReference<Uint256>() {
+                }));
 
 
         // Encode it for the contract to understand
@@ -216,7 +216,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         return Numeric.toBigInt(response.getValue());
     }
 
-    private boolean validateTransactionReceipt(String hash,Web3j web3j)throws Exception{
+    private boolean validateTransactionReceipt(String hash, Web3j web3j) throws Exception {
         Optional<TransactionReceipt> transactionReceiptOptional = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();
         if (!transactionReceiptOptional.isPresent()) {
             log.error("get transactionReceiptOptional error! hash value:{}", hash);
@@ -321,7 +321,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
 
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
-            if (validateTransactionReceipt(hash,web3j)) {
+            if (validateTransactionReceipt(hash, web3j)) {
                 topTransaction.setIsConfirm(1);
                 topTransaction.setStatus("0x1");
                 Long userId = topTransaction.getUserId().longValue();
@@ -352,6 +352,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException(e);
         }
     }
+
     @Transactional(rollbackFor = Exception.class)
     public boolean confirmWithdrawToken(String hash) {
         try {
@@ -368,7 +369,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
 
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
-            if (validateTransactionReceipt(hash,web3j)) {
+            if (validateTransactionReceipt(hash, web3j)) {
                 topTransaction.setIsConfirm(1);
                 topTransaction.setStatus("0x1");
                 Long userId = topTransaction.getUserId().longValue();
@@ -387,7 +388,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     @Transactional
-    public AjaxResult withdraw(WithdrawBody withdrawBody)throws Exception {
+    public AjaxResult withdraw(WithdrawBody withdrawBody) throws Exception {
         TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
         String wallet = withdrawBody.getWallet();
@@ -408,23 +409,23 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
         // 链上转账
         Optional<TopToken> topTokenOptional = topTokenService.queryTokenBySymbol(symbol);
-        if(!topTokenOptional.isPresent()){
-            log.error("token not exist!,symbol is:{}",symbol);
+        if (!topTokenOptional.isPresent()) {
+            log.error("token not exist!,symbol is:{}", symbol);
             throw new ServiceException("token not exist!");
         }
         TopToken topToken = topTokenOptional.get();
         Integer topTokenId = topToken.getId();
         Long chainId = withdrawBody.getChainId();
         Optional<TopTokenChainVO> topTokenChainVOOptional = this.queryTokenByTokenIdAndChainId(topTokenId, chainId);
-        if(!topTokenChainVOOptional.isPresent()){
-            log.error("token chain config is not exist,tokenId is:{},chainId is:{}",topTokenId,chainId);
+        if (!topTokenChainVOOptional.isPresent()) {
+            log.error("token chain config is not exist,tokenId is:{},chainId is:{}", topTokenId, chainId);
             throw new ServiceException("token chain config is not exist");
         }
         TopTokenChainVO topTokenChainVO = topTokenChainVOOptional.get();
         String contractAddress = topTokenChainVO.getErc20Address();
         Optional<TopChain> optByChainIdOptional = topChainService.getOptByChainId(chainId);
-        if(!optByChainIdOptional.isPresent()){
-            log.error("chain is not exist,chainId is:{}",chainId);
+        if (!optByChainIdOptional.isPresent()) {
+            log.error("chain is not exist,chainId is:{}", chainId);
             throw new ServiceException("chain is not exist");
         }
         TopChain topChain = optByChainIdOptional.get();
@@ -437,7 +438,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
         TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
         BigDecimal feeRatio = topPowerConfig.getFeeRatio();
-        if(feeRatio==null){
+        if (feeRatio == null) {
             throw new ServiceException("fee ratio is null");
         }
         BigDecimal fee = withdrawAmount.multiply(feeRatio);
@@ -446,18 +447,17 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         BigDecimal transferAmount = withdrawAmount.subtract(fee);
 
 
-
         BigInteger tokenAmount = transferAmount.multiply(new BigDecimal("10").pow(decimalOfContract.intValue())).toBigInteger();
         // TODO get the privateKey;
-        if(topPowerConfig==null){
+        if (topPowerConfig == null) {
             throw new ServiceException("power config is not exist");
         }
         String curve = topPowerConfig.getCurve();
         String iv = "1234567812345678";
-        String key = secret.substring(0,16);
+        String key = secret.substring(0, 16);
         AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
         String s = aes.decryptStr(curve);
-        String transactionHash = transferToken(web3j,contractAddress,s,to,tokenAmount);
+        String transactionHash = transferToken(web3j, contractAddress, s, to, tokenAmount);
 
         //扣除用户的资金
         accountService.processAccount(
@@ -500,18 +500,19 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     /**
      * btc 提现
+     *
      * @param withdrawBody
      * @return
      * @throws Exception
      */
     @Transactional
-    public AjaxResult withdrawBTC(WithdrawBody withdrawBody)throws Exception {
+    public AjaxResult withdrawBTC(WithdrawBody withdrawBody) throws Exception {
         TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
         String wallet = withdrawBody.getWallet();
         TopUserEntity topUserEntity = topUserService.getByWallet(wallet);
         String btcTransferAddress = topUserEntity.getBtcTransferAddress();
-        if(StringUtils.isEmpty(btcTransferAddress)){
+        if (StringUtils.isEmpty(btcTransferAddress)) {
             throw new ServiceException("btcWallet is empty!");
         }
         Long userId = topUserEntity.getId();
@@ -523,8 +524,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         }
 
         Optional<TopToken> topTokenOptional = topTokenService.queryTokenBySymbol(symbol);
-        if(!topTokenOptional.isPresent()){
-            log.error("token not exist!,symbol is:{}",symbol);
+        if (!topTokenOptional.isPresent()) {
+            log.error("token not exist!,symbol is:{}", symbol);
             throw new ServiceException("token not exist!");
         }
         TopToken topToken = topTokenOptional.get();
@@ -533,7 +534,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         BigDecimal withdrawAmount = withdrawBody.getAmount();
         TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
         BigDecimal feeRatio = topPowerConfig.getFeeRatio();
-        if(feeRatio==null){
+        if (feeRatio == null) {
             throw new ServiceException("fee ratio is null");
         }
         BigDecimal fee = withdrawAmount.multiply(feeRatio);
@@ -582,7 +583,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         return AjaxResult.success("success");
     }
 
-    public String transferToken(Web3j web3j,String contractAddress,String privateKey,String to,BigInteger amount) throws Exception {
+    public String transferToken(Web3j web3j, String contractAddress, String privateKey, String to, BigInteger amount) throws Exception {
 
         BigInteger bigInteger = new BigInteger(privateKey, 16);
         ECKeyPair ecKeyPair = ECKeyPair.create(bigInteger);
@@ -602,13 +603,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String encodedFunction = FunctionEncoder.encode(function);
         log.info("gas price is:{}", DefaultGasProvider.GAS_PRICE);
         log.info("DefaultGasProvider.GAS_LIMIT is:{}", DefaultGasProvider.GAS_LIMIT);
-        RawTransaction rawTransaction = RawTransaction.createTransaction(nonce,  DefaultGasProvider.GAS_PRICE,
+        RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, DefaultGasProvider.GAS_PRICE,
                 new BigInteger("210000"), contractAddress, encodedFunction);
         byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
         String hexValue = Numeric.toHexString(signedMessage);
         EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
         Object transactionHash = ethSendTransaction.getTransactionHash();
-        log.info("transactionHash is:{}",transactionHash.toString());
+        log.info("transactionHash is:{}", transactionHash.toString());
         return transactionHash.toString();
     }
 
@@ -663,7 +664,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String wallet = exchangeBody.getWallet();
         Long userId = topUserService.getByWallet(wallet).getId();
         String originSymbol = "BTC";
-        String exchangeSymbol ="USDT";
+        String exchangeSymbol = "USDT";
 
         BigDecimal btcPrice = topTokenPriceService.getPrice(originSymbol);
         BigDecimal exchangeAmount = amount.multiply(btcPrice);
@@ -702,5 +703,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .build()
                 )
         );
+    }
+
+    public List<TokenVO> getList() {
+        return baseMapper.selectListVO();
+    }
+
+    public TopToken getBySymbol(String symbol) {
+        return baseMapper.selectOne(new LambdaQueryWrapper<TopToken>().eq(TopToken::getSymbol, symbol));
     }
 }

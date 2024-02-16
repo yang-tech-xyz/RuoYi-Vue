@@ -1,72 +1,66 @@
 package com.ruoyi.web.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.*;
+import java.math.BigDecimal;
+import java.io.Serializable;
+import lombok.*;
+import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.annotations.ApiModelProperty;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @TableName(value = "top_store")
 public class TopStore implements Serializable {
-
-    @Schema(description = "主键")
+    
+    @ApiModelProperty("主键")
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @Schema(description = "产品名称")
+    @ApiModelProperty("产品名称")
     @TableField(value = "name")
     private String name;
-
-    @Schema(description = "产品周期（月）,每月限定30天")
+    
+    @ApiModelProperty("产品周期（月）,自然月")
     @TableField(value = "period")
     private Integer period;
-
-    @Schema(description = "存入币种")
-    @TableField(value = "symbol")
-    private String symbol;
-
-    @Schema(description = "收益币种")
-    @TableField(value = "income_symbol")
-    private String incomeSymbol;
-
-    @Schema(description = "最低倍数投资额")
-    @TableField(value = "limit_order_amount")
-    private Integer limitOrderAmount;
-
-    @Schema(description = "收益利率")
+    
+    @ApiModelProperty("最低投资数量")
+    @TableField(value = "limit_min_amount")
+    private BigDecimal limitMinAmount;
+    
+    @ApiModelProperty("展示利率")
+    @TableField(value = "display_rate")
+    private String displayRate;
+    
+    @ApiModelProperty("实际利率")
     @TableField(value = "rate")
     private BigDecimal rate;
-
-    @Schema(description = "状态：1=有效，2=无效")
+    
+    @ApiModelProperty("状态：1=有效，2=无效")
     @TableField(value = "status")
     private Integer status;
-
-    @Schema(description = "创建日期")
+    
+    @ApiModelProperty("创建日期")
     @TableField(value = "created_date")
     private LocalDateTime createdDate;
-
-    @Schema(description = "创建人")
+    
+    @ApiModelProperty("创建人")
     @TableField(value = "created_by")
     private String createdBy;
-
-    @Schema(description = "更新日期")
+    
+    @ApiModelProperty("更新日期")
     @TableField(value = "updated_date")
     private LocalDateTime updatedDate;
-
-    @Schema(description = "更新人")
+    
+    @ApiModelProperty("更新人")
     @TableField(value = "updated_by")
     private String updatedBy;
-
+    
 
 }
 

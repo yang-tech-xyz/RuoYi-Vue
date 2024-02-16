@@ -38,17 +38,25 @@ public class TopToken implements Serializable {
     @TableField(value = "online")
     private Integer online;
 
+    @Schema(description = "是否挖矿")
+    @TableField(value = "power_enabled")
+    private Boolean powerEnabled;
+
+    @Schema(description = "是否理财")
+    @TableField(value = "store_enabled")
+    private Boolean storeEnabled;
+
     @Schema(description = "${column.comment}")
     @TableField(value = "create_time")
     private LocalDateTime createTime;
 
     @Schema(description = "${column.comment}")
-    @TableField(value = "update_time")
-    private LocalDateTime updateTime;
-
-    @Schema(description = "${column.comment}")
     @TableField(value = "create_by")
     private String createBy;
+
+    @Schema(description = "${column.comment}")
+    @TableField(value = "update_time")
+    private LocalDateTime updateTime;
 
     @Schema(description = "${column.comment}")
     @TableField(value = "update_by")
