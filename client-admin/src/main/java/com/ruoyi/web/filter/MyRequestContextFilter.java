@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 @Component
 @Slf4j
-public class RequestContextFilter extends OncePerRequestFilter {
+public class MyRequestContextFilter extends OncePerRequestFilter {
 
     @Autowired
     @Qualifier("handlerExceptionResolver")
