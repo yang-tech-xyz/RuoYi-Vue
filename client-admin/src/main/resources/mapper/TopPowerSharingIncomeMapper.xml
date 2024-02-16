@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.web.mapper.TopPowerSharingIncomeMapper">
+
+    <update id="updateProcessEnabled">
+        update top_power_sharing_income
+        set process_enabled = 1
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="selectProcessIncomeByUserId" resultType="com.ruoyi.web.vo.SharingIncomeProcessVO">
+        SELECT
+            income_symbol as symbol,
+            sum( income ) AS income
+        FROM
+            top_power_sharing_income
+        WHERE
+            user_id = #{userId} and process_enabled = 0
+        GROUP BY
+            income_symbol
+    </select>
+
+</mapper>
+

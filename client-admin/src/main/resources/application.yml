@@ -1,7 +1,7 @@
 # 项目相关配置
 ruoyi:
   # 名称
-  name: client-api
+  name: client-admin
   # 版本
   version: 3.8.7
   # 版权年份
@@ -16,10 +16,10 @@ ruoyi:
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8081
+  port: 8082
   servlet:
     # 应用的访问路径
-    context-path: /api/app
+    context-path: /api/admin
   tomcat:
     # tomcat的URI编码
     uri-encoding: UTF-8
@@ -48,7 +48,7 @@ user:
 # Spring配置
 spring:
   application:
-    name: clientApi
+    name: clientAdmin
   main:
     allow-circular-references: true
   # 资源信息
