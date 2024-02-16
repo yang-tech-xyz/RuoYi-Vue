@@ -2,10 +2,10 @@ package com.ruoyi.web.filter;
 
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.utils.LoginUtil;
-import com.ruoyi.web.utils.StringUtils;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
@@ -32,6 +32,10 @@ public class RequestContextFilter implements Filter {
      */
     private void initializeRequestAttributes(HttpServletRequest request) {
         String url = request.getRequestURI();
+        // swagger
+        if (StringUtils.equalsAny(url, "doc.html", "api-docs", "webjars")) {
+            return;
+        }
         if (url.contains("public")) {
             return;
         }
