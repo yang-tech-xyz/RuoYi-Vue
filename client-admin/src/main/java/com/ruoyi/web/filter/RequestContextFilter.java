@@ -2,35 +2,33 @@ package com.ruoyi.web.filter;
 
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.utils.LoginUtil;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
 /**
  * 过滤器
  */
+@Component
 @Slf4j
-public class RequestContextFilter implements Filter {
+public class RequestContextFilter extends OncePerRequestFilter {
+
+    @Autowired
+    @Qualifier("handlerExceptionResolver")
+    private HandlerExceptionResolver resolver;
 
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-        log.info("Filter init ...");
-    }
-
-    @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        initializeRequestAttributes((HttpServletRequest) servletRequest);
-        filterChain.doFilter(servletRequest, servletResponse);
-    }
-
-
-    /**
-     * 处理Request参数
-     */
-    private void initializeRequestAttributes(HttpServletRequest request) {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String url = request.getRequestURI();
         // swagger
         if (StringUtils.containsAny(url, "doc.html", "api-docs", "webjars")) {
@@ -41,10 +39,12 @@ public class RequestContextFilter implements Filter {
         }
         String token = request.getHeader("token");
         if (StringUtils.isBlank(token)) {
-            throw new ServiceException("未登录", 500);
+            resolver.resolveException(request, response, null, new ServiceException("未登录", 500));
+            return;
         }
         if (!LoginUtil.loginMap.containsKey(token)) {
-            throw new ServiceException("未登录", 500);
+            resolver.resolveException(request, response, null, new ServiceException("未登录", 500));
+            return;
         }
         request.setAttribute("adminId", LoginUtil.loginMap.get(token));
     }
