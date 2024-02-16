@@ -1,32 +1,59 @@
 package com.ruoyi.web.entity;
 
-import com.ruoyi.common.BaseEntity;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * 币种配置对象 top_token
- * 
- * @author ruoyi
- * @date 2024-02-03
- */
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 @Data
-public class TopToken extends BaseEntity
-{
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+@AllArgsConstructor
+@TableName(value = "top_token")
+public class TopToken implements Serializable {
 
-    /** 主键 */
+    @Schema(description = "主键")
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /** token 名称 */
     @Schema(description = "token 名称")
+    @TableField(value = "symbol")
     private String symbol;
 
-//    /** 小数位 */
-//    @Schema(description = "小数位")
-//    private Integer decimals;
+    @Schema(description = "小数位")
+    @TableField(value = "decimals")
+    private Integer decimals;
 
-    /** 是否上线: 0,上线,1下线 */
+    @Schema(description = "价格平台")
+    @TableField(value = "plate")
+    private String plate;
+
     @Schema(description = "是否上线: 0,上线,1下线")
-    private Long online;
+    @TableField(value = "online")
+    private Integer online;
+
+    @Schema(description = "${column.comment}")
+    @TableField(value = "create_time")
+    private LocalDateTime createTime;
+
+    @Schema(description = "${column.comment}")
+    @TableField(value = "update_time")
+    private LocalDateTime updateTime;
+
+    @Schema(description = "${column.comment}")
+    @TableField(value = "create_by")
+    private String createBy;
+
+    @Schema(description = "${column.comment}")
+    @TableField(value = "update_by")
+    private String updateBy;
+
+
 }
+
