@@ -3,18 +3,24 @@ package com.ruoyi.web.service;
 import cn.hutool.core.lang.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.web.dto.AdminAddDTO;
 import com.ruoyi.web.dto.AdminLoginDTO;
+import com.ruoyi.web.dto.AdminUpdateDTO;
 import com.ruoyi.web.entity.TopAdmin;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopAdminMapper;
 import com.ruoyi.web.otp.OtpAuthenticator;
 import com.ruoyi.web.utils.LoginUtil;
+import com.ruoyi.web.utils.RequestUtil;
+import com.ruoyi.web.utils.StringUtils;
 import com.ruoyi.web.vo.AdminLoginVO;
 import com.ruoyi.web.vo.AdminVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,4 +49,36 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
     public List<AdminVO> getList() {
         return baseMapper.selectListVO();
     }
+
+    public Boolean add(AdminAddDTO dto) {
+        TopAdmin admin = new TopAdmin();
+        BeanUtils.copyProperties(dto, admin);
+        admin.setPassword(passwordEncoder.encode(dto.getPassword()));
+        admin.setCreatedBy(RequestUtil.getAdminId());
+        admin.setUpdatedDate(LocalDateTime.now());
+        admin.setUpdatedBy(RequestUtil.getAdminId());
+        admin.setUpdatedDate(LocalDateTime.now());
+        baseMapper.insert(admin);
+        return true;
+    }
+
+    public Boolean edit(AdminUpdateDTO dto) {
+        TopAdmin admin = baseMapper.selectOne(new LambdaQueryWrapper<TopAdmin>().eq(TopAdmin::getAccount, dto.getAccount()));
+        if (StringUtils.isNotBlank(dto.getPassword())) {
+            admin.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+        admin.setGoogleSecret(dto.getGoogleSecret());
+        admin.setStatus(dto.getStatus());
+        admin.setCreatedBy(RequestUtil.getAdminId());
+        admin.setUpdatedDate(LocalDateTime.now());
+        admin.setUpdatedBy(RequestUtil.getAdminId());
+        admin.setUpdatedDate(LocalDateTime.now());
+        baseMapper.insert(admin);
+        return true;
+    }
+
+    public String getGoogleSecret(String account) {
+        return OtpAuthenticator.secretKey();
+    }
+
 }
