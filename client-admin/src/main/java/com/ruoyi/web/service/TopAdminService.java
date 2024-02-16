@@ -9,10 +9,12 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopAdminMapper;
 import com.ruoyi.web.utils.LoginUtil;
 import com.ruoyi.web.vo.AdminLoginVO;
+import com.ruoyi.web.vo.AdminVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -32,5 +34,9 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         loginVO.setToken(UUID.fastUUID().toString(true));
         LoginUtil.loginMap.put(loginVO.getToken(), admin.getAccount());
         return loginVO;
+    }
+
+    public List<AdminVO> getList() {
+        return baseMapper.selectListVO();
     }
 }
