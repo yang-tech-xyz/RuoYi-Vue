@@ -32,9 +32,11 @@ public class MyRequestContextFilter extends OncePerRequestFilter {
         String url = request.getRequestURI();
         // swagger
         if (StringUtils.containsAny(url, "doc.html", "api-docs", "webjars")) {
+            filterChain.doFilter(request,response);
             return;
         }
         if (url.contains("public")) {
+            filterChain.doFilter(request,response);
             return;
         }
         String token = request.getHeader("token");
@@ -47,6 +49,7 @@ public class MyRequestContextFilter extends OncePerRequestFilter {
             return;
         }
         request.setAttribute("adminId", LoginUtil.loginMap.get(token));
+        filterChain.doFilter(request,response);
     }
 
 }
