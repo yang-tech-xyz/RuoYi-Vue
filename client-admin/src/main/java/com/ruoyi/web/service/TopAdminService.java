@@ -7,6 +7,7 @@ import com.ruoyi.web.dto.AdminLoginDTO;
 import com.ruoyi.web.entity.TopAdmin;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopAdminMapper;
+import com.ruoyi.web.otp.OtpAuthenticator;
 import com.ruoyi.web.utils.LoginUtil;
 import com.ruoyi.web.vo.AdminLoginVO;
 import com.ruoyi.web.vo.AdminVO;
@@ -29,6 +30,9 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
                 .orElseThrow(() -> new ServiceException("账号或密码错误", 500));
         if (!passwordEncoder.matches(dto.getPassword(), admin.getPassword())) {
             throw new ServiceException("账号或密码错误", 500);
+        }
+        if (!OtpAuthenticator.checkCode(admin.getGoogleSecret(), dto.getGoogleCode())) {
+            throw new ServiceException("谷歌验证码错误", 500);
         }
         AdminLoginVO loginVO = new AdminLoginVO();
         loginVO.setToken(UUID.fastUUID().toString(true));
