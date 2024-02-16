@@ -47,7 +47,7 @@ public class TopAdminController {
     }
 
     @Operation(summary = "查询所有")
-    @PostMapping("/getList")
+    @GetMapping("/getList")
     public AjaxResult<List<AdminVO>> getList() {
         return AjaxResult.success(service.getList());
     }
