@@ -2,7 +2,7 @@ package com.ruoyi.web.task;
 
 import cn.hutool.core.util.IdUtil;
 import com.ruoyi.web.enums.TopNo;
-import com.ruoyi.web.service.MiningProcessService;
+import com.ruoyi.web.service.TopStoreOrderService;
 import com.ruoyi.web.service.TopTaskProcessService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,32 +15,30 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Component
-public class MiningTask {
+public class StoreTask {
 
     @Autowired
-    private MiningProcessService processService;
+    private TopStoreOrderService orderService;
 
     @Autowired
     private TopTaskProcessService taskProcessService;
 
 
     /**
-     * 矿池挖矿
-     * 1.产生个人收益
-     * 2.产生邀请收益（烧伤机制：每人台数限定为层数）
-     * 3.发放对应的BTC换算USDT
+     * 理财发息
+     * 1:每日凌晨1点
      */
     @Async
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0 1 * * ?")
     public void mining() {
         LocalDateTime start = LocalDateTime.now();
-        log.info("【TOP - API】 -> 开始,收益总线任务执行：{}", start);
+        log.info("【TOP - API】 -> 开始,理财发息任务执行：{}", start);
         String processNo = TopNo.PROCESS_NO._code + IdUtil.getSnowflake(TopNo.PROCESS_NO._workId).nextIdStr();
-        taskProcessService.start(processNo, start.toLocalDate(), 1);
-        processService.process(start.toLocalDate());
+        taskProcessService.start(processNo, start.toLocalDate(), 2);
+        orderService.process(start.toLocalDate());
         LocalDateTime end = LocalDateTime.now();
         taskProcessService.end(processNo);
-        log.info("【TOP - API】 -> 结束,收益总线任务执行：{}，Diff seconds:{}", end, Duration.between(start, end).getSeconds());
+        log.info("【TOP - API】 -> 结束,理财发息任务执行：{}，Diff seconds:{}", end, Duration.between(start, end).getSeconds());
 
     }
 

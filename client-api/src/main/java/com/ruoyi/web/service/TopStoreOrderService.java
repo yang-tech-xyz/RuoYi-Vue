@@ -124,4 +124,15 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         return pageVO;
     }
 
+    /**
+     * 理财生息
+     * 1.按照订单每笔进行计算发放
+     * 2.按照年利率得出日利率（利率/周期天）
+     * 3.投资金额USD*（利率/周期），保留8位
+     * 4.返给直接上级30%
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void process(LocalDate processDate) {
+
+    }
 }

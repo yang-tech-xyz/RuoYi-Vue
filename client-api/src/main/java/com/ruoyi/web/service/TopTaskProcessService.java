@@ -15,12 +15,13 @@ import java.time.LocalDateTime;
 @Service
 public class TopTaskProcessService extends ServiceImpl<TopTaskProcessMapper, TopTaskProcess> {
 
-    public void start(String processNo, LocalDate processDate) {
+    public void start(String processNo, LocalDate processDate, int type) {
         TopTaskProcess taskProcess = new TopTaskProcess();
         taskProcess.setProcessNo(processNo);
         taskProcess.setTaskStartDate(LocalDateTime.now());
         taskProcess.setProcessDate(processDate);
         taskProcess.setStatus(Status._1._value);
+        taskProcess.setType(type);
         taskProcess.setCreatedBy("SYSTEM");
         taskProcess.setCreatedDate(LocalDateTime.now());
         taskProcess.setUpdatedBy("SYSTEM");

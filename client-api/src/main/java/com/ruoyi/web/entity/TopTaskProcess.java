@@ -43,6 +43,10 @@ public class TopTaskProcess implements Serializable {
     @TableField(value = "status")
     private Integer status;
 
+    @Schema(description = "类型：1=MINING，2=STORE")
+    @TableField(value = "type")
+    private Integer type;
+
     @Schema(description = "MEMO")
     @TableField(value = "memo")
     private String memo;

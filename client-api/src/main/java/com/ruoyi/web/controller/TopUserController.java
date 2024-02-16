@@ -141,7 +141,7 @@ public class TopUserController {
                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         while (!start.isAfter(end)) {
             String processNo = TopNo.PROCESS_NO._code + IdUtil.getSnowflake(TopNo.PROCESS_NO._workId).nextIdStr();
-            taskProcessService.start(processNo, start);
+            taskProcessService.start(processNo, start, 1);
             processService.process(start);
             taskProcessService.end(processNo);
             start = start.plusDays(1);
