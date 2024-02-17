@@ -170,8 +170,8 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 BigDecimal parentIncome = income.multiply(new BigDecimal("0.3"));
                 requests.add(
                         AccountRequest.builder()
-                                .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_INTEREST_INVITE.typeCode))
-                                .userId(user.getId())
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + user.getInvitedUserId()).concat("_" + Account.TxType.STORE_INTEREST_INVITE.typeCode))
+                                .userId(user.getInvitedUserId())
                                 .token("USDT")
                                 .balanceChanged(parentIncome)
                                 .fee(BigDecimal.ZERO)
