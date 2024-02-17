@@ -39,7 +39,5 @@ public class StoreTask {
         LocalDateTime end = LocalDateTime.now();
         taskProcessService.end(processNo);
         log.info("【TOP - API】 -> 结束,理财发息任务执行：{}，Diff seconds:{}", end, Duration.between(start, end).getSeconds());
-
     }
-
 }
