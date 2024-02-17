@@ -36,22 +36,29 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         log.info("【TOP - API】 -> 资产处理:{}", requests);
         AccountTxRequest txRequest = new AccountTxRequest();
         txRequest.setTxNo(UUID.fastUUID().toString(true));
-        requests.stream().filter(e -> e.getBalanceChanged().compareTo(BigDecimal.ZERO) != 0).forEach(e -> {
-            txRequest.addDetail(AccountTxRequestDetail.builder()
-                    .uniqueId(e.getUniqueId())
-                    .accountId(getAccount(e.getUserId(), e.getToken()).getId())
-                    .userId(e.getUserId())
-                    .token(e.getToken())
-                    .fee(e.getFee())
-                    .balanceChanged(e.getBalanceChanged())
-                    .balanceTxType(e.getBalanceTxType())
-                    .txType(e.getTxType())
-                    .refNo(e.getRefNo())
-                    .remark(e.getRemark()).build());
-        });
+        requests.stream()
+                .filter(e -> e.getBalanceChanged().compareTo(BigDecimal.ZERO) != 0)
+                .filter(e -> checkUniqueId(e.getUniqueId()) == 0)
+                .forEach(e -> {
+                    txRequest.addDetail(AccountTxRequestDetail.builder()
+                            .uniqueId(e.getUniqueId())
+                            .accountId(getAccount(e.getUserId(), e.getToken()).getId())
+                            .userId(e.getUserId())
+                            .token(e.getToken())
+                            .fee(e.getFee())
+                            .balanceChanged(e.getBalanceChanged())
+                            .balanceTxType(e.getBalanceTxType())
+                            .txType(e.getTxType())
+                            .refNo(e.getRefNo())
+                            .remark(e.getRemark()).build());
+                });
         if (!txRequest.getDetails().isEmpty()) {
             txService.processedTx(txRequest);
         }
+    }
+
+    private Long checkUniqueId(String uniqueId) {
+        return txService.checkUniqueId(uniqueId);
     }
 
     public TopAccount getAccount(Long mebId, String token) {
