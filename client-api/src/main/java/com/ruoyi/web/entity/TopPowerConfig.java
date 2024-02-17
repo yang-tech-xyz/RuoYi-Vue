@@ -36,9 +36,8 @@ public class TopPowerConfig extends BaseEntity
     @Schema(description = "产出币种")
     private String outputSymbol;
 
-    /** 链id */
-    @Schema(description = "产出比例")
-    private BigDecimal outputRatio;
+//    @Schema(description = "产出比例")
+//    private BigDecimal outputRatio;
 
     @JsonIgnore
     @Schema(description = "不要问我这个是做什么的")

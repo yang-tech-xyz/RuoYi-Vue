@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -62,6 +63,11 @@ public class TopToken implements Serializable {
     @TableField(value = "update_by")
     private String updateBy;
 
+    @Schema(description="展示年利率")
+    private String outputAnnualInterestRate;
+
+    @Schema(description="实际年利率")
+    private BigDecimal annualInterestRate;
 
 }
 

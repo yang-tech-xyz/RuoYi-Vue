@@ -44,7 +44,7 @@ public class TopTokenController {
 
     @Operation(summary = "根据链id查询所有支持的token")
     @GetMapping("queryTokensByChainId")
-    public AjaxResult queryTokensByChainId(@Parameter String chainId) {
+    public AjaxResult queryTokensByChainId(@Parameter(description = "链id",example = "11155111") String chainId) {
         List<TopTokenChainVO> list = topTokenService.queryTokensByChainId(chainId);
         return AjaxResult.success("success", list);
     }
@@ -67,7 +67,7 @@ public class TopTokenController {
     }
 
     /**
-     * 提币
+     * 提币申请.
      */
     @Operation(summary = "提币")
     @PostMapping("/withdraw")

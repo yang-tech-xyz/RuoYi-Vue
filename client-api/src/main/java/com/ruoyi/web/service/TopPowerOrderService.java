@@ -60,12 +60,12 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         topPowerOrder.setAmount(buyPowerNeedPayUsdt);
         topPowerOrder.setOutputSymbol(topPowerConfig.getOutputSymbol());
         topPowerOrder.setPeriod(topPowerConfig.getPeriod());
-        topPowerOrder.setOutputRatio(topPowerConfig.getOutputRatio());
+//        topPowerOrder.setOutputRatio(topPowerConfig.getOutputRatio());
         topPowerOrder.setEndDate(LocalDate.now().plusDays(topPowerOrder.getPeriod() + 1));
         topPowerOrder.setOrderDate(LocalDate.now());
         topPowerOrder.setCreateTime(LocalDateTime.now());
         topPowerOrder.setUpdateTime(LocalDateTime.now());
-        topPowerOrder.setExpectedTotalOutput(buyPowerNeedPayUsdt.multiply(topPowerConfig.getOutputRatio()));
+//        topPowerOrder.setExpectedTotalOutput(buyPowerNeedPayUsdt.multiply(topPowerConfig.getOutputRatio()));
         String symbol = buyPowerBody.getSymbol();
         // 查询symbol的价格.
         BigDecimal tokenPrice = topTokenPriceService.getPrice(symbol);

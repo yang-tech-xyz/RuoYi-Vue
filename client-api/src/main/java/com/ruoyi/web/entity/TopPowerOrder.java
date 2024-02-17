@@ -48,9 +48,9 @@ public class TopPowerOrder implements Serializable {
     @TableField(value = "period")
     private Integer period;
 
-    @Schema(description = "产出率")
-    @TableField(value = "output_ratio")
-    private BigDecimal outputRatio;
+//    @Schema(description = "产出率")
+//    @TableField(value = "output_ratio")
+//    private BigDecimal outputRatio;
 
     @Schema(description = "预估总产出")
     @TableField(value = "expected_total_output")

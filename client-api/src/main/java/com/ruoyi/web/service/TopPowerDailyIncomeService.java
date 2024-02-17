@@ -39,8 +39,8 @@ public class TopPowerDailyIncomeService extends ServiceImpl<TopPowerDailyIncomeM
                 dailyIncome.setIncomePrice(priceVOList.stream()
                         .filter(price -> price.getSymbol().equals(order.getOutputSymbol()))
                         .map(TokenPriceVO::getPrice).findFirst().orElse(BigDecimal.ZERO));
-                dailyIncome.setIncomeRate(order.getOutputRatio());
-                dailyIncome.setIncomeUsd(order.getAmount().multiply(order.getOutputRatio()).divide(BigDecimal.valueOf(order.getPeriod()), 8, 1));
+//                dailyIncome.setIncomeRate(order.getOutputRatio());
+//                dailyIncome.setIncomeUsd(order.getAmount().multiply(order.getOutputRatio()).divide(BigDecimal.valueOf(order.getPeriod()), 8, 1));
                 dailyIncome.setIncome(dailyIncome.getIncomeUsd().divide(dailyIncome.getIncomePrice(), 8, 1));
                 dailyIncome.setIncomeDate(processDate);
                 dailyIncome.setProcessEnabled(Boolean.FALSE);
