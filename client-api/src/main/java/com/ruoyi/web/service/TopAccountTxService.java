@@ -1,6 +1,7 @@
 package com.ruoyi.web.service;
 
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -96,5 +97,12 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
         pageVO.setTotal(iPage.getTotal());
         pageVO.setList(iPage.getRecords());
         return pageVO;
+    }
+
+    /**
+     * 流水数量
+     */
+    public Long checkUniqueId(String uniqueId) {
+        return baseMapper.selectCount(new LambdaQueryWrapper<TopAccountTx>().eq(TopAccountTx::getUniqueId, uniqueId));
     }
 }

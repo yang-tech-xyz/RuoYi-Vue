@@ -5,10 +5,7 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
-import com.ruoyi.web.service.MiningProcessService;
-import com.ruoyi.web.service.TopTaskProcessService;
-import com.ruoyi.web.service.TopUserInviteService;
-import com.ruoyi.web.service.TopUserService;
+import com.ruoyi.web.service.*;
 import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
@@ -62,12 +59,12 @@ public class TopUserController {
     @PostMapping("/register")
     public AjaxResult register(@RequestBody WalletRegisterBody loginBody) {
         try {
-            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(),loginBody.getContent(),loginBody.getWallet());
-            if(!validateResult){
+            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(), loginBody.getContent(), loginBody.getWallet());
+            if (!validateResult) {
                 return AjaxResult.error("validate sign error!");
             }
         } catch (SignatureException e) {
-            log.error("签名错误",e);
+            log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
         //check the user wallet is existed.
@@ -100,14 +97,14 @@ public class TopUserController {
 
     @Operation(summary = "设置用户的BTC提现地址")
     @PostMapping("updateWithdrawBTCAddress")
-    public AjaxResult<String> updateWithdrawBTCAddress(@RequestBody BTCAddressBody btcAddressBody){
+    public AjaxResult<String> updateWithdrawBTCAddress(@RequestBody BTCAddressBody btcAddressBody) {
         try {
-            boolean validateResult = UnsignMessageUtils.validate(btcAddressBody.getSignMsg(),btcAddressBody.getContent(),btcAddressBody.getWallet());
-            if(!validateResult){
+            boolean validateResult = UnsignMessageUtils.validate(btcAddressBody.getSignMsg(), btcAddressBody.getContent(), btcAddressBody.getWallet());
+            if (!validateResult) {
                 return AjaxResult.error("validate sign error!");
             }
         } catch (SignatureException e) {
-            log.error("签名错误",e);
+            log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
         String btcTransferAddress = btcAddressBody.getBtcTransferAddress();
@@ -136,13 +133,29 @@ public class TopUserController {
     @Autowired
     private MiningProcessService processService;
 
-    @GetMapping("/process")
-    public AjaxResult process(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
-                              @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+    @Autowired
+    private TopStoreOrderService storeOrderService;
+
+    @GetMapping("/processMining")
+    public AjaxResult processMining(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+                                    @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         while (!start.isAfter(end)) {
             String processNo = TopNo.PROCESS_NO._code + IdUtil.getSnowflake(TopNo.PROCESS_NO._workId).nextIdStr();
             taskProcessService.start(processNo, start, 1);
             processService.process(start);
+            taskProcessService.end(processNo);
+            start = start.plusDays(1);
+        }
+        return AjaxResult.success();
+    }
+
+    @GetMapping("/processStore")
+    public AjaxResult processStore(@DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
+                                   @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+        while (!start.isAfter(end)) {
+            String processNo = TopNo.PROCESS_NO._code + IdUtil.getSnowflake(TopNo.PROCESS_NO._workId).nextIdStr();
+            taskProcessService.start(processNo, start, 2);
+            storeOrderService.process(start);
             taskProcessService.end(processNo);
             start = start.plusDays(1);
         }

@@ -54,7 +54,7 @@ public class TopStoreOrder implements Serializable {
 
     @Schema(description = "订单时间")
     @TableField(value = "order_date")
-    private LocalDateTime orderDate;
+    private LocalDate orderDate;
 
     @Schema(description = "到期释放时间：订单时间+周期")
     @TableField(value = "release_date")

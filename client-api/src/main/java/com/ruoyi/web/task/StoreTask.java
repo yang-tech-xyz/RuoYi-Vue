@@ -30,7 +30,7 @@ public class StoreTask {
      */
     @Async
     @Scheduled(cron = "0 0 1 * * ?")
-    public void mining() {
+    public void store() {
         LocalDateTime start = LocalDateTime.now();
         log.info("【TOP - API】 -> 开始,理财发息任务执行：{}", start);
         String processNo = TopNo.PROCESS_NO._code + IdUtil.getSnowflake(TopNo.PROCESS_NO._workId).nextIdStr();
@@ -39,7 +39,5 @@ public class StoreTask {
         LocalDateTime end = LocalDateTime.now();
         taskProcessService.end(processNo);
         log.info("【TOP - API】 -> 结束,理财发息任务执行：{}，Diff seconds:{}", end, Duration.between(start, end).getSeconds());
-
     }
-
 }
