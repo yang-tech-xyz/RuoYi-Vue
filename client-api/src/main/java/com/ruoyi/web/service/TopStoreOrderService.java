@@ -139,7 +139,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
     public void process(LocalDate processDate) {
         List<TopStoreOrder> storeOrderList = baseMapper.selectList(new LambdaQueryWrapper<TopStoreOrder>()
                 .eq(TopStoreOrder::getStatus, Status._1._value)
-                .le(TopStoreOrder::getReleaseDate, processDate));
+                .gt(TopStoreOrder::getReleaseDate, processDate));
         Map<Long, List<TopStoreOrder>> orderMap = storeOrderList.stream().collect(Collectors.groupingByConcurrent(TopStoreOrder::getStoreId));
         orderMap.forEach((storeId, orders) -> {
             TopStore store = storeMapper.selectOne(new LambdaQueryWrapper<TopStore>().eq(TopStore::getId, storeId));
