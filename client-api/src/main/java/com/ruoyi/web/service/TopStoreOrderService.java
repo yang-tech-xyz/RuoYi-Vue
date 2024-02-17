@@ -148,6 +148,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 if (!Objects.equals(lock.getStatus(), Status._1._value)) {
                     continue;
                 }
+                TopUser user = userMapper.selectOne(new LambdaQueryWrapper<TopUser>().eq(TopUser::getId, lock.getUserId()));
                 long days = lock.getOrderDate().until(lock.getReleaseDate(), ChronoUnit.DAYS);
                 BigDecimal avgRate = store.getRate().divide(new BigDecimal(days), 8, RoundingMode.DOWN);
                 BigDecimal income = lock.getInvestAmount().multiply(avgRate);
@@ -163,6 +164,21 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                                 .txType(Account.TxType.STORE_INTEREST)
                                 .refNo(lock.getOrderNo())
                                 .remark("利息")
+                                .build()
+                );
+                // 收益返直接上级
+                BigDecimal parentIncome = income.multiply(new BigDecimal("0.3"));
+                requests.add(
+                        AccountRequest.builder()
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_INTEREST_INVITE.typeCode))
+                                .userId(user.getId())
+                                .token("USDT")
+                                .balanceChanged(parentIncome)
+                                .fee(BigDecimal.ZERO)
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.STORE_INTEREST_INVITE)
+                                .refNo(lock.getOrderNo())
+                                .remark("利息返上级")
                                 .build()
                 );
                 // 到期自动赎回
