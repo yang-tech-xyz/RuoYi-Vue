@@ -148,9 +148,6 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 if (!Objects.equals(lock.getStatus(), Status._1._value)) {
                     continue;
                 }
-                if (processDate.isAfter(lock.getReleaseDate())) {
-                    continue;
-                }
                 long days = lock.getOrderDate().until(lock.getReleaseDate(), ChronoUnit.DAYS);
                 BigDecimal avgRate = store.getRate().divide(new BigDecimal(days), 8, RoundingMode.DOWN);
                 BigDecimal income = lock.getInvestAmount().multiply(avgRate);
