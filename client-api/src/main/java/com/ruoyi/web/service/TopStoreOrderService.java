@@ -3,6 +3,7 @@ package com.ruoyi.web.service;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -28,9 +29,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopStoreOrder> {
@@ -101,8 +105,8 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                                 .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_IN.typeCode))
                                 .userId(user.getId())
                                 .token(order.getSymbol())
-                                .fee(BigDecimal.ZERO)
                                 .balanceChanged(order.getAmount().negate())
+                                .fee(BigDecimal.ZERO)
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.STORE_IN)
                                 .refNo(orderNo)
@@ -133,6 +137,59 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
      */
     @Transactional(rollbackFor = Exception.class)
     public void process(LocalDate processDate) {
-
+        List<TopStoreOrder> storeOrderList = baseMapper.selectList(new LambdaQueryWrapper<TopStoreOrder>()
+                .eq(TopStoreOrder::getStatus, Status._1._value)
+                .le(TopStoreOrder::getReleaseDate, processDate));
+        Map<Long, List<TopStoreOrder>> orderMap = storeOrderList.stream().collect(Collectors.groupingByConcurrent(TopStoreOrder::getStoreId));
+        orderMap.forEach((storeId, orders) -> {
+            TopStore store = storeMapper.selectOne(new LambdaQueryWrapper<TopStore>().eq(TopStore::getId, storeId));
+            for (TopStoreOrder order : orders) {
+                TopStoreOrder lock = baseMapper.lockByOrderNo(order.getOrderNo());
+                if (!Objects.equals(lock.getStatus(), Status._1._value)) {
+                    continue;
+                }
+                if (processDate.isAfter(lock.getReleaseDate())) {
+                    continue;
+                }
+                long days = lock.getOrderDate().until(lock.getReleaseDate(), ChronoUnit.DAYS);
+                BigDecimal avgRate = store.getRate().divide(new BigDecimal(days), 8, RoundingMode.DOWN);
+                BigDecimal income = lock.getInvestAmount().multiply(avgRate);
+                List<AccountRequest> requests = new ArrayList<>();
+                requests.add(
+                        AccountRequest.builder()
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + lock.getUserId()).concat("_" + Account.TxType.STORE_INTEREST.typeCode))
+                                .userId(lock.getUserId())
+                                .token("USDT")
+                                .balanceChanged(income)
+                                .fee(BigDecimal.ZERO)
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.STORE_INTEREST)
+                                .refNo(lock.getOrderNo())
+                                .remark("利息")
+                                .build()
+                );
+                // 到期自动赎回
+                if (lock.getReleaseDate().isEqual(processDate)) {
+                    requests.add(
+                            AccountRequest.builder()
+                                    .uniqueId(UUID.fastUUID().toString().concat("_" + lock.getUserId()).concat("_" + Account.TxType.STORE_REDEEM.typeCode))
+                                    .userId(lock.getUserId())
+                                    .token(lock.getSymbol())
+                                    .balanceChanged(lock.getAmount())
+                                    .fee(BigDecimal.ZERO)
+                                    .balanceTxType(Account.Balance.AVAILABLE)
+                                    .txType(Account.TxType.STORE_REDEEM)
+                                    .refNo(lock.getOrderNo())
+                                    .remark("赎回")
+                                    .build()
+                    );
+                    lock.setStatus(Status._2._value);
+                }
+                accountService.processAccount(requests);
+                lock.setUpdatedDate(LocalDateTime.now());
+                lock.setUpdatedBy("SYS");
+                baseMapper.updateById(lock);
+            }
+        });
     }
 }
