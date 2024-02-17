@@ -90,7 +90,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setAmount(dto.getAmount());
         order.setPrice(tokenPrice);
         order.setInvestAmount(order.getAmount().multiply(order.getPrice()));
-        order.setOrderDate(LocalDateTime.now());
+        order.setOrderDate(LocalDate.now());
         order.setReleaseDate(LocalDate.now().plusMonths(store.getPeriod()));
         order.setStatus(Status._1._value);
         order.setCreatedBy(user.getId().toString());
