@@ -114,4 +114,17 @@ public class TopTokenController {
         topTokenService.exchangeBTC2USDT(exchangeBody);
         return AjaxResult.success("Success");
     }
+
+    @Operation(summary = "USDT兑换BTCF")
+    @PostMapping("exchangeUsdt2BTCF")
+    public AjaxResult exchangeUsdt2BTCF(@RequestBody ExchangeBody exchangeBody){
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(), exchangeBody.getContent(), exchangeBody.getWallet());
+        } catch (SignatureException e) {
+            log.error("签名错误", e);
+            throw new ServiceException("签名错误");
+        }
+        topTokenService.exchangeUsdt2BTCF(exchangeBody);
+        return AjaxResult.success("Success");
+    }
 }
