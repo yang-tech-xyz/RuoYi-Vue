@@ -1,7 +1,8 @@
 package com.ruoyi.web.service;
 
-import com.ruoyi.web.mapper.TopTokenPriceMapper;
-import com.ruoyi.web.vo.TokenPriceVO;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.ruoyi.web.entity.TopToken;
+import com.ruoyi.web.mapper.TopTokenMapper;
 import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class MiningProcessService {
     private TopUserService userService;
 
     @Autowired
-    private TopTokenPriceMapper priceMapper;
+    private TopTokenMapper tokenMapper;
 
     @Autowired
     private TopPowerOrderService powerOrderService;
@@ -44,12 +45,12 @@ public class MiningProcessService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void process(LocalDate processDate) {
-        List<TokenPriceVO> priceVOList = priceMapper.selectListVO();
+        List<TopToken> tokenList = tokenMapper.selectList(new LambdaQueryWrapper<>());
         List<UserProcessVO> userVOList = userService.getUserVOList();
         userService.process(userVOList);
         powerOrderService.process(userVOList, processDate);
-        dailyIncomeService.process(userVOList, priceVOList, processDate);
-        sharingIncomeService.process(userVOList, priceVOList, processDate);
+        dailyIncomeService.process(userVOList, tokenList, processDate);
+        sharingIncomeService.process(userVOList, tokenList, processDate);
         incomeService.process(userVOList, processDate);
     }
 }

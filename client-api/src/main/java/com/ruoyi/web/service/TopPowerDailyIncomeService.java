@@ -3,6 +3,7 @@ package com.ruoyi.web.service;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.entity.TopPowerDailyIncome;
 import com.ruoyi.web.entity.TopPowerOrder;
+import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.mapper.TopPowerDailyIncomeMapper;
 import com.ruoyi.web.vo.TokenPriceVO;
 import com.ruoyi.web.vo.UserProcessVO;
@@ -26,7 +27,7 @@ public class TopPowerDailyIncomeService extends ServiceImpl<TopPowerDailyIncomeM
      * 3.将收益换算为BTC发放
      */
     @Transactional(rollbackFor = Exception.class)
-    public void process(List<UserProcessVO> userVOList, List<TokenPriceVO> priceVOList, LocalDate processDate) {
+    public void process(List<UserProcessVO> userVOList, List<TopToken> tokens, LocalDate processDate) {
         for (int i = 0; i < userVOList.size(); i++) {
             UserProcessVO userVO = userVOList.get(i);
             for (int j = 0; j < userVO.getPowerOrders().size(); j++) {
@@ -36,9 +37,9 @@ public class TopPowerDailyIncomeService extends ServiceImpl<TopPowerDailyIncomeM
                 dailyIncome.setOrderNo(order.getOrderNo());
                 dailyIncome.setAmount(order.getAmount());
                 dailyIncome.setIncomeSymbol(order.getOutputSymbol());
-                dailyIncome.setIncomePrice(priceVOList.stream()
+                dailyIncome.setIncomePrice(tokens.stream()
                         .filter(price -> price.getSymbol().equals(order.getOutputSymbol()))
-                        .map(TokenPriceVO::getPrice).findFirst().orElse(BigDecimal.ZERO));
+                        .map(TopToken::getPrice).findFirst().orElse(BigDecimal.ZERO));
 //                dailyIncome.setIncomeRate(order.getOutputRatio());
 //                dailyIncome.setIncomeUsd(order.getAmount().multiply(order.getOutputRatio()).divide(BigDecimal.valueOf(order.getPeriod()), 8, 1));
                 dailyIncome.setIncome(dailyIncome.getIncomeUsd().divide(dailyIncome.getIncomePrice(), 8, 1));

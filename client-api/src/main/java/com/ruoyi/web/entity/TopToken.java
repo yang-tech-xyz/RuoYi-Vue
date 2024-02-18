@@ -39,6 +39,22 @@ public class TopToken implements Serializable {
     @TableField(value = "online")
     private Integer online;
 
+    @Schema(description = "展示年利率")
+    @TableField(value = "output_annual_interest_rate")
+    private String outputAnnualInterestRate;
+
+    @Schema(description = "实际年利率")
+    @TableField(value = "annual_interest_rate")
+    private BigDecimal annualInterestRate;
+
+    @Schema(description = "当前最新价格")
+    @TableField(value = "price")
+    private BigDecimal price;
+
+    @Schema(description = "自动刷新价格")
+    @TableField(value = "auto_price_enabled")
+    private Boolean autoPriceEnabled;
+
     @Schema(description = "是否挖矿")
     @TableField(value = "power_enabled")
     private Boolean powerEnabled;
@@ -63,11 +79,6 @@ public class TopToken implements Serializable {
     @TableField(value = "update_by")
     private String updateBy;
 
-    @Schema(description="展示年利率")
-    private String outputAnnualInterestRate;
-
-    @Schema(description="实际年利率")
-    private BigDecimal annualInterestRate;
 
 }
 

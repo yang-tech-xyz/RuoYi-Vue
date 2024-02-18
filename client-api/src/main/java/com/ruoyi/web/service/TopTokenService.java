@@ -6,6 +6,8 @@ import cn.hutool.cron.timingwheel.TimerTask;
 import cn.hutool.crypto.Mode;
 import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -13,6 +15,7 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.*;
 import com.ruoyi.web.enums.Account;
+import com.ruoyi.web.enums.Plate;
 import com.ruoyi.web.enums.TransactionType;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopTokenMapper;
@@ -24,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.TypeDecoder;
 import org.web3j.abi.TypeReference;
@@ -81,7 +85,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     private TopPowerConfigService topPowerConfigService;
 
     @Autowired
-    private TopTokenPriceService topTokenPriceService;
+    private RestTemplate restTemplate;
 
     @Value("${token.secret}")
     private String secret;
@@ -671,7 +675,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String originSymbol = "BTC";
         String exchangeSymbol = "USDT";
 
-        BigDecimal btcPrice = topTokenPriceService.getPrice(originSymbol);
+        BigDecimal btcPrice = getPrice(originSymbol);
         BigDecimal exchangeAmount = amount.multiply(btcPrice);
 
 
@@ -711,7 +715,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     public List<TokenVO> getList() {
-        return baseMapper.selectListVO();
+        return baseMapper.selectOnlineListVO();
     }
 
     public TopToken getBySymbol(String symbol) {
@@ -725,8 +729,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String originSymbol = "USDT";
         String exchangeSymbol = "BTCF";
 
-        BigDecimal btcPrice = topTokenPriceService.getPrice(exchangeSymbol);
-        BigDecimal exchangeAmount = amount.divide(btcPrice,10,2);
+        BigDecimal btcPrice = getPrice(exchangeSymbol);
+        BigDecimal exchangeAmount = amount.divide(btcPrice, 10, 2);
 
 
         // 扣除USDT资金
@@ -762,5 +766,58 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .build()
                 )
         );
+    }
+
+    public BigDecimal getPrice(String symbol) {
+        Optional<TopToken> optional = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopToken>()
+                .eq(TopToken::getSymbol, symbol)));
+        if (optional.isPresent()) {
+            BigDecimal price = optional.get().getPrice();
+            if (price.compareTo(BigDecimal.ZERO) == 0) {
+                throw new ServiceException("无法获取价格", 500);
+            }
+            return price;
+        }
+        throw new ServiceException("无法获取价格", 500);
+    }
+
+    /**
+     * 刷新币种价格
+     * 1.对接不同平台价格
+     */
+    public void refPrice() {
+        List<TopToken> tokens = baseMapper.selectList(new LambdaQueryWrapper<TopToken>()
+                .eq(TopToken::getAutoPriceEnabled, Boolean.TRUE));
+        for (TopToken token : tokens) {
+            try {
+                BigDecimal price = BigDecimal.ONE;
+                try {
+                    if (Plate.GATE_IO._code.equals(token.getPlate())) {
+                        String result = restTemplate.getForObject(Plate.GATE_IO._url + "/api/v4/spot/tickers?currency_pair=" + token.getSymbol() + "_" + "USDT", String.class);
+                        List<TickerVO> tickerVOS = JSONArray.parseArray(result, TickerVO.class);
+                        price = tickerVOS.get(0).getLast();
+                    } else if (Plate.BINANCE._code.equals(token.getPlate())) {
+                        String result = restTemplate.getForObject(Plate.BINANCE._url + "/api/v3/ticker/price?symbol=" + token.getSymbol() + "USDT", String.class);
+                        JSONObject jsonObject = JSONObject.parseObject(result);
+                        price = jsonObject.getBigDecimal("price");
+                    } else if (Plate.OKX._code.equals(token.getPlate())) {
+                        String result = restTemplate.getForObject(Plate.OKX._url + "/api/v5/market/ticker?instId=" + token.getSymbol() + "_" + "USDT-SWAP", String.class);
+                        JSONObject jsonObject = JSONObject.parseObject(result);
+                        price = jsonObject.getJSONArray("data").getJSONObject(0).getBigDecimal("last");
+                    } else if (Plate.HUO_BI._code.equals(token.getPlate())) {
+                        String result = restTemplate.getForObject(Plate.HUO_BI._url + "/market/detail/merged?symbol=" + token.getSymbol().toLowerCase() + "usdt", String.class);
+                        JSONObject jsonObject = JSONObject.parseObject(result);
+                        price = jsonObject.getJSONObject("tick").getBigDecimal("close");
+                    }
+                } catch (Exception ignored) {
+                }
+                token.setPrice(price);
+                token.setUpdateBy("SYS");
+                token.setUpdateTime(LocalDateTime.now());
+                baseMapper.updateById(token);
+            } catch (Exception ex) {
+                log.error("token price error:{}", token.getSymbol(), ex);
+            }
+        }
     }
 }

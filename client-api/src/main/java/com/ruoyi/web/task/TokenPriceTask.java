@@ -1,6 +1,6 @@
 package com.ruoyi.web.task;
 
-import com.ruoyi.web.service.TopTokenPriceService;
+import com.ruoyi.web.service.TopTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class TokenPriceTask {
 
     @Autowired
-    private TopTokenPriceService service;
+    private TopTokenService service;
 
     /**
      * 每3秒执行一次

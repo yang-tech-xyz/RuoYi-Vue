@@ -2,10 +2,10 @@ package com.ruoyi.web.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.entity.TopPowerSharingIncome;
+import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.mapper.TopPowerSharingConfigMapper;
 import com.ruoyi.web.mapper.TopPowerSharingIncomeMapper;
 import com.ruoyi.web.vo.PowerSharingConfigVO;
-import com.ruoyi.web.vo.TokenPriceVO;
 import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
      * 2.
      */
     @Transactional(rollbackFor = Exception.class)
-    public void process(List<UserProcessVO> userVOList, List<TokenPriceVO> priceVOList, LocalDate processDate) {
+    public void process(List<UserProcessVO> userVOList, List<TopToken> tokens, LocalDate processDate) {
         List<PowerSharingConfigVO> configVOList = sharingConfigMapper.selectListVO();
         for (int i = 0; i < userVOList.size(); i++) {
             UserProcessVO userVO = userVOList.get(i);
