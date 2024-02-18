@@ -39,7 +39,7 @@ public class MyRequestContextFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
-        String token = request.getHeader("token");
+        String token = request.getHeader("Authorization");
         if (StringUtils.isBlank(token)) {
             resolver.resolveException(request, response, null, new ServiceException("未登录", 500));
             return;
