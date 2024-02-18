@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.ruoyi.web.mapper.TopPowerOrderMapper">
+<mapper namespace="com.ruoyi.admin.mapper.TopPowerOrderMapper">
 
-    <select id="selectOrderList" resultType="com.ruoyi.web.entity.TopPowerOrder">
+    <select id="selectOrderList" resultType="com.ruoyi.admin.entity.TopPowerOrder">
         select *
         from top_power_order
         where user_id = #{userId}
           and end_date <![CDATA[ > ]]> #{processDate}
     </select>
 
-    <select id="selectPageVO" resultType="com.ruoyi.web.vo.PowerOrderVO">
+    <select id="selectPageVO" resultType="com.ruoyi.admin.vo.PowerOrderVO">
         select
             tpo.*,
             (select ifnull(sum(_tpd.income),0) from top_power_daily_income _tpd where _tpd.order_no = tpo.order_no) as income
@@ -18,7 +18,7 @@
         where tu.wallet = #{walletAddress}
     </select>
 
-    <select id="selectPagePowerVO" resultType="com.ruoyi.web.vo.TopPowerOrderVO">
+    <select id="selectPagePowerVO" resultType="com.ruoyi.admin.vo.TopPowerOrderVO">
         select
             tpo.*,
             (select ifnull(sum(_tpd.income),0) from top_power_daily_income _tpd where _tpd.order_no = tpo.order_no) as income

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.web.mapper.TopAdminMapper">
+<mapper namespace="com.ruoyi.admin.mapper.TopAdminMapper">
 
-    <select id="selectListVO" resultType="com.ruoyi.web.vo.AdminVO">
+    <select id="selectListVO" resultType="com.ruoyi.admin.vo.AdminVO">
         select *
         from top_admin ta
         order by ta.id

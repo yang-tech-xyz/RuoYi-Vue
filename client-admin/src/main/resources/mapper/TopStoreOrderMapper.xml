@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.web.mapper.TopStoreOrderMapper">
+<mapper namespace="com.ruoyi.admin.mapper.TopStoreOrderMapper">
 
-    <select id="selectInfoVO" resultType="com.ruoyi.web.vo.OrderInfoVO">
+    <select id="selectInfoVO" resultType="com.ruoyi.admin.vo.OrderInfoVO">
         select
         sum(tso.amount) as amount,
         sum(IF(tso.`status` = 1,tso.income,0)) as redeem,
@@ -13,7 +13,7 @@
         </where>
     </select>
 
-    <select id="selectPageVO" resultType="com.ruoyi.web.vo.StoreOrderVO">
+    <select id="selectPageVO" resultType="com.ruoyi.admin.vo.StoreOrderVO">
         select
             tso.*,
             ts.period
@@ -26,7 +26,7 @@
         order by tso.id desc
     </select>
 
-    <select id="lockByOrderNo" resultType="com.ruoyi.web.entity.TopStoreOrder">
+    <select id="lockByOrderNo" resultType="com.ruoyi.admin.entity.TopStoreOrder">
         select tso.*
         from top_store_order tso
         where tso.order_no = #{orderNo} for update

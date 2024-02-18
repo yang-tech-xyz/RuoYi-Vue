@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.web.mapper.TopAccountTxMapper">
+<mapper namespace="com.ruoyi.admin.mapper.TopAccountTxMapper">
 
-    <select id="selectPageVO" resultType="com.ruoyi.web.vo.AccountTxVO">
+    <select id="selectPageVO" resultType="com.ruoyi.admin.vo.AccountTxVO">
         select tat.*
         from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
         <where>

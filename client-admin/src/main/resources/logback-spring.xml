@@ -48,7 +48,7 @@
     </filter>
   </appender>
 
-  <logger name="com.ruoyi.web.mapper.TopTokenMapper" level="OFF">
+  <logger name="com.ruoyi.admin.mapper.TopTokenMapper" level="OFF">
     <appender-ref ref="error"/>
   </logger>
   <logger name="com.ruoyi.web.mapper.TopTokenPriceMapper" level="OFF">
