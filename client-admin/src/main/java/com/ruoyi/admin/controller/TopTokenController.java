@@ -31,13 +31,13 @@ public class TopTokenController {
         return AjaxResult.success(service.getList());
     }
 
-    @Operation(summary = "新增理财周期")
+    @Operation(summary = "新增")
     @PostMapping("/add")
     public AjaxResult<Boolean> add(@RequestBody TokenAddDTO dto) {
         return AjaxResult.success(service.add(dto));
     }
 
-    @Operation(summary = "修改理财周期")
+    @Operation(summary = "修改")
     @PostMapping("/edit")
     public AjaxResult<Boolean> edit(@RequestBody TokenUpdateDTO dto) {
         return AjaxResult.success(service.edit(dto));
