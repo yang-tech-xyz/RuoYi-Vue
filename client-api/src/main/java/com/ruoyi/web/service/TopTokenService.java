@@ -457,32 +457,35 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String key = secret.substring(0, 16);
         AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
         String s = aes.decryptStr(curve);
-        String transactionHash = transferToken(web3j, contractAddress, s, to, tokenAmount);
+//        String transactionHash = transferToken(web3j, contractAddress, s, to, tokenAmount);
+
+        String uuid = UUID.fastUUID().toString();
 
         //扣除用户的资金
         accountService.processAccount(
                 Arrays.asList(
                         AccountRequest.builder()
-                                .uniqueId(transactionHash.toString().concat("_" + userId).concat("_" + Account.TxType.WITHDRAW.typeCode))
+                                .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW.typeCode))
                                 .userId(userId)
                                 .token(symbol)
                                 .fee(fee.negate())
                                 .balanceChanged(transferAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.WITHDRAW)
-                                .refNo(transactionHash.toString())
+                                .refNo(uuid)
                                 .remark("提现")
                                 .build()
                 )
         );
-        topTransaction.setHash(transactionHash);
+//        topTransaction.setHash(transactionHash);
+        topTransaction.setTransNo(uuid);
         topTransaction.setChainId(chainId);
         topTransaction.setTokenId(topTokenId);
         topTransaction.setRpcEndpoint(rpcEndpoint);
-        topTransaction.setStatus("0x1");
+        topTransaction.setStatus("0");
         topTransaction.setUserId(userId);
         topTransaction.setSymbol(symbol);
-        topTransaction.setTokenAmount(withdrawAmount);
+        topTransaction.setTokenAmount(transferAmount);
         topTransaction.setIsConfirm(0);
         EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
         BigInteger currentHeight = ethBlockNumber.getBlockNumber();
@@ -494,7 +497,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topTransaction.setBlockConfirm(topChain.getBlockConfirm());
         topTransaction.setType(TransactionType.Withdraw);
         topTransactionService.save(topTransaction);
-        systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
+//        systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
         return AjaxResult.success("success");
     }
 
@@ -547,31 +550,33 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException("account exceed balance");
         }
 
-
+        String uuid = UUID.fastUUID().toString();
         //扣除用户的资金
         accountService.processAccount(
                 Arrays.asList(
                         AccountRequest.builder()
-                                .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_BTC.typeCode))
+                                .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_BTC.typeCode))
                                 .userId(userId)
                                 .token(symbol)
                                 .fee(fee.negate())
                                 .balanceChanged(transferAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.WITHDRAW_BTC)
+                                .refNo(uuid)
                                 .remark("提现")
                                 .build()
                 )
         );
 //        topTransaction.setHash(transactionHash);
+        topTransaction.setTransNo(uuid);
         topTransaction.setChainId(0L);
         topTransaction.setTokenId(topTokenId);
         topTransaction.setRpcEndpoint("");
-        topTransaction.setStatus("0x1");
+        topTransaction.setStatus("0");
         topTransaction.setUserId(userId);
         topTransaction.setSymbol(symbol);
         topTransaction.setTokenAmount(transferAmount);
-        topTransaction.setIsConfirm(1);
+        topTransaction.setIsConfirm(0);
 //        topTransaction.setHeight(currentHeight);
         topTransaction.setCreateTime(LocalDateTime.now());
         topTransaction.setUpdateTime(LocalDateTime.now());

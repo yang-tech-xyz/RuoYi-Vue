@@ -41,7 +41,7 @@ public class TopTransaction extends BaseEntity
     @Schema(description = "链rpc节点")
     private String rpcEndpoint;
 
-    @Schema(description = "事务状态")
+    @Schema(description = "事务状态,1.申请,2.审批通过")
     private String status;
 
     @Schema(description = "token标记")
@@ -64,4 +64,7 @@ public class TopTransaction extends BaseEntity
 
     @Schema(description = "事务类型,recharge充值,withdraw提现")
     private TransactionType type;
+
+    @Schema(description = "事务号")
+    private String transNo;
 }
