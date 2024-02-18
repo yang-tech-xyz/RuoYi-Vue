@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/token")
 @Tag(description = "TokenController", name = "token信息")
 @RestController
-public class TopCoinController {
+public class TopTokenController {
 
     @Autowired
     private TopTokenService topTokenService;
