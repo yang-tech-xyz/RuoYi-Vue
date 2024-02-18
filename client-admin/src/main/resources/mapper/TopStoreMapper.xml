@@ -2,13 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.admin.mapper.TopStoreMapper">
 
-    <select id="selectValidList" resultType="com.ruoyi.admin.vo.StoreVO">
-        select
-            ts.*,
-            (select _ttp.price from top_token_price _ttp where _ttp.symbol =ts.symbol ) as price
-        from top_store ts
-        where ts.status = 1
-        order by ts.id
+    <select id="selectListVO" resultType="com.ruoyi.admin.vo.StoreVO">
+        select *
+        from top_store
+        order by period
     </select>
 
 </mapper>

@@ -1,14 +1,14 @@
-package com.ruoyi.web.dto;
+package com.ruoyi.admin.dto;
 
 import lombok.Data;
 
 @Data
-public class AccountTxPageDTO {
+public class UserPageDTO {
 
     private Integer pageNum = 1;
 
     private Integer pageSize = 10;
 
-    private String symbol;
-
+    private String wallet;
+    
 }

@@ -1,13 +1,12 @@
-package com.ruoyi.admin.vo;
+package com.ruoyi.admin.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Data
-public class StoreVO {
+public class StoreUpdateDTO {
 
     @Schema(description = "产品名称")
     private String name;
@@ -26,11 +25,5 @@ public class StoreVO {
 
     @Schema(description = "状态：1=有效，2=无效")
     private Integer status;
-
-    @Schema(description = "创建日期")
-    private LocalDateTime createdDate;
-
-    @Schema(description = "更新日期")
-    private LocalDateTime updatedDate;
 
 }

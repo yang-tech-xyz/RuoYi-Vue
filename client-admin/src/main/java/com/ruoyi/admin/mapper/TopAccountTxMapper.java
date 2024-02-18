@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TopAccountTxMapper extends BaseMapper<TopAccountTx> {
 
-    IPage<AccountTxVO> selectPageVO(@Param("iPage") IPage<AccountTxVO> iPage, @Param("walletAddress") String walletAddress, @Param("dto") AccountTxPageDTO dto);
+    IPage<AccountTxVO> selectPageVO(@Param("iPage") IPage<AccountTxVO> iPage, @Param("dto") AccountTxPageDTO dto);
 }
 

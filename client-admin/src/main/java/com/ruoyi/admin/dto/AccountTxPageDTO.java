@@ -9,6 +9,8 @@ public class AccountTxPageDTO {
 
     private Integer pageSize = 10;
 
-    private String token;
+    private String wallet;
+
+    private String symbol;
 
 }

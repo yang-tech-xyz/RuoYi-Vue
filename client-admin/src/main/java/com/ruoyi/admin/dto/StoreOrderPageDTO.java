@@ -9,4 +9,10 @@ public class StoreOrderPageDTO {
 
     private Integer pageSize = 10;
 
+    private String wallet;
+
+    private String symbol;
+
+    private Integer period;
+
 }

@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface TopStoreMapper extends BaseMapper<TopStore>{
 
-    List<StoreVO> selectValidList();
+    List<StoreVO> selectListVO();
 }
 
