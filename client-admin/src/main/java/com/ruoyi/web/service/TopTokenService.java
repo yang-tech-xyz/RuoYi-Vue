@@ -57,4 +57,12 @@ import java.util.Optional;
 @Service
 public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
+    public List<TokenVO> getList() {
+        return baseMapper.selectListVO();
+    }
+
+    public void updateTopToken(TopToken topToken) {
+        topToken.setUpdateTime(LocalDateTime.now());
+        this.getBaseMapper().updateById(topToken);
+    }
 }

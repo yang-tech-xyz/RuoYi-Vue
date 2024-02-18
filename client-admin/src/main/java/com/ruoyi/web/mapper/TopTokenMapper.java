@@ -2,6 +2,7 @@ package com.ruoyi.web.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.ruoyi.web.entity.TopToken;
+import com.ruoyi.web.vo.TokenVO;
 import com.ruoyi.web.vo.TopTokenChainVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -18,6 +19,8 @@ import java.util.Optional;
 public interface TopTokenMapper extends BaseMapper<TopToken>
 {
 
+
+    List<TokenVO> selectListVO();
     @Select("select tt.id,tt.symbol ,tt.online ,ttc.erc20_address,ttc.chain_id,tt.create_time ,tt.update_time ,tt.create_by ,tt.update_by,tc.receive_address " +
             "from top_token tt \n" +
             "left join top_token_chain ttc on tt.id = ttc.token_id \n" +
