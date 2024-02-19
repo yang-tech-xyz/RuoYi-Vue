@@ -1,9 +1,9 @@
-package com.ruoyi.web.controller;
+package com.ruoyi.admin.controller;
 
+import com.ruoyi.admin.dto.TopChainDTO;
+import com.ruoyi.admin.entity.TopChain;
+import com.ruoyi.admin.service.TopChainService;
 import com.ruoyi.common.AjaxResult;
-import com.ruoyi.web.dto.TopChainDTO;
-import com.ruoyi.web.entity.TopChain;
-import com.ruoyi.web.service.TopChainService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

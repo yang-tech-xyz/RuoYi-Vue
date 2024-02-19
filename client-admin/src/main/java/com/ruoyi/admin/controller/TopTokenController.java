@@ -1,27 +1,20 @@
-package com.ruoyi.web.controller;
+package com.ruoyi.admin.controller;
 
+import com.ruoyi.admin.entity.TopToken;
+import com.ruoyi.admin.service.TopTokenService;
+import com.ruoyi.admin.service.TopTransactionService;
+import com.ruoyi.admin.vo.TokenVO;
 import com.ruoyi.common.AjaxResult;
-import com.ruoyi.common.CommonSymbols;
 import com.ruoyi.web.dto.TopTokenDTO;
-import com.ruoyi.web.entity.TopToken;
-import com.ruoyi.web.entity.TopTransaction;
-import com.ruoyi.web.exception.ServiceException;
-import com.ruoyi.web.service.TopTokenService;
-import com.ruoyi.web.service.TopTransactionService;
-import com.ruoyi.web.utils.UnsignMessageUtils;
-import com.ruoyi.web.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.SignatureException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 充值
@@ -62,7 +55,8 @@ public class TopTokenController {
     @Operation(summary = "修改token")
     @PutMapping("/")
     public AjaxResult<String> edit(TopToken topToken){
-        topTokenService.updateTopToken(topToken);
+        topToken.setUpdateTime(LocalDateTime.now());
+        topTokenService.updateById(topToken);
         return AjaxResult.success();
     }
 

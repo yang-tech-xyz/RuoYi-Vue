@@ -43,7 +43,4 @@ public class TokenVO {
 
     private LocalDateTime updateTime;
 
-    @Schema(description = "价格")
-    private BigDecimal price;
-
 }

@@ -1,4 +1,4 @@
-package com.ruoyi.web.dto;
+package com.ruoyi.admin.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
