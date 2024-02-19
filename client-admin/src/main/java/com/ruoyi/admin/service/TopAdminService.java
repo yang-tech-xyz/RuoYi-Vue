@@ -75,7 +75,7 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         admin.setStatus(dto.getStatus());
         admin.setUpdatedBy(RequestUtil.getAdminId());
         admin.setUpdatedDate(LocalDateTime.now());
-        baseMapper.insert(admin);
+        baseMapper.updateById(admin);
         return true;
     }
 
