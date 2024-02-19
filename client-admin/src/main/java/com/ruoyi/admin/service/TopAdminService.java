@@ -59,7 +59,7 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         BeanUtils.copyProperties(dto, admin);
         admin.setPassword(passwordEncoder.encode(dto.getPassword()));
         admin.setCreatedBy(RequestUtil.getAdminId());
-        admin.setUpdatedDate(LocalDateTime.now());
+        admin.setCreatedDate(LocalDateTime.now());
         admin.setUpdatedBy(RequestUtil.getAdminId());
         admin.setUpdatedDate(LocalDateTime.now());
         baseMapper.insert(admin);
@@ -73,8 +73,6 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         }
         admin.setGoogleSecret(dto.getGoogleSecret());
         admin.setStatus(dto.getStatus());
-        admin.setCreatedBy(RequestUtil.getAdminId());
-        admin.setUpdatedDate(LocalDateTime.now());
         admin.setUpdatedBy(RequestUtil.getAdminId());
         admin.setUpdatedDate(LocalDateTime.now());
         baseMapper.insert(admin);
