@@ -38,4 +38,7 @@ public class TopChain extends BaseEntity
     @Schema(description = "项目方收款地址")
     private String receiveAddress;
 
+    @Schema(description = "链名称")
+    private String chainName;
+
 }
