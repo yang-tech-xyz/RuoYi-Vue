@@ -31,7 +31,7 @@ public class MyRequestContextFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String url = request.getRequestURI();
         // swagger
-        if (StringUtils.containsAny(url, "doc.html", "api-docs", "webjars")) {
+        if (StringUtils.containsAny(url, "doc.html", "api-docs", "webjars","favicon.ico")) {
             filterChain.doFilter(request,response);
             return;
         }
