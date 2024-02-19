@@ -19,10 +19,10 @@ public class RequestUtil {
         try {
             RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
             HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
-            if (null == request.getHeader("adminId")) {
+            if (null == request.getAttribute("adminId")) {
                 throw new ServiceException("未登录", 500);
             }
-            String adminId = String.valueOf(request.getHeader("adminId"));
+            String adminId = String.valueOf(request.getAttribute("adminId"));
             if (StringUtils.isBlank(adminId)) {
                 throw new ServiceException("未登录", 500);
             }
