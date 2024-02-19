@@ -51,9 +51,6 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
     @Autowired
     private TopTokenService topTokenService;
 
-    @Autowired
-    private TopTokenPriceService topTokenPriceService;
-
     /**
      * 存单信息
      */
@@ -76,7 +73,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         if (BooleanUtil.isFalse(token.getStoreEnabled())) {
             throw new ServiceException("当前币种无法进行存单", 500);
         }
-        BigDecimal tokenPrice = topTokenPriceService.getPrice(dto.getSymbol());
+        BigDecimal tokenPrice = token.getPrice();
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
             throw new ServiceException("币种价格无法获取", 500);
         }

@@ -38,6 +38,6 @@ public interface TopTokenMapper extends BaseMapper<TopToken> {
     )
     Optional<TopTokenChainVO> queryTokenByTokenIdAndChainId(@Param("tokenId") Integer tokenId, @Param("chainId") Long chainId);
 
-    List<TokenVO> selectListVO();
+    List<TokenVO> selectOnlineListVO();
 
 }

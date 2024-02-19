@@ -34,7 +34,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
     private TopPowerConfigService topPowerConfigService;
 
     @Autowired
-    private TopTokenPriceService topTokenPriceService;
+    private TopTokenService topTokenService;
 
     @Autowired
     private TopUserService topUserService;
@@ -68,7 +68,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
 //        topPowerOrder.setExpectedTotalOutput(buyPowerNeedPayUsdt.multiply(topPowerConfig.getOutputRatio()));
         String symbol = buyPowerBody.getSymbol();
         // 查询symbol的价格.
-        BigDecimal tokenPrice = topTokenPriceService.getPrice(symbol);
+        BigDecimal tokenPrice = topTokenService.getPrice(symbol);
         // 计算用户需要的token的数量
         BigDecimal payTokenAmount = buyPowerNeedPayUsdt.divide(tokenPrice, 10, 2);
         String wallet = buyPowerBody.getWallet().toLowerCase();

@@ -7,8 +7,8 @@
         from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
         <where>
             tu.wallet = #{walletAddress}
-            <if test="dto.token != null and dto.token != ''">
-                and tat.token = #{dto.token}
+            <if test="dto.symbol != null and dto.symbol != ''">
+                and tat.token = #{dto.symbol}
             </if>
         </where>
         order by tat.id desc

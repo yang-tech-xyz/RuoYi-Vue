@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.ruoyi.web.mapper.TopAccountTxMapper">
+<mapper namespace="com.ruoyi.admin.mapper.TopAccountTxMapper">
 
-    <select id="selectPageVO" resultType="com.ruoyi.web.vo.AccountTxVO">
-        select tat.*
+    <select id="selectPageVO" resultType="com.ruoyi.admin.vo.AccountTxVO">
+        select
+        tu.wallet,
+        tat.*
         from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
         <where>
-            tu.wallet = #{walletAddress}
-            <if test="dto.token != null and dto.token != ''">
-                and tat.token = #{dto.token}
+            <if test="dto.wallet != null and dto.wallet != ''">
+                and tu.wallet = #{dto.wallet}
+            </if>
+            <if test="dto.symbol != null and dto.symbol != ''">
+                and tat.symbol = #{dto.symbol}
             </if>
         </where>
         order by tat.id desc
