@@ -3,6 +3,7 @@ package com.ruoyi.web.service;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.entity.TopTransaction;
 import com.ruoyi.web.enums.TransactionType;
 import com.ruoyi.web.mapper.TopTransactionMapper;
@@ -15,15 +16,15 @@ import java.util.Optional;
 public class TopTransactionService extends ServiceImpl<TopTransactionMapper, TopTransaction> {
     public List<TopTransaction> queryRechargeUnConfirm() {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getIsConfirm,0).eq(TopTransaction::getType, TransactionType.Recharge);
+        query.eq(TopTransaction::getIsConfirm, CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Recharge);
         return this.list(query);
     }
 
-    public List<TopTransaction> queryWithdrawUnConfirm() {
-        LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getIsConfirm,0).eq(TopTransaction::getType, TransactionType.Withdraw);
-        return this.list(query);
-    }
+//    public List<TopTransaction> queryWithdrawUnConfirm() {
+//        LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
+//        query.eq(TopTransaction::getIsConfirm,0).eq(TopTransaction::getType, TransactionType.Withdraw);
+//        return this.list(query);
+//    }
 
     public Optional<TopTransaction> getTransactionByHash(String hash) {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();

@@ -64,4 +64,19 @@ public class TopTransaction extends BaseEntity
 
     @Schema(description = "事务类型,recharge充值,withdraw提现")
     private TransactionType type;
+
+    @Schema(description = "事务号")
+    private String transNo;
+
+
+    @Schema(description = "erc20地址")
+    private String erc20Address;
+
+
+    @Schema(description = "提现接收地址")
+    private String withdrawReceiveAddress;
+
+
+    @Schema(description = "提现数量")
+    private BigInteger withdrawAmount;
 }

@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.common.AjaxResult;
+import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.*;
 import com.ruoyi.web.enums.Account;
@@ -131,7 +132,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Long userId = topUserEntity.getId();
             topTransaction.setUserId(userId);
             // 设置充值状态为未成功.事务成功状态为0x1
-            topTransaction.setStatus("0x0");
+            topTransaction.setStatus(CommonStatus.STATES_COMMIT);
 
             // 获取币种信息
             Optional<TopToken> topTokenOpt = this.queryTokenBySymbol(rechargeBody.getTokenSymbol());
@@ -256,10 +257,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topRechargeTransactionList.stream().forEach(t -> {
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(t.getHash()), 10000));
         });
-        List<TopTransaction> topWithdrawTransactionList = topTransactionService.queryWithdrawUnConfirm();
-        topWithdrawTransactionList.stream().forEach(t -> {
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 10000));
-        });
+//        List<TopTransaction> topWithdrawTransactionList = topTransactionService.queryWithdrawUnConfirm();
+//        topWithdrawTransactionList.stream().forEach(t -> {
+//            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 10000));
+//        });
     }
 
 //    @Transactional(rollbackFor = Exception.class)
@@ -482,15 +483,18 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 )
         );
 //        topTransaction.setHash(transactionHash);
+        topTransaction.setWithdrawReceiveAddress(to);
+        topTransaction.setErc20Address(contractAddress);
         topTransaction.setTransNo(uuid);
         topTransaction.setChainId(chainId);
         topTransaction.setTokenId(topTokenId);
         topTransaction.setRpcEndpoint(rpcEndpoint);
-        topTransaction.setStatus("0");
+        topTransaction.setStatus(CommonStatus.STATES_COMMIT);
         topTransaction.setUserId(userId);
         topTransaction.setSymbol(symbol);
         topTransaction.setTokenAmount(transferAmount);
-        topTransaction.setIsConfirm(0);
+        topTransaction.setWithdrawAmount(tokenAmount);
+        topTransaction.setIsConfirm(CommonStatus.UN_CONFIRM);
         EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
         BigInteger currentHeight = ethBlockNumber.getBlockNumber();
         topTransaction.setHeight(currentHeight);
@@ -572,6 +576,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 )
         );
 //        topTransaction.setHash(transactionHash);
+        topTransaction.setWithdrawReceiveAddress(btcTransferAddress);
         topTransaction.setTransNo(uuid);
         topTransaction.setChainId(0L);
         topTransaction.setTokenId(topTokenId);

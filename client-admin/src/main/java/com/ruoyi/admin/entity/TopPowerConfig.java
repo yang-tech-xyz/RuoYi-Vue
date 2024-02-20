@@ -47,4 +47,7 @@ public class TopPowerConfig extends BaseEntity
     @Schema(description = "提现费率统一10%")
     private BigDecimal feeRatio;
 
+    @JsonIgnore
+    @Schema(description = "审核签名钱包,必须由改地址进行签名才可放行")
+    private String auditWallet;
 }
