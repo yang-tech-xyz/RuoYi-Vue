@@ -1,5 +1,6 @@
 package com.ruoyi.admin.controller;
 
+import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.entity.TopPowerConfig;
 import com.ruoyi.admin.entity.TopToken;
 import com.ruoyi.admin.entity.TopTransaction;
@@ -109,6 +110,11 @@ public class TopTokenController {
 
         }else{
             // 提现拒绝,
+            String status = topTransaction.getStatus();
+            if(!CommonStatus.STATES_COMMIT.equalsIgnoreCase(status)){
+                log.error("transaction had been audit,hash is:"+topTransaction.getHash());
+                throw new ServiceException("transaction had been reject");
+            }
             topTokenService.withdrawAuditReject(topTransaction);
         }
         return AjaxResult.success();

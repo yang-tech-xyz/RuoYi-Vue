@@ -52,22 +52,35 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         //查询对应的流水
         TopAccountTx topAccountTx = topAccountTxService.getByRefNo(transNo);
         String uuid = UUID.fastUUID().toString();
+        Long userId = topAccountTx.getUserId();
+        String symbol = topAccountTx.getSymbol();
+        BigDecimal amount = topAccountTx.getAmount();
+        BigDecimal fee = topAccountTx.getFee();
         //退回用户的资金
-//        topAccountService.processAccount(
-//                Arrays.asList(
-//                        AccountRequest.builder()
-//                                .uniqueId(uuid.concat("_" + topAccountTx.getUserId()).concat("_" + Account.TxType.WITHDRAW.typeCode))
-//                                .userId(userId)
-//                                .token(symbol)
-//                                .fee(fee.negate())
-//                                .balanceChanged(transferAmount.negate())
-//                                .balanceTxType(Account.Balance.AVAILABLE)
-//                                .txType(Account.TxType.WITHDRAW)
-//                                .refNo(uuid)
-//                                .remark("提现")
-//                                .build()
-//                )
-//        );
+        topAccountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_REJECT.typeCode))
+                                .userId(userId)
+                                .token(symbol)
+                                .balanceChanged(amount)
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.WITHDRAW_REJECT)
+                                .refNo(transNo)
+                                .remark("提现")
+                                .build(),
+                        AccountRequest.builder()
+                                .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_REJECT.typeCode))
+                                .userId(userId)
+                                .token(symbol)
+                                .balanceChanged(fee)
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.WITHDRAW_REJECT)
+                                .refNo(transNo)
+                                .remark("提现")
+                                .build()
+                )
+        );
     }
 
     public void processAccount(List<AccountRequest> requests) {
