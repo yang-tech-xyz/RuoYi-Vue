@@ -37,7 +37,7 @@ public class TopChainController {
 
     @Operation(summary = "新增chain")
     @PostMapping("/")
-    public AjaxResult<String> add(TopChainDTO topChainDTO){
+    public AjaxResult<String> add(@RequestBody TopChainDTO topChainDTO){
         TopChain topChain = new TopChain();
         BeanUtils.copyProperties(topChainDTO,topChain);
         topChain.setCreateTime(LocalDateTime.now());

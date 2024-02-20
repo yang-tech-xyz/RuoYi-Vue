@@ -1,21 +1,19 @@
 package com.ruoyi.admin.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.ruoyi.common.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-/**
- * 【请填写功能名称】对象 top_chain
- * 
- * @author ruoyi
- * @date 2024-02-03
- */
+/** 链信息配置表 */
 @Data
 public class TopChain extends BaseEntity
 {
     private static final long serialVersionUID = 1L;
 
-    /** 链信息配置表 */
+    @Schema(description="主键")
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /** 链类型 */

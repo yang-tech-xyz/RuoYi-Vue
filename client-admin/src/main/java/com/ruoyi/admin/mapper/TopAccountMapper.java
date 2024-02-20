@@ -11,6 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TopAccountMapper extends BaseMapper<TopAccount> {
 
+
+    TopAccount lockById(@Param("id") Long id);
+
     IPage<AccountVO> selectPageVO(@Param("iPage") IPage<AccountVO> iPage, @Param("dto") AccountPageDTO dto);
 }
 

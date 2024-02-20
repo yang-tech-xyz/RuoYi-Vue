@@ -82,8 +82,8 @@ public class TopTokenController {
     @Operation(summary = "提现审批")
     @PostMapping("/withdrawAudit")
     public AjaxResult<String> withdrawAudit(@RequestBody WithdrawAuditBody withdrawBody){
+        TopTransaction topTransaction = topTransactionService.getOptByTransactionNo(withdrawBody.getTransactionNo());
         if(withdrawBody.getPass()){
-            TopTransaction topTransaction = topTransactionService.getOptByTransactionNo(withdrawBody.getTransactionNo());
             if(CommonSymbols.BTC_SYMBOL.equalsIgnoreCase(topTransaction.getSymbol())){
                 log.warn("BTC can not withdraw audit");
                 throw new ServiceException("BTC can not withdraw audit");
@@ -108,8 +108,8 @@ public class TopTokenController {
             topTokenService.withdrawAuditPass(topTransaction);
 
         }else{
-            // TODO 提现拒绝
-
+            // 提现拒绝,
+            topTokenService.withdrawAuditReject(topTransaction);
         }
         return AjaxResult.success();
     }

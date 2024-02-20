@@ -1,6 +1,8 @@
 package com.ruoyi.admin.common;
 
 public class CommonStatus {
+
+    public static String STATES_REJECT = "0x2";
     public static String STATES_SUCCESS = "0x1";
     public static String STATES_COMMIT = "0x0";
 
@@ -13,4 +15,9 @@ public class CommonStatus {
      * 已确认状态
      */
     public static Integer IS_CONFIRM = 1;
+
+    /**
+     * 提现射核拒绝状态
+     */
+    public static Integer REJECT = 2;
 }

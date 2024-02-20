@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.admin.dto.TokenAddDTO;
 import com.ruoyi.admin.dto.TokenUpdateDTO;
+import com.ruoyi.admin.entity.TopAccountTx;
 import com.ruoyi.admin.entity.TopPowerConfig;
 import com.ruoyi.admin.entity.TopToken;
 import com.ruoyi.admin.entity.TopTransaction;
@@ -65,6 +66,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Autowired
     private TopTokenService topTokenService;
+
+    @Autowired
+    private TopAccountService topAccountService;
 
 
     /**
@@ -226,5 +230,18 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.error("transfer error!",e);
             throw new ServiceException("transfer error");
         }
+    }
+
+    /**
+     * 标记为审核失败并退款
+     * @param topTransaction
+     */
+    @Transactional
+    public void withdrawAuditReject(TopTransaction topTransaction) {
+        topTransaction.setStatus(CommonStatus.STATES_REJECT);
+        topTransaction.setIsConfirm(CommonStatus.REJECT);
+        topTransactionService.updateById(topTransaction);
+        // 开始退款
+        topAccountService.refund(topTransaction.getTransNo());
     }
 }
