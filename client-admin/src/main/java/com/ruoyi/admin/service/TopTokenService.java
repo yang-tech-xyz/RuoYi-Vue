@@ -17,6 +17,7 @@ import com.ruoyi.admin.exception.ServiceException;
 import com.ruoyi.admin.mapper.TopTokenMapper;
 import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.vo.TokenVO;
+import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -82,7 +83,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 //            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(t.getHash()), 10000));
 //        });
         List<TopTransaction> topWithdrawTransactionList = topTransactionService.queryWithdrawUnConfirm();
-        topWithdrawTransactionList.stream().forEach(t -> {
+        topWithdrawTransactionList.stream().filter(t -> StringUtils.isNotBlank(t.getHash())).forEach(t -> {
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 10000));
         });
     }

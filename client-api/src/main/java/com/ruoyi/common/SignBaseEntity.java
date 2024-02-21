@@ -20,20 +20,20 @@ public class SignBaseEntity implements Serializable
     /**
      * 用户钱包地址
      */
-    @Schema(description="钱包地址",example = "0x5ebacac108d665819398e5c37e12b0162d781398")
+    @Schema(description="钱包地址",example = "0x127BC32E4eD80B47EB63BA57C29A6920AB1372F4")
     private String wallet;
 
     /**
      * 用户签名后信息
      */
-    @Schema(description="簽名信息",example = "0x4a2164fff41e784af1482cd91f8b7b60f8e1216c9afc89689f83bcaa27115e4d124af62bb2f24013a55604fe37e8401bf2f607ade2b84f2d353807f3f961ac0d1c")
+    @Schema(description="簽名信息",example = "0x2b7f8afee45230099e1ea11e989d4f6e85aa9c73987026ff264f3ec9380a1a06186407801f6df9c568458de7ffd0fd487b76207c79c9ff191eb3539105d771631b")
     private String signMsg;
 
 
     /**
      * 用户签名后信息
      */
-    @Schema(description="签名内容", example= "青年人的责任重大！努力吧...")
+    @Schema(description="签名内容", example= "GatPool-sign")
     private String content;
 
 

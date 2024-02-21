@@ -50,7 +50,7 @@ public class TopChainController {
 
     @Operation(summary = "修改链信息")
     @PutMapping("/")
-    public AjaxResult<String> edit(TopChain topChain){
+    public AjaxResult<String> edit(@RequestBody TopChain topChain){
         topChain.setUpdateTime(LocalDateTime.now());
         topChainService.updateById(topChain);
         return AjaxResult.success();
