@@ -79,44 +79,4 @@ public class TopTokenController {
         topTokenService.removeById(id);
         return AjaxResult.success();
     }
-
-    @Operation(summary = "提现审批")
-    @PostMapping("/withdrawAudit")
-    public AjaxResult<String> withdrawAudit(@RequestBody WithdrawAuditBody withdrawBody){
-        TopTransaction topTransaction = topTransactionService.getOptByTransactionNo(withdrawBody.getTransactionNo());
-        if(withdrawBody.getPass()){
-            if(CommonSymbols.BTC_SYMBOL.equalsIgnoreCase(topTransaction.getSymbol())){
-                log.warn("BTC can not withdraw audit");
-                throw new ServiceException("BTC can not withdraw audit");
-            }
-
-            TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
-            String auditWallet = topPowerConfig.getAuditWallet();
-            try {
-                boolean validateResult = UnsignMessageUtils.validate(withdrawBody.getSignMsg(), withdrawBody.getContent(), auditWallet);
-                if (!validateResult) {
-                    return AjaxResult.error("validate sign error!");
-                }
-            } catch (SignatureException e) {
-                log.error("签名错误", e);
-                throw new ServiceException("签名错误");
-            }
-            if(StringUtils.isNotEmpty(topTransaction.getHash())){
-                log.error("transaction had been audit,hash is:"+topTransaction.getHash());
-                throw new ServiceException("transaction had been audit");
-            }
-
-            topTokenService.withdrawAuditPass(topTransaction);
-
-        }else{
-            // 提现拒绝,
-            String status = topTransaction.getStatus();
-            if(!CommonStatus.STATES_COMMIT.equalsIgnoreCase(status)){
-                log.error("transaction had been audit,hash is:"+topTransaction.getHash());
-                throw new ServiceException("transaction had been reject");
-            }
-            topTokenService.withdrawAuditReject(topTransaction);
-        }
-        return AjaxResult.success();
-    }
 }

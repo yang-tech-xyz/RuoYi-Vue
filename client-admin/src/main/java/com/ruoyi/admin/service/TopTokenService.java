@@ -245,4 +245,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         // 开始退款
         topAccountService.refund(topTransaction.getTransNo());
     }
+
+    public static void main(String[] args) {
+        systemTimer.addTask(new TimerTask(() -> System.out.println("test111"), 10));
+        try {
+            Thread.sleep(1000000000000L);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
