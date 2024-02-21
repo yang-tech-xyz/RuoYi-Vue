@@ -1,6 +1,7 @@
 package com.ruoyi.web.vo;
 
 import com.ruoyi.web.entity.TopPowerOrder;
+import com.ruoyi.web.entity.TopPowerOrderIncome;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -21,7 +22,9 @@ public class UserProcessVO {
 
     private Integer powerNumber = 0;
 
-    private List<TopPowerOrder> powerOrders;
+    private ArrayList<TopPowerOrder> powerOrders;
+
+    private ArrayList<TopPowerOrderIncome> incomeOrders;
 
     private List<UserProcessVO> directChildMebList = new ArrayList<>();
 

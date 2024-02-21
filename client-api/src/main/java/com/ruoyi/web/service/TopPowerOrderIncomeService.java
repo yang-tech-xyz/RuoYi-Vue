@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ public class TopPowerOrderIncomeService extends ServiceImpl<TopPowerOrderIncomeM
     public void process(List<UserProcessVO> userVOList, Map<String, TopToken> tokens, LocalDate processDate) {
         for (int i = 0; i < userVOList.size(); i++) {
             UserProcessVO userVO = userVOList.get(i);
+            ArrayList<TopPowerOrderIncome> incomeOrders = new ArrayList<>();
             for (int j = 0; j < userVO.getPowerOrders().size(); j++) {
                 TopPowerOrder order = userVO.getPowerOrders().get(j);
                 TopPowerOrderIncome orderIncome = new TopPowerOrderIncome();
@@ -50,7 +52,9 @@ public class TopPowerOrderIncomeService extends ServiceImpl<TopPowerOrderIncomeM
                 orderIncome.setUpdatedDate(LocalDateTime.now());
                 orderIncome.setUpdatedBy("SYS");
                 baseMapper.insert(orderIncome);
+                incomeOrders.add(orderIncome);
             }
+            userVO.setIncomeOrders(incomeOrders);
         }
     }
 }

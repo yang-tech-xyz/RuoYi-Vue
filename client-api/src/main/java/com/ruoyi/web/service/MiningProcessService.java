@@ -48,6 +48,6 @@ public class MiningProcessService {
         powerOrderService.process(userVOList, processDate);
         orderIncomeService.process(userVOList, tokens, processDate);
         sharingIncomeService.process(userVOList, tokens, processDate);
-        incomeService.process(userVOList, processDate);
+        //incomeService.process(userVOList, processDate);
     }
 }

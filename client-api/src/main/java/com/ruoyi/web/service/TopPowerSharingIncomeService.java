@@ -1,7 +1,7 @@
 package com.ruoyi.web.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.web.entity.TopPowerOrder;
+import com.ruoyi.web.entity.TopPowerOrderIncome;
 import com.ruoyi.web.entity.TopPowerSharingIncome;
 import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.mapper.TopPowerSharingConfigMapper;
@@ -54,17 +54,19 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
                     UserProcessVO curChild = curChildMebList.get(k);
                     int powerNumber = userVO.getPowerNumber();
                     // 下级订单，要根据父级拥有的台数，按照订单顺序进行返利
-                    for (int l = 0; l < curChild.getPowerOrders().size(); l++) {
-
-                        TopPowerOrder order = curChild.getPowerOrders().get(l);
+                    for (int l = 0; l < curChild.getIncomeOrders().size(); l++) {
+                        if (powerNumber <= 0) {
+                            break;
+                        }
+                        TopPowerOrderIncome incomeOrder = curChild.getIncomeOrders().get(l);
                         TopPowerSharingIncome sharingIncome = new TopPowerSharingIncome();
                         sharingIncome.setUserId(userVO.getId());
                         sharingIncome.setProviderUserId(curChild.getId());
-                        sharingIncome.setProviderOrderNo(order.getOrderNo());
+                        sharingIncome.setProviderOrderNo(incomeOrder.getOrderNo());
                         sharingIncome.setProviderLevel(j);
                         sharingIncome.setRate(levelRate);
-                        sharingIncome.setSymbol(order.getOutputSymbol());
-                       // sharingIncome.setIncome();
+                        sharingIncome.setSymbol(incomeOrder.getSymbol());
+                        sharingIncome.setIncome(incomeOrder.getIncome().multiply(sharingIncome.getRate()));
                         sharingIncome.setProcessEnabled(Boolean.FALSE);
                         sharingIncome.setProcessDate(processDate);
                         sharingIncome.setCreatedDate(LocalDateTime.now());
@@ -72,8 +74,8 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
                         sharingIncome.setUpdatedDate(LocalDateTime.now());
                         sharingIncome.setUpdatedBy("SYS");
                         baseMapper.insert(sharingIncome);
+                        powerNumber = powerNumber - 1;
                     }
-
                 }
                 // 下一层数据
                 if (j < lv) {
