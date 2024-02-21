@@ -30,9 +30,9 @@ public interface TopTokenMapper extends BaseMapper<TopToken> {
 
 
     @Select("select tt.id,tt.symbol ,tt.online ,ttc.erc20_address,ttc.chain_id,tt.create_time ,tt.update_time ,tt.create_by ,tt.update_by " +
-            "from top_token tt \n" +
-            "left join top_token_chain ttc on tt.id = ttc.token_id \n" +
-            "where tt.online = 0\n" +
+            "from top_token_chain ttc \n" +
+            "left join top_token tt on tt.id = ttc.token_id \n" +
+            "where tt.online = 1\n" +
             "and ttc.chain_id = #{chainId}\n" +
             "and ttc.token_id = #{tokenId}\n"
     )

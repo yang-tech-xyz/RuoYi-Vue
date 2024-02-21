@@ -18,7 +18,7 @@ import java.util.List;
 public interface TopTokenChainMapper extends BaseMapper<TopTokenChain> {
 
 
-    @Select("SELECT ttc.*,tt.symbol ,tc.chain_name as chainName FROM top_token_chain ttc \n" +
+    @Select("SELECT ttc.id,ttc.*,tt.symbol ,tc.chain_name as chainName FROM top_token_chain ttc \n" +
             "LEFT JOIN top_token tt ON tt.id =ttc.token_id \n" +
             "LEFT JOIN top_chain tc on tc.id = ttc.chain_id ")
     List<TopTokenChainVO> selectListVO();

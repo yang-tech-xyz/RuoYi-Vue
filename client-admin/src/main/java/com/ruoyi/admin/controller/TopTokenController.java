@@ -54,7 +54,7 @@ public class TopTokenController {
 
     @Operation(summary = "新增token")
     @PostMapping("/")
-    public AjaxResult<String> add(TopTokenDTO topTokenDTO){
+    public AjaxResult<String> add(@RequestBody TopTokenDTO topTokenDTO){
         TopToken topToken = new TopToken();
         BeanUtils.copyProperties(topTokenDTO,topToken);
         topToken.setCreateTime(LocalDateTime.now());
@@ -67,7 +67,7 @@ public class TopTokenController {
 
     @Operation(summary = "修改token")
     @PutMapping("/")
-    public AjaxResult<String> edit(TopToken topToken){
+    public AjaxResult<String> edit(@RequestBody TopToken topToken){
         topToken.setUpdateTime(LocalDateTime.now());
         topTokenService.updateById(topToken);
         return AjaxResult.success();

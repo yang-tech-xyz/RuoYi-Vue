@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 @Data
 public class TopTokenChainVO extends BaseEntity
 {
+    @Schema(description = "id")
+    private Long id;
+
     @Schema(description = "token id")
     private Long tokenId;
 
