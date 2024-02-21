@@ -46,6 +46,7 @@ public class TopPowerOrderIncomeService extends ServiceImpl<TopPowerOrderIncomeM
                 // BTC收益:最大10位
                 orderIncome.setPrice(tokens.get(orderIncome.getSymbol()).getPrice());
                 orderIncome.setIncome(orderIncome.getIncome().divide(orderIncome.getPrice(), 10, RoundingMode.DOWN));
+                orderIncome.setProcessEnabled(Boolean.FALSE);
                 orderIncome.setProcessDate(processDate);
                 orderIncome.setCreatedDate(LocalDateTime.now());
                 orderIncome.setCreatedBy("SYS");

@@ -3,22 +3,10 @@
 <mapper namespace="com.ruoyi.web.mapper.TopPowerDailyIncomeMapper">
 
     <update id="updateProcessEnabled">
-        update top_power_daily_income
+        update top_power_order_income
         set process_enabled = 1
         WHERE user_id = #{userId}
     </update>
-
-    <select id="selectProcessIncomeByUserId" resultType="com.ruoyi.web.vo.DailyIncomeProcessVO">
-        SELECT
-            income_symbol as symbol,
-            sum( income ) AS income
-        FROM
-            top_power_daily_income
-        WHERE
-            user_id = #{userId} and process_enabled = 0
-        GROUP BY
-            income_symbol
-    </select>
 
 </mapper>
 

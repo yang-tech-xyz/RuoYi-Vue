@@ -30,7 +30,7 @@ public class MiningProcessService {
     private TopPowerSharingIncomeService sharingIncomeService;
 
     @Autowired
-    private TopPowerIncomeService incomeService;
+    private TopPowerDailyIncomeService dailyIncomeService;
 
 
     /**
@@ -48,6 +48,6 @@ public class MiningProcessService {
         powerOrderService.process(userVOList, processDate);
         orderIncomeService.process(userVOList, tokens, processDate);
         sharingIncomeService.process(userVOList, tokens, processDate);
-        //incomeService.process(userVOList, processDate);
+        dailyIncomeService.process(userVOList, processDate);
     }
 }

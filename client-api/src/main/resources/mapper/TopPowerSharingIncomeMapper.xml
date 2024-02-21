@@ -9,15 +9,12 @@
     </update>
 
     <select id="selectProcessIncomeByUserId" resultType="com.ruoyi.web.vo.SharingIncomeProcessVO">
-        SELECT
-            income_symbol as symbol,
-            sum( income ) AS income
-        FROM
-            top_power_sharing_income
-        WHERE
-            user_id = #{userId} and process_enabled = 0
-        GROUP BY
-            income_symbol
+        SELECT symbol,
+               sum(income) AS income
+        FROM top_power_sharing_income
+        WHERE user_id = #{userId}
+          and process_enabled = 0
+        GROUP BY symbol
     </select>
 
 </mapper>

@@ -52,6 +52,10 @@ public class TopPowerOrderIncome implements Serializable {
     @TableField(value = "process_date")
     private LocalDate processDate;
 
+    @Schema(description = "是否处理")
+    @TableField(value = "process_enabled")
+    private Boolean processEnabled;
+
     @Schema(description = "创建日期")
     @TableField(value = "created_date")
     private LocalDateTime createdDate;
