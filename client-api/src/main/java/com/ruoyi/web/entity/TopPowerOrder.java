@@ -32,6 +32,10 @@ public class TopPowerOrder implements Serializable {
     @TableField(value = "order_no")
     private String orderNo;
 
+    @Schema(description = "购买币种")
+    @TableField(value = "symbol")
+    private String symbol;
+
     @Schema(description = "购买金额,价格乘以购买数量等于购买金额")
     @TableField(value = "amount")
     private BigDecimal amount;

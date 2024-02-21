@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.admin.dto.StoreAddDTO;
 import com.ruoyi.admin.dto.StoreUpdateDTO;
 import com.ruoyi.admin.entity.TopStore;
+import com.ruoyi.admin.exception.ServiceException;
 import com.ruoyi.admin.mapper.TopStoreMapper;
 import com.ruoyi.admin.vo.StoreVO;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,10 @@ public class TopStoreService extends ServiceImpl<TopStoreMapper, TopStore> {
     }
 
     public Boolean add(StoreAddDTO dto) {
+        Long count = baseMapper.selectCount(new LambdaQueryWrapper<TopStore>().eq(TopStore::getPeriod, dto.getPeriod()));
+        if (count > 0) {
+            throw new ServiceException("周期重复", 500);
+        }
         TopStore store = new TopStore();
         BeanUtils.copyProperties(dto, store);
         store.setCreatedBy("SYS");

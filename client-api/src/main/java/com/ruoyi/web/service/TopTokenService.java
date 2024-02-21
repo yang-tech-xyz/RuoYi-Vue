@@ -52,10 +52,7 @@ import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -824,5 +821,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 log.error("token price error:{}", token.getSymbol(), ex);
             }
         }
+    }
+
+    public Map<String, TopToken> getTopToken() {
+        Map<String, TopToken> tokenMap = new HashMap<>();
+        List<TopToken> tokens = baseMapper.selectList(new LambdaQueryWrapper<>());
+        for (TopToken token : tokens) {
+            tokenMap.put(token.getSymbol(), token);
+        }
+        return tokenMap;
     }
 }

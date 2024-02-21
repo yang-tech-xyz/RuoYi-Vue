@@ -36,25 +36,21 @@ public class TopPowerSharingIncome implements Serializable {
     @TableField(value = "provider_level")
     private Integer providerLevel;
 
+    @Schema(description = "层级收益比例")
+    @TableField(value = "rate")
+    private BigDecimal rate;
+
     @Schema(description = "收益币种")
-    @TableField(value = "income_symbol")
-    private String incomeSymbol;
+    @TableField(value = "symbol")
+    private String symbol;
 
-    @Schema(description = "贡献人收益金额")
-    @TableField(value = "provider_income")
-    private BigDecimal providerIncome;
-
-    @Schema(description = "收益比例")
-    @TableField(value = "income_rate")
-    private BigDecimal incomeRate;
-
-    @Schema(description = "转收益币种收益")
+    @Schema(description = "收益金额")
     @TableField(value = "income")
     private BigDecimal income;
 
     @Schema(description = "收益日期")
-    @TableField(value = "income_date")
-    private LocalDate incomeDate;
+    @TableField(value = "process_date")
+    private LocalDate processDate;
 
     @Schema(description = "是否处理")
     @TableField(value = "process_enabled")
