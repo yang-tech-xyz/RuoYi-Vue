@@ -8,10 +8,12 @@ import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.mapper.TopPowerDailyIncomeMapper;
 import com.ruoyi.web.mapper.TopPowerOrderIncomeMapper;
 import com.ruoyi.web.mapper.TopPowerSharingIncomeMapper;
+import com.ruoyi.web.vo.DailyIncomeVO;
 import com.ruoyi.web.vo.OrderIncomeProcessVO;
 import com.ruoyi.web.vo.SharingIncomeProcessVO;
 import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -91,4 +94,70 @@ public class TopPowerDailyIncomeService extends ServiceImpl<TopPowerDailyIncomeM
         sharingIncomeMapper.updateProcessEnabled(userId);
     }
 
+    /**
+     * 查询未领取收益
+     */
+    public List<DailyIncomeVO> getUnclaimedList(String walletAddress) {
+        return baseMapper.selectUnclaimedList(walletAddress);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean claim(String wallet, Long id) {
+        TopPowerDailyIncome lock = baseMapper.lockById(id);
+        if (BooleanUtils.isTrue(lock.getProcessEnabled())) {
+            return false;
+        }
+        lock.setProcessEnabled(Boolean.TRUE);
+        lock.setUpdatedDate(LocalDateTime.now());
+        baseMapper.updateById(lock);
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + lock.getUserId()).concat("_" + Account.TxType.POWER_DAILY_INCOME.typeCode))
+                                .userId(lock.getUserId())
+                                .token(lock.getSymbol())
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(lock.getIncome())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.POWER_DAILY_INCOME)
+                                .refNo(lock.getId().toString())
+                                .remark("领取收益")
+                                .build()
+                )
+        );
+        return true;
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean claimAll(String wallet) {
+        List<TopPowerDailyIncome> dailyIncomes = baseMapper.selectUnclaimed(wallet);
+        if (dailyIncomes.isEmpty()) {
+            return false;
+        }
+        List<AccountRequest> requests = new ArrayList<>();
+        for (TopPowerDailyIncome dailyIncome : dailyIncomes) {
+            TopPowerDailyIncome lock = baseMapper.lockById(dailyIncome.getId());
+            if (BooleanUtils.isTrue(lock.getProcessEnabled())) {
+                continue;
+            }
+            lock.setProcessEnabled(Boolean.TRUE);
+            lock.setUpdatedDate(LocalDateTime.now());
+            baseMapper.updateById(lock);
+            requests.add(
+                    AccountRequest.builder()
+                            .uniqueId(UUID.fastUUID().toString().concat("_" + lock.getUserId()).concat("_" + Account.TxType.POWER_DAILY_INCOME.typeCode))
+                            .userId(lock.getUserId())
+                            .token(lock.getSymbol())
+                            .fee(BigDecimal.ZERO)
+                            .balanceChanged(lock.getIncome())
+                            .balanceTxType(Account.Balance.AVAILABLE)
+                            .txType(Account.TxType.POWER_DAILY_INCOME)
+                            .refNo(lock.getId().toString())
+                            .remark("领取收益")
+                            .build()
+            );
+        }
+        accountService.processAccount(requests);
+        return true;
+    }
 }

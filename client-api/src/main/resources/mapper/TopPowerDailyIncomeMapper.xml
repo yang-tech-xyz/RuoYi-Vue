@@ -8,5 +8,25 @@
         WHERE user_id = #{userId}
     </update>
 
+    <select id="selectUnclaimedList" resultType="com.ruoyi.web.vo.DailyIncomeVO">
+        SELECT tpd.*
+        FROM top_user tu
+                 INNER JOIN top_power_daily_income tpd ON tu.id = tpd.user_id
+        where tu.wallet = #{wallet} and tpd.process_enabled = 0
+        order by tpd.process_date
+    </select>
+
+    <select id="lockById" resultType="com.ruoyi.web.entity.TopPowerDailyIncome">
+        select * from top_power_daily_income where id = #{id} for update
+    </select>
+
+    <select id="selectUnclaimed" resultType="com.ruoyi.web.entity.TopPowerDailyIncome">
+        SELECT tpd.*
+        FROM top_user tu
+                 INNER JOIN top_power_daily_income tpd ON tu.id = tpd.user_id
+        where tu.wallet = #{wallet} and tpd.process_enabled = 0
+        order by tpd.process_date
+    </select>
+
 </mapper>
 
