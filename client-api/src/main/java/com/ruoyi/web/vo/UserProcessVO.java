@@ -19,11 +19,10 @@ public class UserProcessVO {
 
     private String invitedUserCode;
 
-    private List<TopPowerOrder> powerOrders;
-
     private Integer powerNumber = 0;
 
-    // 下级直接邀请人
+    private List<TopPowerOrder> powerOrders;
+
     private List<UserProcessVO> directChildMebList = new ArrayList<>();
 
 }

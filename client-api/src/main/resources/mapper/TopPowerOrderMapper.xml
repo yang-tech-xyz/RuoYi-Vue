@@ -7,6 +7,7 @@
         from top_power_order
         where user_id = #{userId}
           and end_date <![CDATA[ > ]]> #{processDate}
+        order by create_time
     </select>
 
     <select id="selectPageVO" resultType="com.ruoyi.web.vo.PowerOrderVO">

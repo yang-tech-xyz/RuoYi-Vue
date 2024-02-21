@@ -1,6 +1,7 @@
 package com.ruoyi.web.service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.web.entity.TopPowerOrder;
 import com.ruoyi.web.entity.TopPowerSharingIncome;
 import com.ruoyi.web.entity.TopToken;
 import com.ruoyi.web.mapper.TopPowerSharingConfigMapper;
@@ -31,6 +32,7 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
      * 层级收益
      * 1.按照已有矿机数量来获取层级数量
      * 2.每层用户只能获取到本身台数数量收益，按照订单时间正序
+     * 3.收益：用户挖矿收益BTC*层级比例
      */
     @Transactional(rollbackFor = Exception.class)
     public void process(List<UserProcessVO> userVOList, Map<String, TopToken> tokens, LocalDate processDate) {
@@ -51,23 +53,27 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
                 for (int k = 0; k < curChildMebList.size(); k++) {
                     UserProcessVO curChild = curChildMebList.get(k);
                     int powerNumber = userVO.getPowerNumber();
-                    BigDecimal income = BigDecimal.ZERO;
-                    TopPowerSharingIncome sharingIncome = new TopPowerSharingIncome();
-                    sharingIncome.setUserId(userVO.getId());
-                    sharingIncome.setProviderUserId(curChild.getId());
-                    sharingIncome.setProviderLevel(j);
                     // 下级订单，要根据父级拥有的台数，按照订单顺序进行返利
                     for (int l = 0; l < curChild.getPowerOrders().size(); l++) {
-                        
 
+                        TopPowerOrder order = curChild.getPowerOrders().get(l);
+                        TopPowerSharingIncome sharingIncome = new TopPowerSharingIncome();
+                        sharingIncome.setUserId(userVO.getId());
+                        sharingIncome.setProviderUserId(curChild.getId());
+                        sharingIncome.setProviderOrderNo(order.getOrderNo());
+                        sharingIncome.setProviderLevel(j);
+                        sharingIncome.setRate(levelRate);
+                        sharingIncome.setSymbol(order.getOutputSymbol());
+                       // sharingIncome.setIncome();
+                        sharingIncome.setProcessEnabled(Boolean.FALSE);
+                        sharingIncome.setProcessDate(processDate);
+                        sharingIncome.setCreatedDate(LocalDateTime.now());
+                        sharingIncome.setCreatedBy("SYS");
+                        sharingIncome.setUpdatedDate(LocalDateTime.now());
+                        sharingIncome.setUpdatedBy("SYS");
+                        baseMapper.insert(sharingIncome);
                     }
-                    sharingIncome.setProcessEnabled(Boolean.FALSE);
-                    sharingIncome.setProcessDate(processDate);
-                    sharingIncome.setCreatedDate(LocalDateTime.now());
-                    sharingIncome.setCreatedBy("SYS");
-                    sharingIncome.setUpdatedDate(LocalDateTime.now());
-                    sharingIncome.setUpdatedBy("SYS");
-                    baseMapper.insert(sharingIncome);
+
                 }
                 // 下一层数据
                 if (j < lv) {

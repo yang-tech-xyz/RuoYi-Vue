@@ -32,6 +32,10 @@ public class TopPowerSharingIncome implements Serializable {
     @TableField(value = "provider_user_id")
     private Long providerUserId;
 
+    @Schema(description = "贡献人订单号")
+    @TableField(value = "provider_order_no")
+    private String providerOrderNo;
+
     @Schema(description = "贡献人层级")
     @TableField(value = "provider_level")
     private Integer providerLevel;
