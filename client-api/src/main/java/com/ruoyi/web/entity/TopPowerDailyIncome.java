@@ -28,42 +28,21 @@ public class TopPowerDailyIncome implements Serializable {
     @TableField(value = "user_id")
     private Long userId;
 
-    @Schema(description = "订单号")
-    @TableField(value = "order_no")
-    private String orderNo;
-
-    @Schema(description = "存入金额")
-    @TableField(value = "amount")
-    private BigDecimal amount;
-
     @Schema(description = "收益币种")
-    @TableField(value = "income_symbol")
-    private String incomeSymbol;
+    @TableField(value = "symbol")
+    private String symbol;
 
-    @Schema(description = "币种价格")
-    @TableField(value = "income_price")
-    private BigDecimal incomePrice;
-
-    @Schema(description = "比列")
-    @TableField(value = "income_rate")
-    private BigDecimal incomeRate;
-
-    @Schema(description = "收益金额USD")
-    @TableField(value = "income_usd")
-    private BigDecimal incomeUsd;
-
-    @Schema(description = "币种收益金额")
+    @Schema(description = "收益金额")
     @TableField(value = "income")
     private BigDecimal income;
 
-    @Schema(description = "收益日期")
-    @TableField(value = "income_date")
-    private LocalDate incomeDate;
+    @Schema(description = "处理日期")
+    @TableField(value = "process_date")
+    private LocalDate processDate;
 
     @Schema(description = "是否处理")
     @TableField(value = "process_enabled")
     private Boolean processEnabled;
-
 
     @Schema(description = "创建日期")
     @TableField(value = "created_date")

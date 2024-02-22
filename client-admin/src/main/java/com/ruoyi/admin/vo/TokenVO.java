@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 @Data
 public class TokenVO {
 
+    private Long id;
+
     @Schema(description = "token 名称")
     private String symbol;
 

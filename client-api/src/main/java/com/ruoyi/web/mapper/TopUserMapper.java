@@ -22,4 +22,6 @@ public interface TopUserMapper extends BaseMapper<TopUser> {
     InviteInfoVO selectInviteInfo(@Param("walletAddress") String walletAddress);
 
     TopUser selectParent(@Param("parentId") Long parentId);
+
+    TopUser lockById(@Param("id") Long id);
 }

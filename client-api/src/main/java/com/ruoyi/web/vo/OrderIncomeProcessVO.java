@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class DailyIncomeProcessVO {
+public class OrderIncomeProcessVO {
 
     private String symbol;
 

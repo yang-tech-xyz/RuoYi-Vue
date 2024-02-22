@@ -10,14 +10,17 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.ArrayList;
 
 @Mapper
 public interface TopPowerOrderMapper extends BaseMapper<TopPowerOrder> {
 
-    List<TopPowerOrder> selectOrderList(@Param("userId") Long userId, @Param("processDate") LocalDate processDate);
+    ArrayList<TopPowerOrder> selectOrderList(@Param("userId") Long userId, @Param("processDate") LocalDate processDate);
 
     IPage<PowerOrderVO> selectPageVO(@Param("iPage") IPage<PowerOrderVO> iPage, @Param("walletAddress") String walletAddress);
 
     Page<TopPowerOrderVO> selectPagePowerVO(@Param("page") Page page, @Param("userId") Long userId);
+
+    Integer sumPowerNumberByUserId(@Param("userId") Long userId);
+
 }

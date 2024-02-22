@@ -43,4 +43,11 @@
         where tu.id = #{parentId}
     </select>
 
+    <select id="lockById" resultType="com.ruoyi.web.entity.TopUser">
+        select
+            tu.*
+        from top_user tu
+        where tu.id = #{id} for update
+    </select>
+
 </mapper>

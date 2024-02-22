@@ -1,16 +1,14 @@
 package com.ruoyi.web.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.web.entity.TopToken;
-import com.ruoyi.web.mapper.TopTokenMapper;
 import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -20,19 +18,19 @@ public class MiningProcessService {
     private TopUserService userService;
 
     @Autowired
-    private TopTokenMapper tokenMapper;
+    private TopTokenService tokenService;
 
     @Autowired
     private TopPowerOrderService powerOrderService;
 
     @Autowired
-    private TopPowerDailyIncomeService dailyIncomeService;
+    private TopPowerOrderIncomeService orderIncomeService;
 
     @Autowired
     private TopPowerSharingIncomeService sharingIncomeService;
 
     @Autowired
-    private TopPowerIncomeService incomeService;
+    private TopPowerDailyIncomeService dailyIncomeService;
 
 
     /**
@@ -43,14 +41,13 @@ public class MiningProcessService {
      * 4.计算层级收益
      * 5.入账资产
      */
-    @Transactional(rollbackFor = Exception.class)
     public void process(LocalDate processDate) {
-        List<TopToken> tokenList = tokenMapper.selectList(new LambdaQueryWrapper<>());
+        Map<String, TopToken> tokens = tokenService.getTopToken();
         List<UserProcessVO> userVOList = userService.getUserVOList();
         userService.process(userVOList);
         powerOrderService.process(userVOList, processDate);
-        dailyIncomeService.process(userVOList, tokenList, processDate);
-        sharingIncomeService.process(userVOList, tokenList, processDate);
-        incomeService.process(userVOList, processDate);
+        orderIncomeService.process(userVOList, tokens, processDate);
+        sharingIncomeService.process(userVOList, tokens, processDate);
+        dailyIncomeService.process(userVOList, processDate);
     }
 }

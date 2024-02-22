@@ -1,7 +1,9 @@
 package com.ruoyi.admin.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.entity.TopPowerConfig;
+import com.ruoyi.admin.entity.TopStore;
 import com.ruoyi.admin.entity.TopToken;
 import com.ruoyi.admin.entity.TopTransaction;
 import com.ruoyi.admin.exception.ServiceException;
@@ -54,9 +56,13 @@ public class TopTokenController {
 
     @Operation(summary = "新增token")
     @PostMapping("/")
-    public AjaxResult<String> add(@RequestBody TopTokenDTO topTokenDTO){
+    public AjaxResult<String> add(@RequestBody TopTokenDTO dto){
+        long count = topTokenService.count(new LambdaQueryWrapper<TopToken>().eq(TopToken::getSymbol, dto.getSymbol()));
+        if (count > 0) {
+            throw new ServiceException("数据重复", 500);
+        }
         TopToken topToken = new TopToken();
-        BeanUtils.copyProperties(topTokenDTO,topToken);
+        BeanUtils.copyProperties(dto,topToken);
         topToken.setCreateTime(LocalDateTime.now());
         topToken.setUpdateTime(LocalDateTime.now());
         topToken.setCreateBy("sys");

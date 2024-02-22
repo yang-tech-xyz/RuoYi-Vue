@@ -7,6 +7,7 @@
         from top_power_order
         where user_id = #{userId}
           and end_date <![CDATA[ > ]]> #{processDate}
+        order by create_time
     </select>
 
     <select id="selectPageVO" resultType="com.ruoyi.web.vo.PowerOrderVO">
@@ -25,6 +26,10 @@
         from top_user tu
                  inner join top_power_order tpo on tu.id = tpo.user_id
         where tu.id = #{userId}
+    </select>
+
+    <select id="sumPowerNumberByUserId" resultType="java.lang.Integer">
+        select ifnull(sum(t.number),0) from top_power_order t where t.user_id = #{userId}
     </select>
 
 </mapper>
