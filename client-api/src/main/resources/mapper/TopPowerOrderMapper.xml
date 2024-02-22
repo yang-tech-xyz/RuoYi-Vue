@@ -28,4 +28,8 @@
         where tu.id = #{userId}
     </select>
 
+    <select id="sumPowerNumberByUserId" resultType="java.lang.Integer">
+        select ifnull(sum(t.number),0) from top_power_order t where t.user_id = #{userId}
+    </select>
+
 </mapper>

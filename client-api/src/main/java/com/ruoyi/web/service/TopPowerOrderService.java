@@ -103,6 +103,15 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
 
         //生成算力訂單
         this.baseMapper.insert(topPowerOrder);
+
+        /*
+            更新用户等级：挖矿台数为等级,最大十级
+         */
+        TopUser lockUser = topUserService.lockById(topUserEntity.getId());
+        int powerNumber = baseMapper.sumPowerNumberByUserId(lockUser.getId()) + topPowerOrder.getNumber();
+        lockUser.setGrade(Math.min(powerNumber, 10));
+        topUserService.updateById(lockUser);
+
     }
 
     /**

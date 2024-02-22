@@ -39,6 +39,4 @@ public class TopPowerDailyIncomeController {
     public AjaxResult<Boolean> claimAll() {
         return AjaxResult.success(service.claimAll(RequestUtil.getWalletAddress()));
     }
-
 }
-

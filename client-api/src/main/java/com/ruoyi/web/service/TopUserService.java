@@ -75,4 +75,8 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
         }
         return baseMapper.selectInviteListById(optional.get().getId());
     }
+
+    public TopUser lockById(Long id) {
+        return baseMapper.lockById(id);
+    }
 }
