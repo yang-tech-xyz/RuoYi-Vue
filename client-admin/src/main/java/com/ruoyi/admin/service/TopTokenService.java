@@ -7,15 +7,14 @@ import cn.hutool.crypto.Padding;
 import cn.hutool.crypto.symmetric.AES;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.dto.TokenAddDTO;
 import com.ruoyi.admin.dto.TokenUpdateDTO;
-import com.ruoyi.admin.entity.TopAccountTx;
 import com.ruoyi.admin.entity.TopPowerConfig;
 import com.ruoyi.admin.entity.TopToken;
 import com.ruoyi.admin.entity.TopTransaction;
 import com.ruoyi.admin.exception.ServiceException;
 import com.ruoyi.admin.mapper.TopTokenMapper;
-import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.vo.TokenVO;
 import io.micrometer.common.util.StringUtils;
 import jakarta.annotation.PostConstruct;
@@ -56,6 +55,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
 
     static SystemTimer systemTimer = new SystemTimer();
+
+    static {
+        systemTimer.start();
+    }
 
     @Value("${token.secret}")
     private String secret;
@@ -246,12 +249,4 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topAccountService.refund(topTransaction.getTransNo());
     }
 
-    public static void main(String[] args) {
-        systemTimer.addTask(new TimerTask(() -> System.out.println("test111"), 10));
-        try {
-            Thread.sleep(1000000000000L);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
