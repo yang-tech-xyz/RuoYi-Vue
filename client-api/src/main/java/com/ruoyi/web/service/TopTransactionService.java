@@ -1,12 +1,16 @@
 package com.ruoyi.web.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.common.CommonStatus;
+import com.ruoyi.web.dto.TopTransactionDTO;
 import com.ruoyi.web.entity.TopTransaction;
 import com.ruoyi.web.enums.TransactionType;
 import com.ruoyi.web.mapper.TopTransactionMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,5 +42,14 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
      */
     public void updateConfirm(TopTransaction topTransaction) {
         this.baseMapper.updateConfirm(topTransaction.getId());
+    }
+
+    public IPage<TopTransaction> getTransaction(TopTransactionDTO topTransaction) {
+        IPage<TopTransaction> page = new Page<>(topTransaction.getPageNum(), topTransaction.getPageSize());
+        LambdaQueryWrapper<TopTransaction> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StringUtils.isNotEmpty(topTransaction.getHash()),TopTransaction::getHash,topTransaction.getHash())
+                .eq(StringUtils.isNotEmpty(topTransaction.getStatus()),TopTransaction::getStatus,topTransaction.getStatus())
+                .orderByDesc(TopTransaction::getCreateTime);
+        return this.getBaseMapper().selectPage(page,wrapper);
     }
 }

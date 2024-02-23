@@ -147,7 +147,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         TopTransaction topTransactionEntity = new TopTransaction();
         topTransactionEntity.setId(topTransaction.getId());
         topTransactionEntity.setHash(topTransaction.getHash());
-
+        topTransactionEntity.setStatus(CommonStatus.STATES_SUCCESS);
+        topTransactionEntity.setIsConfirm(CommonStatus.IS_CONFIRM);
         topTransactionService.updateById(topTransactionEntity);
     }
 

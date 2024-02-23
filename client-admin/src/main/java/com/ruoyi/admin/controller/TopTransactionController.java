@@ -101,7 +101,7 @@ public class TopTransactionController {
     }
 
 
-    @Operation(summary = "提现审批")
+    @Operation(summary = "BTC提现审批")
     @PostMapping("/withdrawBTCAudit")
     public AjaxResult<String> withdrawBTCAudit(@RequestBody WithdrawBTCAuditBody withdrawBTCAuditBody){
         TopTransaction topTransaction = topTransactionService.getOptByTransactionNo(withdrawBTCAuditBody.getTransactionNo());
@@ -126,6 +126,7 @@ public class TopTransactionController {
                 log.error("transaction had been audit,hash is:"+topTransaction.getHash());
                 throw new ServiceException("transaction had been audit");
             }
+            topTransaction.setHash(withdrawBTCAuditBody.getHash());
             topTokenService.withdrawBTCAuditPass(topTransaction);
         }else{
             // 提现拒绝,

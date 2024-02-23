@@ -578,11 +578,11 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topTransaction.setChainId(0L);
         topTransaction.setTokenId(topTokenId);
         topTransaction.setRpcEndpoint("");
-        topTransaction.setStatus("0");
+        topTransaction.setStatus(CommonStatus.STATES_COMMIT);
         topTransaction.setUserId(userId);
         topTransaction.setSymbol(symbol);
         topTransaction.setTokenAmount(transferAmount);
-        topTransaction.setIsConfirm(0);
+        topTransaction.setIsConfirm(CommonStatus.UN_CONFIRM);
 //        topTransaction.setHeight(currentHeight);
         topTransaction.setCreateTime(LocalDateTime.now());
         topTransaction.setUpdateTime(LocalDateTime.now());
