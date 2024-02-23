@@ -1,5 +1,7 @@
 package com.ruoyi.admin.controller;
 
+import cn.hutool.core.codec.Base64Encoder;
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.entity.TopPowerConfig;
@@ -23,10 +25,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.SignatureException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 充值
@@ -85,4 +89,29 @@ public class TopTokenController {
         topTokenService.removeById(id);
         return AjaxResult.success();
     }
+
+    @Operation(summary = "增加图标")
+    @PutMapping("/updateIcon/{tokenId}")
+    public AjaxResult<String> edit(MultipartFile iconFile,@PathVariable("tokenId") Long tokenId){
+        try{
+            byte[] imageData = iconFile.getBytes();
+            String icon = Base64Encoder.encode(imageData);
+            Optional<TopToken> topTokenOptional = topTokenService.getOptById(tokenId);
+            if(topTokenOptional.isEmpty()){
+                log.warn("token not exist,token id is:{}",tokenId);
+                throw new ServiceException("token not exist");
+            }
+            TopToken topToken = topTokenOptional.get();
+            topToken.setIcon(icon);
+            topTokenService.updateById(topToken);
+        }catch (ServiceException e){
+            throw e;
+        }catch (Exception e) {
+            log.error("upload file error", e);
+            throw new ServiceException("upload file error");
+        }
+        return AjaxResult.success();
+    }
+
+
 }

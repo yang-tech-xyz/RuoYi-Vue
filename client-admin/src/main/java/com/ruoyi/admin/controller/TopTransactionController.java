@@ -16,6 +16,7 @@ import com.ruoyi.admin.service.TopTransactionService;
 import com.ruoyi.admin.utils.UnsignMessageUtils;
 import com.ruoyi.admin.vo.TokenVO;
 import com.ruoyi.admin.vo.WithdrawAuditBody;
+import com.ruoyi.admin.vo.WithdrawBTCAuditBody;
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.common.CommonSymbols;
 import com.ruoyi.web.dto.TopTokenDTO;
@@ -87,6 +88,45 @@ public class TopTransactionController {
 
             topTokenService.withdrawAuditPass(topTransaction);
 
+        }else{
+            // 提现拒绝,
+            String status = topTransaction.getStatus();
+            if(!CommonStatus.STATES_COMMIT.equalsIgnoreCase(status)){
+                log.error("transaction had been audit,hash is:"+topTransaction.getHash());
+                throw new ServiceException("transaction had been reject");
+            }
+            topTokenService.withdrawAuditReject(topTransaction);
+        }
+        return AjaxResult.success();
+    }
+
+
+    @Operation(summary = "提现审批")
+    @PostMapping("/withdrawBTCAudit")
+    public AjaxResult<String> withdrawBTCAudit(@RequestBody WithdrawBTCAuditBody withdrawBTCAuditBody){
+        TopTransaction topTransaction = topTransactionService.getOptByTransactionNo(withdrawBTCAuditBody.getTransactionNo());
+        if(withdrawBTCAuditBody.getPass()){
+            if(!CommonSymbols.BTC_SYMBOL.equalsIgnoreCase(topTransaction.getSymbol())){
+                log.warn("NOT BTC can not withdraw audit");
+                throw new ServiceException("NOT BTC can not withdraw audit");
+            }
+
+            TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
+            String auditWallet = topPowerConfig.getAuditWallet();
+            try {
+                boolean validateResult = UnsignMessageUtils.validate(withdrawBTCAuditBody.getSignMsg(), withdrawBTCAuditBody.getContent(), auditWallet);
+                if (!validateResult) {
+                    return AjaxResult.error("validate sign error!");
+                }
+            } catch (SignatureException e) {
+                log.error("签名错误", e);
+                throw new ServiceException("签名错误");
+            }
+            if(StringUtils.isNotEmpty(topTransaction.getHash())){
+                log.error("transaction had been audit,hash is:"+topTransaction.getHash());
+                throw new ServiceException("transaction had been audit");
+            }
+            topTokenService.withdrawBTCAuditPass(topTransaction);
         }else{
             // 提现拒绝,
             String status = topTransaction.getStatus();

@@ -143,6 +143,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
     }
 
+    public void withdrawBTCAuditPass(TopTransaction topTransaction) {
+        TopTransaction topTransactionEntity = new TopTransaction();
+        topTransactionEntity.setId(topTransaction.getId());
+        topTransactionEntity.setHash(topTransaction.getHash());
+
+        topTransactionService.updateById(topTransactionEntity);
+    }
+
 
     private boolean validateTransactionReceipt(String hash, Web3j web3j) throws Exception {
         Optional<TransactionReceipt> transactionReceiptOptional = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();

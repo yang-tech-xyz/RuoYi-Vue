@@ -79,6 +79,9 @@ public class TopToken implements Serializable {
     @TableField(value = "update_by")
     private String updateBy;
 
+    @Schema(description = "图标")
+    private String icon;
+
 
 }
 
