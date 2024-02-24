@@ -37,4 +37,8 @@ public class TokenVO {
 
     @Schema(description = "是否理财")
     private Boolean storeEnabled;
+
+    @Schema(description = "图标")
+    private String icon;
+
 }
