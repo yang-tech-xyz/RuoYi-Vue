@@ -4,6 +4,7 @@ import cn.hutool.core.codec.Base64Encoder;
 import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.ruoyi.admin.common.CommonStatus;
+import com.ruoyi.admin.dto.UpdateIconDTO;
 import com.ruoyi.admin.entity.TopPowerConfig;
 import com.ruoyi.admin.entity.TopStore;
 import com.ruoyi.admin.entity.TopToken;
@@ -91,11 +92,11 @@ public class TopTokenController {
     }
 
     @Operation(summary = "增加图标")
-    @PutMapping("/updateIcon/{tokenId}")
-    public AjaxResult<String> edit(MultipartFile iconFile,@PathVariable("tokenId") Long tokenId){
+    @PostMapping("/updateIcon")
+    public AjaxResult<String> edit(@RequestBody UpdateIconDTO updateIconDTO){
         try{
-            byte[] imageData = iconFile.getBytes();
-            String icon = Base64Encoder.encode(imageData);
+            String icon = updateIconDTO.getIcon();
+            Long tokenId = updateIconDTO.getTokenId();
             Optional<TopToken> topTokenOptional = topTokenService.getOptById(tokenId);
             if(topTokenOptional.isEmpty()){
                 log.warn("token not exist,token id is:{}",tokenId);
