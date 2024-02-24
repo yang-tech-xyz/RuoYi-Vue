@@ -5,7 +5,7 @@
     <select id="selectOnlineListVO" resultType="com.ruoyi.web.vo.TokenVO">
         select tt.*
         from top_token tt
-        where tt.online = 0
+        where tt.online = 1
     </select>
 
 </mapper>
