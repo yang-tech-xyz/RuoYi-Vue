@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.web.mapper.TopStoreOrderMapper">
 
-    <select id="selectInfoVO" resultType="com.ruoyi.web.vo.OrderInfoVO">
+    <select id="selectInfoVO" resultType="com.ruoyi.web.vo.StoreOrderInfoVO">
         select
         sum(tso.invest_amount) as investAmount,
         (select sum(_tat.amount) from top_account_tx _tat

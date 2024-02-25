@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class OrderInfoVO {
+public class StoreOrderInfoVO {
 
     @Schema(description = "累计投资（USD）")
     private BigDecimal investAmount = BigDecimal.ZERO;

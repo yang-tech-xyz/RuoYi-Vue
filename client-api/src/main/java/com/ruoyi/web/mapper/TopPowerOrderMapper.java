@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.web.entity.TopPowerOrder;
+import com.ruoyi.web.vo.PowerOrderInfoVO;
 import com.ruoyi.web.vo.PowerOrderVO;
 import com.ruoyi.web.vo.TopPowerOrderVO;
 import org.apache.ibatis.annotations.Mapper;
@@ -23,4 +24,5 @@ public interface TopPowerOrderMapper extends BaseMapper<TopPowerOrder> {
 
     Integer sumPowerNumberByUserId(@Param("userId") Long userId);
 
+    PowerOrderInfoVO selectInfo(@Param("wallet") String wallet);
 }

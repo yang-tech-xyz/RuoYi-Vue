@@ -6,7 +6,7 @@ import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.service.TopStoreOrderService;
 import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
-import com.ruoyi.web.vo.OrderInfoVO;
+import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.PageVO;
 import com.ruoyi.web.vo.StoreOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +26,7 @@ public class TopStoreOrderController {
 
     @Operation(summary = "理财统计数据")
     @GetMapping("/orderInfo")
-    public AjaxResult<OrderInfoVO> orderInfo() {
+    public AjaxResult<StoreOrderInfoVO> orderInfo() {
         return AjaxResult.success(service.getOderInfo(RequestUtil.getWallet()));
     }
 
