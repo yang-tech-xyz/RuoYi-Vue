@@ -49,7 +49,7 @@
         from top_user i_tu
             inner join top_user_invite tui on i_tu.id = tui.invite_user_id
         where tui.user_id = #{userId}
-        order by tu.create_time
+        order by i_tu.create_time
     </select>
 
     <select id="selectStoreInviteInfo" resultType="com.ruoyi.web.vo.StoreInviteInfoVO">
@@ -68,7 +68,7 @@
         from top_user i_tu
                  inner join top_user_invite tui on i_tu.id = tui.invite_user_id
         where tui.user_id = #{userId}
-        order by tu.create_time
+        order by i_tu.create_time
     </select>
 
 </mapper>
