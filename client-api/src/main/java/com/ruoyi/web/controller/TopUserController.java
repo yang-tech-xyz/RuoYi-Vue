@@ -118,13 +118,13 @@ public class TopUserController {
     @Operation(summary = "获取个人分享数据")
     @GetMapping("/getInviteInfo")
     public AjaxResult getInviteInfo() {
-        return AjaxResult.success(topUserService.getInviteInfo(RequestUtil.getWalletAddress()));
+        return AjaxResult.success(topUserService.getInviteInfo(RequestUtil.getWallet()));
     }
 
     @Operation(summary = "我的分享")
     @GetMapping("/getInviteList")
     public AjaxResult getInviteList() {
-        return AjaxResult.success(topUserService.getInviteList(RequestUtil.getWalletAddress()));
+        return AjaxResult.success(topUserService.getInviteList(RequestUtil.getWallet()));
     }
 
     @Autowired

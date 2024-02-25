@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TopStoreOrderMapper extends BaseMapper<TopStoreOrder> {
 
-    OrderInfoVO selectInfoVO(@Param("walletAddress") String walletAddress);
+    OrderInfoVO selectInfoVO(@Param("wallet") String wallet);
 
-    IPage<StoreOrderVO> selectPageVO(@Param("iPage") IPage<StoreOrderVO> iPage, @Param("walletAddress") String walletAddress);
+    IPage<StoreOrderVO> selectPageVO(@Param("iPage") IPage<StoreOrderVO> iPage, @Param("wallet") String wallet);
 
     TopStoreOrder lockByOrderNo(@Param("orderNo") String orderNo);
 

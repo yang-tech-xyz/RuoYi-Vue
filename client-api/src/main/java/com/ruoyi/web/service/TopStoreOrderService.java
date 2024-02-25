@@ -114,9 +114,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         return true;
     }
 
-    public PageVO<StoreOrderVO> getPage(String walletAddress, StoreOrderPageDTO dto) {
+    public PageVO<StoreOrderVO> getPage(String wallet, StoreOrderPageDTO dto) {
         IPage<StoreOrderVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
-        iPage = baseMapper.selectPageVO(iPage, walletAddress);
+        iPage = baseMapper.selectPageVO(iPage, wallet);
         PageVO<StoreOrderVO> pageVO = new PageVO<>();
         pageVO.setPageNum(dto.getPageNum());
         pageVO.setPageSize(dto.getPageSize());
@@ -201,5 +201,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 baseMapper.updateById(lock);
             }
         });
+    }
+
+    public OrderInfoVO getOderInfo(String wallet) {
+        return baseMapper.selectInfoVO(wallet);
     }
 }
