@@ -77,7 +77,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
             throw new ServiceException("币种价格无法获取", 500);
         }
-        TopUser user = userMapper.selectByWalletAddress(walletAddress);
+        TopUser user = userMapper.selectByWallet(walletAddress);
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
         TopStoreOrder order = new TopStoreOrder();
         order.setStoreId(store.getId());

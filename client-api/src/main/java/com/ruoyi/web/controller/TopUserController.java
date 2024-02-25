@@ -2,6 +2,7 @@ package com.ruoyi.web.controller;
 
 import cn.hutool.core.util.IdUtil;
 import com.ruoyi.common.AjaxResult;
+import com.ruoyi.web.dto.InvitePageDTO;
 import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
@@ -115,16 +116,28 @@ public class TopUserController {
         return AjaxResult.success("Success");
     }
 
-    @Operation(summary = "获取个人分享数据")
-    @GetMapping("/getInviteInfo")
-    public AjaxResult getInviteInfo() {
-        return AjaxResult.success(topUserService.getInviteInfo(RequestUtil.getWallet()));
+    @Operation(summary = "算力推广统计数据")
+    @GetMapping("/getPowerInviteInfo")
+    public AjaxResult getPowerInviteInfo() {
+        return AjaxResult.success(topUserService.getPowerInviteInfo(RequestUtil.getWallet()));
     }
 
-    @Operation(summary = "我的分享")
-    @GetMapping("/getInviteList")
-    public AjaxResult getInviteList() {
-        return AjaxResult.success(topUserService.getInviteList(RequestUtil.getWallet()));
+    @Operation(summary = "算力推广")
+    @GetMapping("/getPowerInvitePage")
+    public AjaxResult getPowerInvitePage(@ModelAttribute InvitePageDTO dto) {
+        return AjaxResult.success(topUserService.getPowerInvitePage(RequestUtil.getWallet(), dto));
+    }
+
+    @Operation(summary = "理财推广统计数据")
+    @GetMapping("/getStoreInviteInfo")
+    public AjaxResult getStoreInviteInfo() {
+        return AjaxResult.success(topUserService.getStoreInviteInfo(RequestUtil.getWallet()));
+    }
+
+    @Operation(summary = "理财推广")
+    @GetMapping("/getStoreInvitePage")
+    public AjaxResult getStoreInvitePage(@ModelAttribute InvitePageDTO dto) {
+        return AjaxResult.success(topUserService.getStoreInvitePage(RequestUtil.getWallet(), dto));
     }
 
     @Autowired

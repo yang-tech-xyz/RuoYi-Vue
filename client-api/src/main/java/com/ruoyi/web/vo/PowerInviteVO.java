@@ -6,9 +6,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-public class InviteVO {
+public class PowerInviteVO {
 
-    private Integer level;
+    private Integer grade;
 
     private String wallet;
 
