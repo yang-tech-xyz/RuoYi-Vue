@@ -54,7 +54,7 @@
 
     <select id="selectStoreInviteInfo" resultType="com.ruoyi.web.vo.StoreInviteInfoVO">
         select
-            (select _tu.wallet from top_user _tu where _tu.id = tu.invited_user_id) as invitedUserWallet,
+            (select count(_tui.id) from top_user_invite _tui where _tui.user_id = tu.id) as totalInviteUser,
             (select ifnull(sum(_tat.amount),0) from top_account_tx _tat where _tat.tx_type = 'STORE_INTEREST' and _tat.user_id = tu.id) as totalStoreIncome
         from top_user tu
         where tu.wallet = #{wallet}
