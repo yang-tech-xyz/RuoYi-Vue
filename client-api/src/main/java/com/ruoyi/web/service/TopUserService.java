@@ -91,13 +91,21 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
      * 理财推广
      */
     public StoreInviteInfoVO getStoreInviteInfo(String wallet) {
-        return null;
+        return baseMapper.selectStoreInviteInfo(wallet);
     }
 
     /**
      * 理财推广
      */
-    public PageVO<PowerInviteVO> getStoreInvitePage(String wallet, InvitePageDTO dto) {
-        return null;
+    public PageVO<StoreInviteVO> getStoreInvitePage(String wallet, InvitePageDTO dto) {
+        TopUser user = baseMapper.selectByWallet(wallet);
+        IPage<StoreInviteVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+        iPage = baseMapper.selectStorePageVO(iPage, user.getId());
+        PageVO<StoreInviteVO> pageVO = new PageVO<>();
+        pageVO.setPageNum(dto.getPageNum());
+        pageVO.setPageSize(dto.getPageSize());
+        pageVO.setTotal(iPage.getTotal());
+        pageVO.setList(iPage.getRecords());
+        return pageVO;
     }
 }

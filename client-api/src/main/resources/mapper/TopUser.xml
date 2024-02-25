@@ -52,4 +52,23 @@
         order by tu.create_time
     </select>
 
+    <select id="selectStoreInviteInfo" resultType="com.ruoyi.web.vo.StoreInviteInfoVO">
+        select
+            (select _tu.wallet from top_user _tu where _tu.id = tu.invited_user_id) as invitedUserWallet,
+            (select ifnull(sum(_tat.amount),0) from top_account_tx _tat where _tat.tx_type = 'STORE_INTEREST' and _tat.user_id = tu.id) as totalStoreIncome
+        from top_user tu
+        where tu.wallet = #{wallet}
+    </select>
+
+    <select id="selectStorePageVO" resultType="com.ruoyi.web.vo.StoreInviteVO">
+        select
+            i_tu.grade,
+            i_tu.wallet,
+            (select ifnull(sum(_tso.invest_amount),0) from top_store_order _tso where _tso.user_id = i_tu.id) as investAmount
+        from top_user i_tu
+                 inner join top_user_invite tui on i_tu.id = tui.invite_user_id
+        where tui.user_id = #{userId}
+        order by tu.create_time
+    </select>
+
 </mapper>
