@@ -48,7 +48,7 @@
             (select ifnull(sum(_tpo.amount),0) from top_power_order _tpo where _tpo.user_id = i_tu.id) as power
         from top_user i_tu
             inner join top_user_invite tui on i_tu.id = tui.invite_user_id
-        where tui.user_id = #{userId}  and tui.level = 10
+        where tui.user_id = #{userId}  and tui.level &lt;= 10
         order by i_tu.create_time
     </select>
 
