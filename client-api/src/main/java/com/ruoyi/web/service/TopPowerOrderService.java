@@ -1,6 +1,7 @@
 package com.ruoyi.web.service;
 
-import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.dto.AccountRequest;
@@ -9,9 +10,9 @@ import com.ruoyi.web.entity.TopPowerConfig;
 import com.ruoyi.web.entity.TopPowerOrder;
 import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.enums.Account;
-import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
+import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.vo.BuyPowerBody;
 import com.ruoyi.web.vo.PowerOrderInfoVO;
 import com.ruoyi.web.vo.TopPowerOrderVO;
@@ -78,7 +79,8 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         if (account.getAvailableBalance().compareTo(payTokenAmount) < 0) {
             log.warn("account have no enough money,account info:{}", account);
         }
-        String orderNo = TopNo.POWER_NO._code + IdUtil.getSnowflake(TopNo.POWER_NO._workId).nextIdStr();
+        // 月+日+字符随机码
+        String orderNo = genPowerOrderNo();
         topPowerOrder.setOrderNo(orderNo);
         Long userId = account.getUserId();
         topPowerOrder.setUserId(userId);
@@ -113,6 +115,21 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         lockUser.setGrade(Math.min(powerNumber, 10));
         topUserService.updateById(lockUser);
 
+    }
+
+    /**
+     * 生成订单号
+     * 1：月+日+字符串随机（0221abcdef）
+     */
+    public String genPowerOrderNo() {
+        LocalDate localDate = LocalDate.now();
+        String month = localDate.toString().split("-")[1];
+        String day = localDate.toString().split("-")[2];
+        String orderNo = month + day + RandomUtil.randomString(RandomUtil.BASE_CHAR,6);
+        if (baseMapper.selectCount(new LambdaQueryWrapper<TopPowerOrder>().eq(TopPowerOrder::getOrderNo, orderNo)) == 0) {
+            return orderNo;
+        }
+        return genPowerOrderNo();
     }
 
     /**
