@@ -5,8 +5,11 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.service.TopPowerOrderService;
 import com.ruoyi.web.service.TopUserService;
+import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.BuyPowerBody;
+import com.ruoyi.web.vo.PowerOrderInfoVO;
+import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.TopPowerOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +36,12 @@ public class TopPowerOrderController
     private final TopPowerOrderService topPowerOrderService;
 
     private final TopUserService topUserService;
+
+    @Operation(summary = "挖矿统计数据")
+    @GetMapping("/orderInfo")
+    public AjaxResult<PowerOrderInfoVO> orderInfo() {
+        return AjaxResult.success(topPowerOrderService.getOderInfo(RequestUtil.getWallet()));
+    }
 
     @Operation(summary = "购买算力,需要用户签名")
     @PostMapping("buyOrder")

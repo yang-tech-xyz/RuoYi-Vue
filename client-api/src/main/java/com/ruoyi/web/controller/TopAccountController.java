@@ -22,7 +22,7 @@ public class TopAccountController {
     @Operation(summary = "资产信息")
     @GetMapping("/getAccounts")
     public AjaxResult getAccounts(@RequestParam(required = false) String symbol) {
-        return AjaxResult.success(service.getAccounts(RequestUtil.getWalletAddress(), symbol));
+        return AjaxResult.success(service.getAccounts(RequestUtil.getWallet(), symbol));
     }
 
 }

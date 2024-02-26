@@ -1,18 +1,18 @@
 package com.ruoyi.web.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.web.dto.InvitePageDTO;
 import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopUserMapper;
-import com.ruoyi.web.vo.InviteInfoVO;
-import com.ruoyi.web.vo.InviteVO;
-import com.ruoyi.web.vo.UserProcessVO;
+import com.ruoyi.web.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,8 +24,8 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
         LambdaQueryWrapper<TopUser> queryWallet = Wrappers.lambdaQuery();
         queryWallet.eq(TopUser::getWallet, walletAddress);
         Optional<TopUser> topUserEntityOptional = this.getOneOpt(queryWallet);
-        if(!topUserEntityOptional.isPresent()){
-            log.error("user not exist,the wallet is:{}",walletAddress);
+        if (!topUserEntityOptional.isPresent()) {
+            log.error("user not exist,the wallet is:{}", walletAddress);
             throw new ServiceException("user not exist!");
         }
         return topUserEntityOptional.get();
@@ -61,22 +61,55 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
         return processMebList.stream().filter(v -> v.getInvitedUserId().equals(userId)).collect(Collectors.toList());
     }
 
-    /**
-     * 查询用户邀请数据
-     */
-    public InviteInfoVO getInviteInfo(String walletAddress) {
-        return baseMapper.selectInviteInfo(walletAddress);
-    }
-
-    public List<InviteVO> getInviteList(String walletAddress) {
-        Optional<TopUser> optional = getByWalletOptional(walletAddress);
-        if (optional.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return baseMapper.selectInviteListById(optional.get().getId());
-    }
-
     public TopUser lockById(Long id) {
         return baseMapper.lockById(id);
+    }
+
+    /**
+     * 算力推广
+     * 1:限制十层用户
+     */
+    public PowerInviteInfoVO getPowerInviteInfo(String wallet) {
+        return baseMapper.selectPowerInviteInfo(wallet);
+    }
+
+    /**
+     * 算力推广
+     * 1:限制十层用户
+     */
+    public PageVO<PowerInviteVO> getPowerInvitePage(String wallet, InvitePageDTO dto) {
+        TopUser user = baseMapper.selectByWallet(wallet);
+        IPage<PowerInviteVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+        iPage = baseMapper.selectPowerPageVO(iPage, user.getId());
+        PageVO<PowerInviteVO> pageVO = new PageVO<>();
+        pageVO.setPageNum(dto.getPageNum());
+        pageVO.setPageSize(dto.getPageSize());
+        pageVO.setTotal(iPage.getTotal());
+        pageVO.setList(iPage.getRecords());
+        return pageVO;
+    }
+
+    /**
+     * 理财推广
+     * 1:限制一层用户
+     */
+    public StoreInviteInfoVO getStoreInviteInfo(String wallet) {
+        return baseMapper.selectStoreInviteInfo(wallet);
+    }
+
+    /**
+     * 理财推广
+     * 1:限制一层用户
+     */
+    public PageVO<StoreInviteVO> getStoreInvitePage(String wallet, InvitePageDTO dto) {
+        TopUser user = baseMapper.selectByWallet(wallet);
+        IPage<StoreInviteVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+        iPage = baseMapper.selectStorePageVO(iPage, user.getId());
+        PageVO<StoreInviteVO> pageVO = new PageVO<>();
+        pageVO.setPageNum(dto.getPageNum());
+        pageVO.setPageSize(dto.getPageSize());
+        pageVO.setTotal(iPage.getTotal());
+        pageVO.setList(iPage.getRecords());
+        return pageVO;
     }
 }

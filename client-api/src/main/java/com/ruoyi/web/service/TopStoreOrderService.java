@@ -21,7 +21,7 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopStoreMapper;
 import com.ruoyi.web.mapper.TopStoreOrderMapper;
 import com.ruoyi.web.mapper.TopUserMapper;
-import com.ruoyi.web.vo.OrderInfoVO;
+import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.PageVO;
 import com.ruoyi.web.vo.StoreOrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +55,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
      * 存单信息
      */
 
-    public OrderInfoVO info(String walletAddress) {
+    public StoreOrderInfoVO info(String walletAddress) {
         return baseMapper.selectInfoVO(walletAddress);
     }
 
@@ -77,7 +77,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
             throw new ServiceException("币种价格无法获取", 500);
         }
-        TopUser user = userMapper.selectByWalletAddress(walletAddress);
+        TopUser user = userMapper.selectByWallet(walletAddress);
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
         TopStoreOrder order = new TopStoreOrder();
         order.setStoreId(store.getId());
@@ -114,9 +114,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         return true;
     }
 
-    public PageVO<StoreOrderVO> getPage(String walletAddress, StoreOrderPageDTO dto) {
+    public PageVO<StoreOrderVO> getPage(String wallet, StoreOrderPageDTO dto) {
         IPage<StoreOrderVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
-        iPage = baseMapper.selectPageVO(iPage, walletAddress);
+        iPage = baseMapper.selectPageVO(iPage, wallet);
         PageVO<StoreOrderVO> pageVO = new PageVO<>();
         pageVO.setPageNum(dto.getPageNum());
         pageVO.setPageSize(dto.getPageSize());
@@ -201,5 +201,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 baseMapper.updateById(lock);
             }
         });
+    }
+
+    public StoreOrderInfoVO getOderInfo(String wallet) {
+        return baseMapper.selectInfoVO(wallet);
     }
 }

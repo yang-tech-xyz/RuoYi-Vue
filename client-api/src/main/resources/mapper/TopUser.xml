@@ -2,10 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.web.mapper.TopUserMapper">
 
-    <select id="selectByWalletAddress" resultType="com.ruoyi.web.entity.TopUser">
+    <select id="selectByWallet" resultType="com.ruoyi.web.entity.TopUser">
         select *
         from top_user
-        where wallet = #{walletAddress}
+        where wallet = #{wallet}
     </select>
 
     <select id="selectUserVOList" resultType="com.ruoyi.web.vo.UserProcessVO">
@@ -13,27 +13,6 @@
             tu.*
         from top_user tu
         order by tu.id
-    </select>
-
-    <select id="selectInviteListById" resultType="com.ruoyi.web.vo.InviteVO">
-        select ti.`level`,
-               tu.wallet,
-               tu.create_time,
-               0 as power
-        from top_user tu inner join top_user_invite ti on tu.id = ti.invite_user_id
-        where ti.user_id = #{id}
-        order by tu.id
-    </select>
-
-    <select id="selectInviteInfo" resultType="com.ruoyi.web.vo.InviteInfoVO">
-        select
-            tu.grade,
-            tu.invited_code,
-            (select _tu.wallet from top_user _tu where _tu.id = tu.invited_user_id) as invitedUserWallet,
-            0 as totalAmount,
-            0 as totalInviteUser
-        from top_user tu
-        where tu.wallet = #{walletAddress}
     </select>
 
     <select id="selectParent" resultType="com.ruoyi.web.entity.TopUser">
@@ -48,6 +27,48 @@
             tu.*
         from top_user tu
         where tu.id = #{id} for update
+    </select>
+
+    <select id="selectPowerInviteInfo" resultType="com.ruoyi.web.vo.PowerInviteInfoVO">
+        select
+            tu.grade,
+            tu.invited_code,
+            (select _tu.wallet from top_user _tu where _tu.id = tu.invited_user_id) as invitedUserWallet,
+            (select count(_tui.id) from top_user_invite _tui where _tui.user_id = tu.id and _tui.level = 10) as totalInviteUser,
+            (select ifnull(sum(_tpsi.income),0) from top_power_sharing_income _tpsi where _tpsi.user_id = tu.id) as totalPowerIncome
+        from top_user tu
+        where tu.wallet = #{wallet}
+    </select>
+
+    <select id="selectPowerPageVO" resultType="com.ruoyi.web.vo.PowerInviteVO">
+        select
+            i_tu.grade,
+            i_tu.wallet,
+            i_tu.create_time,
+            (select ifnull(sum(_tpo.amount),0) from top_power_order _tpo where _tpo.user_id = i_tu.id) as power
+        from top_user i_tu
+            inner join top_user_invite tui on i_tu.id = tui.invite_user_id
+        where tui.user_id = #{userId}  and tui.level = 10
+        order by i_tu.create_time
+    </select>
+
+    <select id="selectStoreInviteInfo" resultType="com.ruoyi.web.vo.StoreInviteInfoVO">
+        select
+            (select count(_tui.id) from top_user_invite _tui where _tui.user_id = tu.id and _tui.level = 1) as totalInviteUser,
+            (select ifnull(sum(_tat.amount),0) from top_account_tx _tat where _tat.tx_type = 'STORE_INTEREST' and _tat.user_id = tu.id) as totalStoreIncome
+        from top_user tu
+        where tu.wallet = #{wallet}
+    </select>
+
+    <select id="selectStorePageVO" resultType="com.ruoyi.web.vo.StoreInviteVO">
+        select
+            i_tu.grade,
+            i_tu.wallet,
+            (select ifnull(sum(_tso.invest_amount),0) from top_store_order _tso where _tso.user_id = i_tu.id) as investAmount
+        from top_user i_tu
+                 inner join top_user_invite tui on i_tu.id = tui.invite_user_id
+        where tui.user_id = #{userId} and tui.level = 1
+        order by i_tu.create_time
     </select>
 
 </mapper>

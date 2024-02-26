@@ -25,18 +25,18 @@ public class TopPowerDailyIncomeController {
     @Operation(summary = "查询未领取收益")
     @GetMapping("/getUnclaimedList")
     public AjaxResult<List<DailyIncomeVO>> getUnclaimedList() {
-        return AjaxResult.success(service.getUnclaimedList(RequestUtil.getWalletAddress()));
+        return AjaxResult.success(service.getUnclaimedList(RequestUtil.getWallet()));
     }
 
     @Operation(summary = "领取收益")
     @PostMapping("/claim")
     public AjaxResult<Boolean> claim(Long id) {
-        return AjaxResult.success(service.claim(RequestUtil.getWalletAddress(), id));
+        return AjaxResult.success(service.claim(RequestUtil.getWallet(), id));
     }
 
     @Operation(summary = "领取全部收益")
     @PostMapping("/claimAll")
     public AjaxResult<Boolean> claimAll() {
-        return AjaxResult.success(service.claimAll(RequestUtil.getWalletAddress()));
+        return AjaxResult.success(service.claimAll(RequestUtil.getWallet()));
     }
 }

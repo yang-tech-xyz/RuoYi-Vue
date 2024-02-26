@@ -25,7 +25,7 @@ public class SwaggerConfig {
     public OpenAPI openApi() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Client Admin 接口文档")
+                        .title("Admin 接口文档")
                         .version("0.0.1")
                 )
                 // 配置全局鉴权参数-Authorize

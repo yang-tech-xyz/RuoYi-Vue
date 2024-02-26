@@ -2,14 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.web.mapper.TopStoreOrderMapper">
 
-    <select id="selectInfoVO" resultType="com.ruoyi.web.vo.OrderInfoVO">
+    <select id="selectInfoVO" resultType="com.ruoyi.web.vo.StoreOrderInfoVO">
         select
-        sum(tso.amount) as amount,
-        sum(IF(tso.`status` = 1,tso.income,0)) as redeem,
-        sum(IF(tso.`status` = 2,tso.income,0)) as income
-        from top_user tu inner join top_store_order tso on tu.id = tso.user_id
+        sum(tso.invest_amount) as investAmount,
+        (select sum(_tat.amount) from top_account_tx _tat
+                                 where _tat.user_id = tu.id
+                                   and _tat.tx_type = 'STORE_INTEREST') as interest
+        from top_user tu
+            inner join top_store_order tso on tu.id = tso.user_id
         <where>
-            tu.wallet = #{walletAddress}
+            tu.wallet = #{wallet}
         </where>
     </select>
 
@@ -21,7 +23,7 @@
             inner join top_store_order tso on tu.id = tso.user_id
             inner join top_store ts on ts.id = tso.store_id
         <where>
-            tu.wallet = #{walletAddress}
+            tu.wallet = #{wallet}
         </where>
         order by tso.id desc
     </select>

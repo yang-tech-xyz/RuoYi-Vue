@@ -32,4 +32,13 @@
         select ifnull(sum(t.number),0) from top_power_order t where t.user_id = #{userId}
     </select>
 
+    <select id="selectInfo" resultType="com.ruoyi.web.vo.PowerOrderInfoVO">
+        select
+            ifnull(sum(if(tpd.process_enabled = 1,tpd.income,0)),0) as claimIncome,
+            ifnull(sum(if(tpd.process_enabled = 0,tpd.income,0)),0) as unClaimIncome
+        from top_user tu
+                 inner join top_power_daily_income tpd on tu.id = tpd.user_id
+        where tu.wallet = #{wallet}
+    </select>
+
 </mapper>

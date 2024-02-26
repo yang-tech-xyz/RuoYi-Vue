@@ -13,6 +13,7 @@ import com.ruoyi.web.enums.TopNo;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
 import com.ruoyi.web.vo.BuyPowerBody;
+import com.ruoyi.web.vo.PowerOrderInfoVO;
 import com.ruoyi.web.vo.TopPowerOrderVO;
 import com.ruoyi.web.vo.UserProcessVO;
 import lombok.extern.slf4j.Slf4j;
@@ -127,5 +128,9 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
 
     public Page<TopPowerOrderVO> getPowerOrderList(Page page, Long userId) {
         return this.baseMapper.selectPagePowerVO(page, userId);
+    }
+
+    public PowerOrderInfoVO getOderInfo(String wallet) {
+        return baseMapper.selectInfo(wallet);
     }
 }

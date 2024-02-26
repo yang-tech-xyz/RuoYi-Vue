@@ -15,7 +15,7 @@ public class RequestUtil {
     /**
      * 从线程里面获取UID
      */
-    public static String getWalletAddress() {
+    public static String getWallet() {
         try {
             RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
             HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();

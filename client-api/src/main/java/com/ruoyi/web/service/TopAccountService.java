@@ -85,7 +85,7 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
      * 获取用户所有资产
      */
     public List<AccountVO> getAccounts(String walletAddress, String symbol) {
-        TopUser user = userMapper.selectByWalletAddress(walletAddress);
+        TopUser user = userMapper.selectByWallet(walletAddress);
         List<TopAccount> accounts = baseMapper.selectList(new LambdaQueryWrapper<TopAccount>()
                 .eq(TopAccount::getUserId, user.getId())
                 .eq(StringUtils.isNotBlank(symbol), TopAccount::getSymbol, symbol));
