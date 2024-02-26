@@ -44,7 +44,7 @@ public class AjaxResult<T> implements Serializable {
     /**
      * 初始化一个新创建的 AjaxResult 对象，使其表示一个空消息。
      */
-    public AjaxResult() {
+    private AjaxResult() {
     }
 
     /**
@@ -53,7 +53,7 @@ public class AjaxResult<T> implements Serializable {
      * @param code 状态码
      * @param msg  返回内容
      */
-    public AjaxResult(int code, String msg) {
+    private AjaxResult(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }
@@ -65,7 +65,7 @@ public class AjaxResult<T> implements Serializable {
      * @param msg  返回内容
      * @param data 数据对象
      */
-    public AjaxResult(int code, String msg, T data) {
+    private AjaxResult(int code, String msg, T data) {
         this.code = code;
         this.msg = msg;
         this.data = data;
@@ -76,10 +76,8 @@ public class AjaxResult<T> implements Serializable {
      *
      * @return 成功消息
      */
-    public static AjaxResult<String> success() {
-        AjaxResult<String> result = new AjaxResult<>();
-        result.msg = "操作成功";
-        return result;
+    public static AjaxResult success() {
+        return AjaxResult.success("Success");
     }
 
     /**
@@ -88,7 +86,7 @@ public class AjaxResult<T> implements Serializable {
      * @return 成功消息
      */
     public static <T> AjaxResult<T> success(T data) {
-        AjaxResult<T> result = new AjaxResult<>();
+        AjaxResult<T> result = AjaxResult.success();
         result.data = data;
         result.msg = "操作成功";
         return result;
@@ -102,6 +100,7 @@ public class AjaxResult<T> implements Serializable {
      */
     public static <T> AjaxResult<String> success(String msg) {
         AjaxResult<String> result = new AjaxResult<>();
+        result.code = HttpStatus.SUCCESS;
         result.msg = msg;
         return result;
     }
@@ -114,8 +113,7 @@ public class AjaxResult<T> implements Serializable {
      * @return 成功消息
      */
     public static <T> AjaxResult<T> success(String msg, T data) {
-        AjaxResult<T> result = new AjaxResult<>();
-        result.code = HttpStatus.SUCCESS;
+        AjaxResult<T> result = AjaxResult.success();
         result.data = data;
         result.msg = "操作成功";
         return result;
@@ -182,5 +180,4 @@ public class AjaxResult<T> implements Serializable {
     public static AjaxResult error(int code, String msg) {
         return new AjaxResult(code, msg, null);
     }
-
 }
