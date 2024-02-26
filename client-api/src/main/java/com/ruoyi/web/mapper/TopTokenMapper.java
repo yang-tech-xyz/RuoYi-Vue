@@ -24,7 +24,7 @@ public interface TopTokenMapper extends BaseMapper<TopToken> {
             "from top_token tt \n" +
             "left join top_token_chain ttc on tt.id = ttc.token_id \n" +
             "left join top_chain tc on tc.chain_id = ttc.chain_id \n" +
-            "where tt.online = 0\n" +
+            "where tt.online = 1\n" +
             "and ttc.chain_id = #{chainId}\n")
     List<TopTokenChainVO> queryTokensByChainId(String chainId);
 
