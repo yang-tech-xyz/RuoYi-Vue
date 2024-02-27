@@ -49,6 +49,18 @@ public class TopUserController {
         return AjaxResult.success(topUserEntity);
     }
 
+    @Operation(summary = "校验地址是否注册", description = "校验地址是否注册")
+    @GetMapping("/checkWallet")
+    public AjaxResult<Boolean> checkWallet(String walletAddress) {
+        return AjaxResult.success(topUserService.checkWallet(walletAddress));
+    }
+
+    @Operation(summary = "校验邀请码是否存在", description = "校验邀请码是否存在")
+    @GetMapping("/checkInviteCode")
+    public AjaxResult<Boolean> checkInviteCode(String inviteCode) {
+        return AjaxResult.success(topUserService.checkInviteCode(inviteCode));
+    }
+
     /**
      * 用户注册
      *

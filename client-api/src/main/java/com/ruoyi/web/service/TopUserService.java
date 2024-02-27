@@ -112,4 +112,12 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
         pageVO.setList(iPage.getRecords());
         return pageVO;
     }
+
+    public Boolean checkWallet(String walletAddress) {
+        return baseMapper.selectCount(new LambdaQueryWrapper<TopUser>().eq(TopUser::getWallet, walletAddress)) == 1;
+    }
+
+    public Boolean checkInviteCode(String inviteCode) {
+        return baseMapper.selectCount(new LambdaQueryWrapper<TopUser>().eq(TopUser::getInvitedCode, inviteCode)) == 1;
+    }
 }
