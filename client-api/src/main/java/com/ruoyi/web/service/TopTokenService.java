@@ -770,6 +770,53 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         );
     }
 
+    public void exchangeBTC2BTCF(ExchangeBody exchangeBody) {
+        BigDecimal amount = exchangeBody.getAmount();
+        String wallet = exchangeBody.getWallet();
+        Long userId = topUserService.getByWallet(wallet).getId();
+        String originSymbol = "BTC";
+        String exchangeSymbol = "BTCF";
+
+        BigDecimal btcPrice = getPrice(originSymbol);
+        BigDecimal btcfPrice = getPrice(exchangeSymbol);
+        BigDecimal exchangeAmount = amount.multiply(btcPrice).divide(btcfPrice, 10, 2);
+
+
+        // 扣除USDT资金
+        UUID uuid = UUID.fastUUID();
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(uuid.toString().concat("_" + userId).concat("_" + Account.TxType.EXCHANGE.typeCode))
+                                .userId(userId)
+                                .token(originSymbol)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(amount.negate())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.EXCHANGE)
+                                .refNo(uuid.toString())
+                                .remark("转出")
+                                .build()
+                )
+        );
+        // 转换成BTCF资金
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.EXCHANGE.typeCode))
+                                .userId(userId)
+                                .token(exchangeSymbol)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(exchangeAmount)
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.EXCHANGE)
+                                .refNo(uuid.toString())
+                                .remark("转入")
+                                .build()
+                )
+        );
+    }
+
     public BigDecimal getPrice(String symbol) {
         Optional<TopToken> optional = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopToken>()
                 .eq(TopToken::getSymbol, symbol)));
