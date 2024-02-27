@@ -11,11 +11,13 @@ public class CorsConfig implements WebMvcConfigurer {
         //添加映射路径
         registry.addMapping("/**")
                 //是否发送Cookie
+                .allowedOrigins("*")
                 .allowCredentials(true)
                 //设置放行哪些原始域   SpringBoot2.4.4下低版本使用.allowedOrigins("*")
                 .allowedOriginPatterns("*")
                 //放行哪些请求方式
-                .allowedMethods(new String[]{"GET", "POST", "PUT", "DELETE"})
+                .allowedMethods(new String[]{"GET", "POST", "PUT", "DELETE","OPTIONS"})
+                .allowCredentials(true)
                 //.allowedMethods("*") //或者放行全部
                 //放行哪些原始请求头部信息
                 .allowedHeaders("*")
