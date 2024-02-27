@@ -1,3 +1,4 @@
+/*
 package com.ruoyi.web.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -25,3 +26,4 @@ public class CorsConfig implements WebMvcConfigurer {
                 .exposedHeaders("*");
     }
 }
+*/
