@@ -12,6 +12,7 @@ import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +62,7 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
         return processMebList.stream().filter(v -> v.getInvitedUserId().equals(userId)).collect(Collectors.toList());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public TopUser lockById(Long id) {
         return baseMapper.lockById(id);
     }

@@ -4,8 +4,8 @@
 
     <select id="selectInfoVO" resultType="com.ruoyi.web.vo.StoreOrderInfoVO">
         select
-        sum(tso.invest_amount) as investAmount,
-        (select sum(_tat.amount) from top_account_tx _tat
+        ifnull(sum(tso.invest_amount),0) as investAmount,
+        (select ifnull(sum(_tat.amount),0) from top_account_tx _tat
                                  where _tat.user_id = tu.id
                                    and _tat.tx_type = 'STORE_INTEREST') as interest
         from top_user tu

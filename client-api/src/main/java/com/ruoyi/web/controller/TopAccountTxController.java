@@ -4,6 +4,8 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.dto.AccountTxPageDTO;
 import com.ruoyi.web.service.TopAccountTxService;
 import com.ruoyi.web.utils.RequestUtil;
+import com.ruoyi.web.vo.AccountTxVO;
+import com.ruoyi.web.vo.PageVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ public class TopAccountTxController {
 
     @Operation(summary="查询流水记录")
     @GetMapping("/getPage")
-    public AjaxResult getPage(@ModelAttribute AccountTxPageDTO dto) {
+    public AjaxResult<PageVO<AccountTxVO>> getPage(@ModelAttribute AccountTxPageDTO dto) {
         return AjaxResult.success(service.getPage(RequestUtil.getWallet(), dto));
     }
 

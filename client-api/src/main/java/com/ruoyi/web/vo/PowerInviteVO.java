@@ -3,7 +3,7 @@ package com.ruoyi.web.vo;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 public class PowerInviteVO {
@@ -14,6 +14,6 @@ public class PowerInviteVO {
 
     private BigDecimal power;
 
-    private LocalDateTime createTime;
+    private LocalDate createTime;
 
 }

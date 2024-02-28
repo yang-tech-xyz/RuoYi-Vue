@@ -34,7 +34,7 @@
             tu.grade,
             tu.invited_code,
             (select _tu.wallet from top_user _tu where _tu.id = tu.invited_user_id) as invitedUserWallet,
-            (select count(_tui.id) from top_user_invite _tui where _tui.user_id = tu.id and _tui.level = 10) as totalInviteUser,
+            (select count(_tui.id) from top_user_invite _tui where _tui.user_id = tu.id and _tui.level &lt;= 10) as totalInviteUser,
             (select ifnull(sum(_tpsi.income),0) from top_power_sharing_income _tpsi where _tpsi.user_id = tu.id) as totalPowerIncome
         from top_user tu
         where tu.wallet = #{wallet}
