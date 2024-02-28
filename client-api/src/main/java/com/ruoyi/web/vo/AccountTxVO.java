@@ -1,9 +1,11 @@
 package com.ruoyi.web.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 public class AccountTxVO {
@@ -46,5 +48,8 @@ public class AccountTxVO {
 
     @Schema(description="备注")
     private String remark;
+
+    @Schema(description="创建日期")
+    private LocalDateTime createdDate;
 
 }
