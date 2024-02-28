@@ -670,6 +670,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         );
     }
 
+    @Transactional
     public void exchangeBTC2USDT(ExchangeBody exchangeBody) {
         BigDecimal amount = exchangeBody.getAmount();
         String wallet = exchangeBody.getWallet();
@@ -724,6 +725,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         return baseMapper.selectOne(new LambdaQueryWrapper<TopToken>().eq(TopToken::getSymbol, symbol));
     }
 
+    @Transactional
     public void exchangeUsdt2BTCF(ExchangeBody exchangeBody) {
         BigDecimal amount = exchangeBody.getAmount();
         String wallet = exchangeBody.getWallet();
@@ -770,6 +772,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         );
     }
 
+
+    @Transactional
     public void exchangeBTC2BTCF(ExchangeBody exchangeBody) {
         BigDecimal amount = exchangeBody.getAmount();
         String wallet = exchangeBody.getWallet();
