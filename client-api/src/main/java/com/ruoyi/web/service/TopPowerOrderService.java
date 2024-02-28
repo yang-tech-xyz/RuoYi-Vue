@@ -56,6 +56,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         //通过购买数量,计算需要的金额.
         BigDecimal price = topPowerConfig.getPrice();
         BigDecimal buyNumbers = buyPowerBody.getNumber();
+        topPowerOrder.setSymbol(buyPowerBody.getSymbol());
         topPowerOrder.setNumber(buyNumbers.intValue());
         // 购买矿机需要的U的数量
         BigDecimal buyPowerNeedPayUsdt = buyNumbers.multiply(price);
