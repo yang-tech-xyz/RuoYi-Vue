@@ -12,7 +12,6 @@ import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.enums.Account;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopPowerOrderMapper;
-import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.vo.BuyPowerBody;
 import com.ruoyi.web.vo.PowerOrderInfoVO;
 import com.ruoyi.web.vo.TopPowerOrderVO;
@@ -112,7 +111,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
             更新用户等级：挖矿台数为等级,最大十级
          */
         TopUser lockUser = topUserService.lockById(topUserEntity.getId());
-        int powerNumber = baseMapper.sumPowerNumberByUserId(lockUser.getId()) + topPowerOrder.getNumber();
+        int powerNumber = baseMapper.sumPowerNumberByUserId(lockUser.getId());
         lockUser.setGrade(Math.min(powerNumber, 10));
         topUserService.updateById(lockUser);
 
@@ -126,7 +125,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         LocalDate localDate = LocalDate.now();
         String month = localDate.toString().split("-")[1];
         String day = localDate.toString().split("-")[2];
-        String orderNo = month + day + RandomUtil.randomString(RandomUtil.BASE_CHAR,6);
+        String orderNo = month + day + RandomUtil.randomString(RandomUtil.BASE_CHAR, 6);
         if (baseMapper.selectCount(new LambdaQueryWrapper<TopPowerOrder>().eq(TopPowerOrder::getOrderNo, orderNo)) == 0) {
             return orderNo;
         }
