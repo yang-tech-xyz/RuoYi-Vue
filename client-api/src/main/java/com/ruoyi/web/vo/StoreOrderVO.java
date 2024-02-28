@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 public class StoreOrderVO {
@@ -35,7 +34,7 @@ public class StoreOrderVO {
     private BigDecimal investAmount;
 
     @Schema(description = "订单时间")
-    private LocalDateTime orderDate;
+    private LocalDate orderDate;
 
     @Schema(description = "到期释放时间：订单时间+周期")
     private LocalDate releaseDate;
