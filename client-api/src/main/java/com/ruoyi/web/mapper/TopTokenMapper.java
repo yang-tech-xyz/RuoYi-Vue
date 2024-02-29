@@ -20,7 +20,7 @@ import java.util.Optional;
 @Repository
 public interface TopTokenMapper extends BaseMapper<TopToken> {
 
-    @Select("select tt.id,tt.symbol ,tt.online ,ttc.erc20_address,ttc.chain_id,tt.create_time ,tt.update_time ,tt.create_by ,tt.update_by,tc.receive_address " +
+    @Select("select tt.id,tt.symbol ,tt.online ,ttc.erc20_address,ttc.chain_id,tt.create_time ,tt.update_time ,tt.create_by ,tt.update_by,tc.receive_address as receive_address  " +
             "from top_token tt \n" +
             "left join top_token_chain ttc on tt.id = ttc.token_id \n" +
             "left join top_chain tc on tc.chain_id = ttc.chain_id \n" +
