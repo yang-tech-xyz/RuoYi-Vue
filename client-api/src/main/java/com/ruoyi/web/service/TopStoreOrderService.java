@@ -148,7 +148,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                 TopUser user = userMapper.selectOne(new LambdaQueryWrapper<TopUser>().eq(TopUser::getId, lock.getUserId()));
                 long days = lock.getOrderDate().until(lock.getReleaseDate(), ChronoUnit.DAYS);
                 BigDecimal avgRate = store.getRate().divide(new BigDecimal(days), 8, RoundingMode.DOWN);
-                BigDecimal income = lock.getInvestAmount().multiply(avgRate);
+                BigDecimal income = lock.getInvestAmount().multiply(avgRate).setScale(8, RoundingMode.DOWN);
                 List<AccountRequest> requests = new ArrayList<>();
                 requests.add(
                         AccountRequest.builder()
@@ -164,7 +164,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                                 .build()
                 );
                 // 收益返直接上级
-                BigDecimal parentIncome = income.multiply(new BigDecimal("0.3"));
+                BigDecimal parentIncome = income.multiply(new BigDecimal("0.3")).setScale(8, RoundingMode.DOWN);
                 requests.add(
                         AccountRequest.builder()
                                 .uniqueId(UUID.fastUUID().toString().concat("_" + user.getInvitedUserId()).concat("_" + Account.TxType.STORE_INTEREST_INVITE.typeCode))

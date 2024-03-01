@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -66,7 +67,7 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
                         sharingIncome.setProviderLevel(j);
                         sharingIncome.setRate(levelRate);
                         sharingIncome.setSymbol(incomeOrder.getSymbol());
-                        sharingIncome.setIncome(incomeOrder.getIncome().multiply(sharingIncome.getRate()));
+                        sharingIncome.setIncome(incomeOrder.getIncome().multiply(sharingIncome.getRate()).setScale(10, RoundingMode.DOWN));
                         sharingIncome.setProcessEnabled(Boolean.FALSE);
                         sharingIncome.setProcessDate(processDate);
                         sharingIncome.setCreatedDate(LocalDateTime.now());
