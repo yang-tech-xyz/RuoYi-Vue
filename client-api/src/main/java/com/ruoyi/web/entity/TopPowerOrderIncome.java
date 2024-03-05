@@ -32,6 +32,10 @@ public class TopPowerOrderIncome implements Serializable {
     @TableField(value = "order_no")
     private String orderNo;
 
+    @Schema(description = "购买台数")
+    @TableField(value = "number")
+    private Integer number;
+
     @Schema(description = "收益币种")
     @TableField(value = "symbol")
     private String symbol;

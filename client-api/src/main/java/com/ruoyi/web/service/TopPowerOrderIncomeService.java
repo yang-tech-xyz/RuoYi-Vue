@@ -38,6 +38,7 @@ public class TopPowerOrderIncomeService extends ServiceImpl<TopPowerOrderIncomeM
                 TopPowerOrderIncome orderIncome = new TopPowerOrderIncome();
                 orderIncome.setUserId(userVO.getId());
                 orderIncome.setOrderNo(order.getOrderNo());
+                orderIncome.setNumber(order.getNumber());
                 orderIncome.setSymbol(order.getOutputSymbol());
                 // 日利率
                 orderIncome.setRate(tokens.get(order.getSymbol()).getAnnualInterestRate().divide(BigDecimal.valueOf(order.getPeriod()), 8, RoundingMode.DOWN));
