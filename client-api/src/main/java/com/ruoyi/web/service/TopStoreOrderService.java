@@ -147,8 +147,7 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
                     continue;
                 }
                 TopUser user = userMapper.selectOne(new LambdaQueryWrapper<TopUser>().eq(TopUser::getId, lock.getUserId()));
-                long days = lock.getOrderDate().until(lock.getReleaseDate(), ChronoUnit.DAYS);
-                BigDecimal avgRate = store.getRate().divide(new BigDecimal(days), 8, RoundingMode.DOWN);
+                BigDecimal avgRate = store.getRate().divide(new BigDecimal(lock.getDays()), 8, RoundingMode.DOWN);
                 BigDecimal income = lock.getInvestAmount().multiply(avgRate).setScale(8, RoundingMode.DOWN);
                 List<AccountRequest> requests = new ArrayList<>();
                 requests.add(
