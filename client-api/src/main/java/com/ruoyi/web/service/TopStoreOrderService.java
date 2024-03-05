@@ -21,8 +21,8 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopStoreMapper;
 import com.ruoyi.web.mapper.TopStoreOrderMapper;
 import com.ruoyi.web.mapper.TopUserMapper;
-import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.PageVO;
+import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.StoreOrderVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +54,6 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
     /**
      * 存单信息
      */
-
     public StoreOrderInfoVO info(String walletAddress) {
         return baseMapper.selectInfoVO(walletAddress);
     }
@@ -89,6 +88,8 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setInvestAmount(order.getAmount().multiply(order.getPrice()));
         order.setOrderDate(LocalDate.now());
         order.setReleaseDate(LocalDate.now().plusMonths(store.getPeriod()));
+        Long days = order.getOrderDate().until(order.getReleaseDate(), ChronoUnit.DAYS);
+        order.setDays(days.intValue());
         order.setStatus(Status._1._value);
         order.setCreatedBy(user.getId().toString());
         order.setCreatedDate(LocalDateTime.now());

@@ -60,6 +60,10 @@ public class TopStoreOrder implements Serializable {
     @TableField(value = "release_date")
     private LocalDate releaseDate;
 
+    @Schema(description = "日期天数")
+    @TableField(value = "days")
+    private Integer days;
+
     @Schema(description = "状态：1=收益中，2=已领取")
     @TableField(value = "status")
     private Integer status;
