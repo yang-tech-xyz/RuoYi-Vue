@@ -30,10 +30,7 @@ import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.ECKeyPair;
-import org.web3j.crypto.RawTransaction;
-import org.web3j.crypto.TransactionEncoder;
+import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
@@ -120,6 +117,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String contractAddress = topTransaction.getErc20Address();
         String rpcEndpoint = topTransaction.getRpcEndpoint();
         String to = topTransaction.getWithdrawReceiveAddress(); //为了保护资金安全,转账只能转到用户注册的钱包地址
+        Long chainId = topTransaction.getChainId();
         Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
 
         TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
@@ -134,7 +132,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String key = secret.substring(0, 16);
         AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
         String s = aes.decryptStr(curve);
-        String transactionHash = transferToken(web3j, contractAddress, s, to, tokenAmount);
+        String transactionHash = transferToken(chainId,web3j, contractAddress, s, to, tokenAmount);
         TopTransaction topTransactionEntity = new TopTransaction();
         topTransactionEntity.setId(topTransaction.getId());
         topTransactionEntity.setHash(transactionHash);
@@ -211,7 +209,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         }
     }
 
-    public String transferToken(Web3j web3j, String contractAddress, String privateKey, String to, BigInteger amount) throws ServiceException {
+    public String transferToken(Long chainId, Web3j web3j, String contractAddress, String privateKey, String to, BigInteger amount) throws ServiceException {
         try {
             BigInteger bigInteger = new BigInteger(privateKey, 16);
             ECKeyPair ecKeyPair = ECKeyPair.create(bigInteger);
@@ -231,11 +229,28 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             String encodedFunction = FunctionEncoder.encode(function);
             log.info("gas price is:{}", DefaultGasProvider.GAS_PRICE);
             log.info("DefaultGasProvider.GAS_LIMIT is:{}", DefaultGasProvider.GAS_LIMIT);
-            RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, DefaultGasProvider.GAS_PRICE,
-                    new BigInteger("210000"), contractAddress, encodedFunction);
+
+//            BigInteger nonce, BigInteger gasPrice, BigInteger gasLimit, String to, String data
+//            RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, DefaultGasProvider.GAS_PRICE,
+//                    new BigInteger("210000"), contractAddress, encodedFunction);
+
+//            long chainId,BigInteger nonce,BigInteger gasLimit,String to,BigInteger value,String data,BigInteger maxPriorityFeePerGas,BigInteger maxFeePerGas
+//            long chainId,
+//            BigInteger nonce,
+//            BigInteger gasPrice,
+//            BigInteger gasLimit,
+//            String to,
+//            BigInteger value,
+//            String data,
+//            List<AccessListObject> accessList
+            RawTransaction rawTransaction = RawTransaction.createTransaction(chainId,nonce, DefaultGasProvider.GAS_PRICE,new BigInteger("210000"),contractAddress,
+                    new BigInteger("0"), encodedFunction,new ArrayList<>());
             byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
             String hexValue = Numeric.toHexString(signedMessage);
             EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
+            if(ethSendTransaction.hasError()){
+                throw new ServiceException(ethSendTransaction.getError().getMessage());
+            }
             Object transactionHash = ethSendTransaction.getTransactionHash();
             log.info("transactionHash is:{}", transactionHash.toString());
             return transactionHash.toString();
