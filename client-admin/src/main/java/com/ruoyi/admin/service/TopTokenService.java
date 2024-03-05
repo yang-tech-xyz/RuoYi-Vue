@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Function;
@@ -33,6 +34,7 @@ import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount;
 import org.web3j.protocol.core.methods.response.EthSendTransaction;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
@@ -40,11 +42,14 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Numeric;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
@@ -132,7 +137,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String key = secret.substring(0, 16);
         AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
         String s = aes.decryptStr(curve);
-        String transactionHash = transferToken(chainId,web3j, contractAddress, s, to, tokenAmount);
+
+        // 检查提现账户是否有足够的金额
+        boolean amountCheckResult = topTokenService.checkTransferValueEnough(s, web3j, contractAddress, tokenAmount);
+        if(!amountCheckResult){
+            throw new ServiceException("amountCheckResult failed");
+        }
+
+        String transactionHash = transferToken(chainId, web3j, contractAddress, s, to, tokenAmount);
         TopTransaction topTransactionEntity = new TopTransaction();
         topTransactionEntity.setId(topTransaction.getId());
         topTransactionEntity.setHash(transactionHash);
@@ -243,25 +255,26 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 //            BigInteger value,
 //            String data,
 //            List<AccessListObject> accessList
-            RawTransaction rawTransaction = RawTransaction.createTransaction(chainId,nonce, DefaultGasProvider.GAS_PRICE,new BigInteger("210000"),contractAddress,
-                    new BigInteger("0"), encodedFunction,new ArrayList<>());
+            RawTransaction rawTransaction = RawTransaction.createTransaction(chainId, nonce, DefaultGasProvider.GAS_PRICE, new BigInteger("210000"), contractAddress,
+                    new BigInteger("0"), encodedFunction, new ArrayList<>());
             byte[] signedMessage = TransactionEncoder.signMessage(rawTransaction, credentials);
             String hexValue = Numeric.toHexString(signedMessage);
             EthSendTransaction ethSendTransaction = web3j.ethSendRawTransaction(hexValue).sendAsync().get();
-            if(ethSendTransaction.hasError()){
+            if (ethSendTransaction.hasError()) {
                 throw new ServiceException(ethSendTransaction.getError().getMessage());
             }
             Object transactionHash = ethSendTransaction.getTransactionHash();
             log.info("transactionHash is:{}", transactionHash.toString());
             return transactionHash.toString();
-        }catch (Exception e){
-            log.error("transfer error!",e);
+        } catch (Exception e) {
+            log.error("transfer error!", e);
             throw new ServiceException("transfer error");
         }
     }
 
     /**
      * 标记为审核失败并退款
+     *
      * @param topTransaction
      */
     @Transactional
@@ -273,4 +286,36 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topAccountService.refund(topTransaction.getTransNo());
     }
 
+    public boolean checkTransferValueEnough(String privateKey, Web3j web3j, String contractAddress,BigInteger transferAmount) {
+        try {
+            BigInteger bigInteger = new BigInteger(privateKey, 16);
+            ECKeyPair ecKeyPair = ECKeyPair.create(bigInteger);
+            Credentials credentials = Credentials.create(ecKeyPair);
+            String fromAddress = credentials.getAddress();
+            List<Type> parametersList = new ArrayList<>();
+            parametersList.add(new Address(fromAddress));
+            List<TypeReference<?>> outList = new ArrayList<>();
+            outList.add(TypeReference.create(Uint256.class));
+            Function function = new Function(
+                    "balanceOf",
+                    parametersList,  // Solidity Types in smart contract functions
+                    outList);
+
+            String encodedFunction = FunctionEncoder.encode(function);
+            org.web3j.protocol.core.methods.response.EthCall response = null;
+
+            response = web3j.ethCall(
+                            Transaction.createEthCallTransaction(fromAddress, contractAddress, encodedFunction),
+                            DefaultBlockParameterName.LATEST)
+                    .sendAsync().get();
+
+            List<Type> balanceOf = FunctionReturnDecoder.decode(
+                    response.getValue(), function.getOutputParameters());
+            BigInteger balance = (BigInteger) balanceOf.getFirst().getValue();
+            return balance.compareTo(transferAmount)>0;
+        } catch (Exception e) {
+            log.error("check balance of amount error!", e);
+            throw new ServiceException(e.getMessage());
+        }
+    }
 }
