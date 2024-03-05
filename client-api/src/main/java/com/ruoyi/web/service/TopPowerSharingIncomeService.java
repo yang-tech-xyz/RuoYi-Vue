@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -59,6 +60,15 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
                             break;
                         }
                         TopPowerOrderIncome incomeOrder = curChild.getIncomeOrders().get(l);
+
+                        BigDecimal income = BigDecimal.ZERO;
+                        if (powerNumber >= incomeOrder.getNumber()) {
+                            income = incomeOrder.getIncome().multiply(levelRate).setScale(10, RoundingMode.DOWN);
+                        } else {
+                            income = incomeOrder.getIncome().divide(BigDecimal.valueOf(incomeOrder.getNumber()), 10, RoundingMode.DOWN)
+                                    .multiply(BigDecimal.valueOf(powerNumber))
+                                    .multiply(levelRate).setScale(10, RoundingMode.DOWN);
+                        }
                         TopPowerSharingIncome sharingIncome = new TopPowerSharingIncome();
                         sharingIncome.setUserId(userVO.getId());
                         sharingIncome.setProviderUserId(curChild.getId());
@@ -66,7 +76,7 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
                         sharingIncome.setProviderLevel(j);
                         sharingIncome.setRate(levelRate);
                         sharingIncome.setSymbol(incomeOrder.getSymbol());
-                        sharingIncome.setIncome(incomeOrder.getIncome().multiply(sharingIncome.getRate()));
+                        sharingIncome.setIncome(income);
                         sharingIncome.setProcessEnabled(Boolean.FALSE);
                         sharingIncome.setProcessDate(processDate);
                         sharingIncome.setCreatedDate(LocalDateTime.now());
@@ -74,7 +84,7 @@ public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingInc
                         sharingIncome.setUpdatedDate(LocalDateTime.now());
                         sharingIncome.setUpdatedBy("SYS");
                         baseMapper.insert(sharingIncome);
-                        powerNumber = powerNumber - 1;
+                        powerNumber = powerNumber - incomeOrder.getNumber();
                     }
                 }
                 // 下一层数据

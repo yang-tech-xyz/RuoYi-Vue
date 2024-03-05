@@ -38,11 +38,12 @@ public class TopPowerOrderIncomeService extends ServiceImpl<TopPowerOrderIncomeM
                 TopPowerOrderIncome orderIncome = new TopPowerOrderIncome();
                 orderIncome.setUserId(userVO.getId());
                 orderIncome.setOrderNo(order.getOrderNo());
+                orderIncome.setNumber(order.getNumber());
                 orderIncome.setSymbol(order.getOutputSymbol());
                 // 日利率
                 orderIncome.setRate(tokens.get(order.getSymbol()).getAnnualInterestRate().divide(BigDecimal.valueOf(order.getPeriod()), 8, RoundingMode.DOWN));
                 // 日收益USD：最大8位
-                orderIncome.setIncome(order.getAmount().multiply(orderIncome.getRate()));
+                orderIncome.setIncome(order.getAmount().multiply(orderIncome.getRate()).setScale(8, RoundingMode.DOWN));
                 // BTC收益:最大10位
                 orderIncome.setPrice(tokens.get(orderIncome.getSymbol()).getPrice());
                 orderIncome.setIncome(orderIncome.getIncome().divide(orderIncome.getPrice(), 10, RoundingMode.DOWN));
