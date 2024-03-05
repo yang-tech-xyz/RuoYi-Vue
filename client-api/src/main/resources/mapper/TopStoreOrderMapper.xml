@@ -7,7 +7,7 @@
         ifnull(sum(tso.invest_amount),0) as investAmount,
         (select ifnull(sum(_tat.amount),0) from top_account_tx _tat
                                  where _tat.user_id = tu.id
-                                   and _tat.tx_type = 'STORE_INTEREST') as interest
+                                   and _tat.tx_type = 'STORE_INTEREST_INVITE') as interest
         from top_user tu
             inner join top_store_order tso on tu.id = tso.user_id
         <where>
