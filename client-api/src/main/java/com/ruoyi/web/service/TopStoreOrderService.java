@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.web.dto.AccountRequest;
+import com.ruoyi.web.dto.StoreCpOrderDTO;
 import com.ruoyi.web.dto.StoreOrderDTO;
 import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.entity.TopStore;
@@ -84,6 +85,67 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
         order.setOrderNo(orderNo);
         order.setSymbol(dto.getSymbol());
         order.setAmount(dto.getAmount());
+        order.setPrice(tokenPrice);
+        order.setInvestAmount(order.getAmount().multiply(order.getPrice()));
+        order.setOrderDate(LocalDate.now());
+        order.setReleaseDate(LocalDate.now().plusMonths(store.getPeriod()));
+        Long days = order.getOrderDate().until(order.getReleaseDate(), ChronoUnit.DAYS);
+        order.setDays(days.intValue());
+        order.setStatus(Status._1._value);
+        order.setCreatedBy(user.getId().toString());
+        order.setCreatedDate(LocalDateTime.now());
+        order.setUpdatedBy(user.getId().toString());
+        order.setUpdatedDate(LocalDateTime.now());
+        baseMapper.insert(order);
+
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(UUID.fastUUID().toString().concat("_" + user.getId()).concat("_" + Account.TxType.STORE_IN.typeCode))
+                                .userId(user.getId())
+                                .token(order.getSymbol())
+                                .balanceChanged(order.getAmount().negate())
+                                .fee(BigDecimal.ZERO)
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.STORE_IN)
+                                .refNo(orderNo)
+                                .remark("存单")
+                                .build()
+                )
+        );
+        return true;
+    }
+
+
+    /**
+     * 复投
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean cpOrder(String wallet, StoreCpOrderDTO dto) {
+        TopStoreOrder cpOrder = baseMapper.selectOne(new LambdaQueryWrapper<TopStoreOrder>().eq(TopStoreOrder::getOrderNo, dto.getOrderNo()));
+        if (cpOrder == null || cpOrder.getStatus().equals(Status._1._value)) {
+            throw new ServiceException("原订单信息错误", 500);
+        }
+        TopStore store = storeMapper.selectById(cpOrder.getStoreId());
+        if (store.getStatus() != 1) {
+            throw new ServiceException("状态错误", 500);
+        }
+        TopToken token = topTokenService.getBySymbol(cpOrder.getSymbol());
+        if (BooleanUtil.isFalse(token.getStoreEnabled())) {
+            throw new ServiceException("当前币种无法进行存单", 500);
+        }
+        BigDecimal tokenPrice = token.getPrice();
+        if (tokenPrice.compareTo(BigDecimal.ZERO) == 0) {
+            throw new ServiceException("币种价格无法获取", 500);
+        }
+        TopUser user = userMapper.selectByWallet(wallet);
+        String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
+        TopStoreOrder order = new TopStoreOrder();
+        order.setStoreId(cpOrder.getStoreId());
+        order.setUserId(user.getId());
+        order.setOrderNo(orderNo);
+        order.setSymbol(cpOrder.getSymbol());
+        order.setAmount(cpOrder.getAmount());
         order.setPrice(tokenPrice);
         order.setInvestAmount(order.getAmount().multiply(order.getPrice()));
         order.setOrderDate(LocalDate.now());
@@ -206,4 +268,5 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
     public StoreOrderInfoVO getOderInfo(String wallet) {
         return baseMapper.selectInfoVO(wallet);
     }
+
 }
