@@ -1,6 +1,7 @@
 package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
+import com.ruoyi.web.dto.StoreCpOrderDTO;
 import com.ruoyi.web.dto.StoreOrderDTO;
 import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.service.TopStoreOrderService;
@@ -42,6 +43,20 @@ public class TopStoreOrderController {
             throw new RuntimeException(e);
         }
         return AjaxResult.success(service.order(RequestUtil.getWallet(), dto));
+    }
+
+    @Operation(summary = "订单复投")
+    @PostMapping("/cpOrder")
+    public AjaxResult cpOrder(@RequestBody StoreCpOrderDTO dto) {
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(dto.getSignMsg(), dto.getContent(), dto.getWallet());
+            if (!validateResult) {
+                return AjaxResult.error("validate sign error!");
+            }
+        } catch (SignatureException e) {
+            throw new RuntimeException(e);
+        }
+        return AjaxResult.success(service.cpOrder(RequestUtil.getWallet(), dto));
     }
 
     @Operation(summary = "查询订单")
