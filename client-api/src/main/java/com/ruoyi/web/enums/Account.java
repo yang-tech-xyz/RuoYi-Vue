@@ -36,6 +36,7 @@ public interface Account {
         EXCHANGE("EXCHANGE", "交易"),
         RECHARGE_IN("RECHARGE_IN", "充值"),
         WITHDRAW("WITHDRAW", "提现"),
+        WITHDRAW_REJECT("WITHDRAW_REJECT", "提现拒绝"),
         WITHDRAW_BTC("WITHDRAW_BTC", "提现BTC"),
         STORE_REDEEM("STORE_REDEEM", "理财赎回"),
         STORE_INTEREST("STORE_INTEREST", "理财利息"),
