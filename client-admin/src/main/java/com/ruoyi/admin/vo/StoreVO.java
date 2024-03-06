@@ -9,6 +9,8 @@ import java.time.LocalDateTime;
 @Data
 public class StoreVO {
 
+    private Long id;
+
     @Schema(description = "产品名称")
     private String name;
 
