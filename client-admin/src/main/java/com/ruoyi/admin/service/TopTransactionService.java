@@ -46,7 +46,8 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
 
     public List<TopTransaction> queryWithdrawUnConfirm() {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getIsConfirm,CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Withdraw);
+        query.eq(TopTransaction::getIsConfirm,CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Withdraw)
+                .isNotNull(TopTransaction::getHash);
         return this.list(query);
     }
 
