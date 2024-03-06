@@ -18,5 +18,25 @@
         order by tat.id desc
     </select>
 
+    <select id="selectStoreIncomePageVO" resultType="com.ruoyi.admin.vo.StoreIncomeVO">
+        select
+        tu.wallet,
+        tat.*
+        from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
+        <where>
+            tat.tx_type in ('STORE_INTEREST', 'STORE_INTEREST_INVITE')
+            <if test="dto.startDateTime != null">
+                and tu.created_date between #{dto.startDateTime} and #{dto.endDateTime}
+            </if>
+            <if test="dto.wallet != null and dto.wallet != ''">
+                and tu.wallet = #{dto.wallet}
+            </if>
+            <if test="dto.orderNo != null and dto.orderNo != ''">
+                and tat.ref_no = #{dto.orderNo}
+            </if>
+        </where>
+        order by tat.id desc
+    </select>
+
 </mapper>
 

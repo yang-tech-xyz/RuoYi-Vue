@@ -9,16 +9,16 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.admin.dto.AccountTxPageDTO;
 import com.ruoyi.admin.dto.AccountTxRequest;
 import com.ruoyi.admin.dto.AccountTxRequestDetail;
+import com.ruoyi.admin.dto.StoreIncomePageDTO;
 import com.ruoyi.admin.entity.TopAccount;
 import com.ruoyi.admin.entity.TopAccountTx;
-import com.ruoyi.admin.entity.TopTransaction;
 import com.ruoyi.admin.enums.Account;
 import com.ruoyi.admin.exception.ServiceException;
 import com.ruoyi.admin.mapper.TopAccountMapper;
 import com.ruoyi.admin.mapper.TopAccountTxMapper;
 import com.ruoyi.admin.vo.AccountTxVO;
-import com.ruoyi.admin.vo.AccountVO;
 import com.ruoyi.admin.vo.PageVO;
+import com.ruoyi.admin.vo.StoreIncomeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,10 +53,10 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
 
     public TopAccountTx getByRefNo(String transNo) {
         LambdaQueryWrapper<TopAccountTx> query = Wrappers.lambdaQuery();
-        query.eq(TopAccountTx::getRefNo,transNo);
+        query.eq(TopAccountTx::getRefNo, transNo);
         Optional<TopAccountTx> topAccountTxOptional = this.getOneOpt(query);
-        if(topAccountTxOptional.isEmpty()){
-            log.error("account tx is not exist,refer no is:"+transNo);
+        if (topAccountTxOptional.isEmpty()) {
+            log.error("account tx is not exist,refer no is:" + transNo);
             throw new ServiceException("account tx is not exist");
         }
         return topAccountTxOptional.get();
@@ -121,5 +121,16 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
         if (Arrays.stream(balance).anyMatch(e -> e.compareTo(BigDecimal.ZERO) < 0)) {
             throw new ServiceException("余额不足", 500);
         }
+    }
+
+    public PageVO<StoreIncomeVO> getStoreIncomePage(StoreIncomePageDTO dto) {
+        IPage<StoreIncomeVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+        iPage = baseMapper.selectStoreIncomePageVO(iPage, dto);
+        PageVO<StoreIncomeVO> pageVO = new PageVO<>();
+        pageVO.setPageNum(dto.getPageNum());
+        pageVO.setPageSize(dto.getPageSize());
+        pageVO.setTotal(iPage.getTotal());
+        pageVO.setList(iPage.getRecords());
+        return pageVO;
     }
 }

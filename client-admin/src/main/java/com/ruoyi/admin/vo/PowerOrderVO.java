@@ -9,13 +9,18 @@ import java.time.LocalDate;
 @Data
 public class PowerOrderVO {
 
+    private String wallet;
+
     @Schema(description = "用户ID")
     private Long userId;
 
     @Schema(description = "订单编号")
     private String orderNo;
 
-    @Schema(description = "购买金额,价格乘以购买数量等于购买金额")
+    @Schema(description = "购买币种")
+    private String symbol;
+
+    @Schema(description = "购买金额")
     private BigDecimal amount;
 
     @Schema(description = "购买台数")
@@ -27,19 +32,13 @@ public class PowerOrderVO {
     @Schema(description = "产出周期,默认值360天")
     private Integer period;
 
-    @Schema(description = "产出率")
-    private BigDecimal outputRatio;
-
-    @Schema(description = "预估总产出")
-    private BigDecimal expectedTotalOutput;
+    @Schema(description = "累计产出")
+    private BigDecimal income;
 
     @Schema(description = "订单日期")
     private LocalDate orderDate;
 
     @Schema(description = "退出日期")
     private LocalDate endDate;
-
-    @Schema(description = "累计收益")
-    private BigDecimal income;
 
 }

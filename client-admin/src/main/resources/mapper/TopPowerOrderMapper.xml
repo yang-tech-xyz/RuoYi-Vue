@@ -2,29 +2,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ruoyi.admin.mapper.TopPowerOrderMapper">
 
-    <select id="selectOrderList" resultType="com.ruoyi.admin.entity.TopPowerOrder">
-        select *
-        from top_power_order
-        where user_id = #{userId}
-          and end_date <![CDATA[ > ]]> #{processDate}
-    </select>
-
     <select id="selectPageVO" resultType="com.ruoyi.admin.vo.PowerOrderVO">
         select
+            tu.wallet,
             tpo.*,
             (select ifnull(sum(_tpd.income),0) from top_power_daily_income _tpd where _tpd.order_no = tpo.order_no) as income
         from top_user tu
                  inner join top_power_order tpo on tu.id = tpo.user_id
-        where tu.wallet = #{walletAddress}
-    </select>
-
-    <select id="selectPagePowerVO" resultType="com.ruoyi.admin.vo.TopPowerOrderVO">
-        select
-            tpo.*,
-            (select ifnull(sum(_tpd.income),0) from top_power_daily_income _tpd where _tpd.order_no = tpo.order_no) as income
-        from top_user tu
-                 inner join top_power_order tpo on tu.id = tpo.user_id
-        where tu.id = #{userId}
+        <where>
+            <if test="dto.wallet != null and dto.wallet != ''">
+                and tu.wallet = #{dto.wallet}
+            </if>
+            <if test="dto.symbol != null and dto.symbol != ''">
+                and tpo.symbol = #{dto.symbol}
+            </if>
+        </where>
+        order by tpo.order_date desc
     </select>
 
 </mapper>
