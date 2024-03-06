@@ -39,7 +39,7 @@ public interface Account {
         WITHDRAW_BTC("WITHDRAW_BTC", "提现BTC"),
         STORE_REDEEM("STORE_REDEEM", "理财赎回"),
         STORE_INTEREST("STORE_INTEREST", "理财利息"),
-        STORE_INTEREST_INVITE("STORE_INTEREST_INVITE", "理财邀请利息"),
+        STORE_INTEREST_INVITE("STORE_INTEREST_INVITE", "理财邀请收益"),
         POWER_DAILY_INCOME("POWER_DAILY_INCOME", "挖矿收益"),
         POWER_SHARING_INCOME("POWER_SHARING_INCOME", "挖矿邀请收益"),
 
