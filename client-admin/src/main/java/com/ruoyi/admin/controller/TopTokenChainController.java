@@ -53,7 +53,7 @@ public class TopTokenChainController {
     @PostMapping("/")
     public AjaxResult<String> add(@RequestBody TopTokenChainDTO topTokenChainDTO){
         Long chainId = topTokenChainDTO.getChainId();
-        Optional<TopChain> optionalTopChain = topChainService.getOptById(chainId);
+        Optional<TopChain> optionalTopChain = topChainService.getOptByChainId(chainId);
         if(optionalTopChain.isEmpty()){
             log.warn("chain is not exist,chain id is:{}",chainId);
             throw new ServiceException("chain is not exist");
