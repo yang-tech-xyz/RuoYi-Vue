@@ -10,13 +10,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 充值
  */
 @Tag(description = "算力订单", name = "算力订单")
-@RestController("powerOrder")
+@RestController
+@RequestMapping("powerOrder")
 public class TopPowerOrderController {
 
     @Autowired
