@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 @Data
 public class StoreUpdateDTO {
 
+    private Long id;
+
     @Schema(description = "产品名称")
     private String name;
 

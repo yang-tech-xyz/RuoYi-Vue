@@ -24,7 +24,8 @@ public class TopStoreService extends ServiceImpl<TopStoreMapper, TopStore> {
     }
 
     public Boolean add(StoreAddDTO dto) {
-        Long count = baseMapper.selectCount(new LambdaQueryWrapper<TopStore>().eq(TopStore::getPeriod, dto.getPeriod()));
+        Long count = baseMapper.selectCount(new LambdaQueryWrapper<TopStore>()
+                .eq(TopStore::getPeriod, dto.getPeriod()));
         if (count > 0) {
             throw new ServiceException("周期重复", 500);
         }
@@ -39,7 +40,8 @@ public class TopStoreService extends ServiceImpl<TopStoreMapper, TopStore> {
     }
 
     public Boolean edit(StoreUpdateDTO dto) {
-        TopStore store = baseMapper.selectOne(new LambdaQueryWrapper<TopStore>().eq(TopStore::getPeriod, dto.getPeriod()));
+        TopStore store = baseMapper.selectOne(new LambdaQueryWrapper<TopStore>()
+                .eq(TopStore::getId, dto.getId()));
         BeanUtils.copyProperties(dto, store);
         store.setUpdatedBy("SYS");
         store.setUpdatedDate(LocalDateTime.now());

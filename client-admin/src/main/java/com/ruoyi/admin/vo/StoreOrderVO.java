@@ -38,7 +38,7 @@ public class StoreOrderVO {
     private BigDecimal investAmount;
 
     @Schema(description = "订单时间")
-    private LocalDateTime orderDate;
+    private LocalDate orderDate;
 
     @Schema(description = "到期释放时间：订单时间+周期")
     private LocalDate releaseDate;
