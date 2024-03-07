@@ -36,7 +36,7 @@
         <hutool.version>5.8.22</hutool.version>
         <sentinel.version>1.8.4</sentinel.version>
         <mybatisplus.version>3.5.4</mybatisplus.version>
-        <custom.lib-path>${basedir}/src/main/resources/lib</custom.lib-path>
+        <custom.lib-path>${basedir}/src/lib</custom.lib-path>
     </properties>
 
     <dependencies>
@@ -259,25 +259,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <classesDirectory>${project.build.directory}/classes</classesDirectory>
-                    <archive>
-                        <manifestEntries>
-                            <Class-Path>. lib/abi-0.3.0.jar lib/core-0.3.0.jar lib/utils-0.3.0</Class-Path>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <addResources>true</addResources>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.graalvm.buildtools</groupId>
                 <artifactId>native-maven-plugin</artifactId>
             </plugin>
@@ -285,6 +266,8 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <addResources>true</addResources>
+                    <includeSystemScope>true</includeSystemScope>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
