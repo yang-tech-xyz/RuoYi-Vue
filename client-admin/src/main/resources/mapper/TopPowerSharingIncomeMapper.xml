@@ -2,22 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.admin.mapper.TopPowerSharingIncomeMapper">
 
-    <update id="updateProcessEnabled">
-        update top_power_sharing_income
-        set process_enabled = 1
-        WHERE user_id = #{userId}
-    </update>
-
-    <select id="selectProcessIncomeByUserId" resultType="com.ruoyi.admin.vo.SharingIncomeProcessVO">
-        SELECT
-            income_symbol as symbol,
-            sum( income ) AS income
-        FROM
-            top_power_sharing_income
-        WHERE
-            user_id = #{userId} and process_enabled = 0
-        GROUP BY
-            income_symbol
+    <select id="selectPageVO" resultType="com.ruoyi.admin.vo.PowerOrderSharingIncomeVO">
+        select
+        tu.wallet,
+        (select _tu.wallet from top_user _tu where _tu.id = tpsi.provider_user_id) as providerWallet,
+        tpsi.*
+        from top_user tu
+        inner join top_power_sharing_income tpsi on tu.id = tpsi.user_id
+        <where>
+            <if test="dto.wallet != null and dto.wallet != ''">
+                and tu.wallet = #{dto.wallet}
+            </if>
+            <if test="dto.startDate != null">
+                and tpsi.process_date between #{dto.startDate} and #{dto.endDate}
+            </if>
+            <if test="dto.orderNo != null and dto.orderNo != ''">
+                and tpsi.provider_order_no = #{dto.orderNo}
+            </if>
+        </where>
+        order by tpsi.process_date desc
     </select>
 
 </mapper>

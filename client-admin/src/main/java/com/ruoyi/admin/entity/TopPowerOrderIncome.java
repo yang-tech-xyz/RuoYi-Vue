@@ -17,8 +17,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(value = "top_power_income")
-public class TopPowerIncome implements Serializable {
+@TableName(value = "top_power_order_income")
+public class TopPowerOrderIncome implements Serializable {
 
     @Schema(description = "主键")
     @TableId(value = "id", type = IdType.AUTO)
@@ -28,17 +28,37 @@ public class TopPowerIncome implements Serializable {
     @TableField(value = "user_id")
     private Long userId;
 
-    @Schema(description = "收益币种")
-    @TableField(value = "income_symbol")
-    private String incomeSymbol;
+    @Schema(description = "订单号")
+    @TableField(value = "order_no")
+    private String orderNo;
 
-    @Schema(description = "币种收益金额")
+    @Schema(description = "台数")
+    @TableField(value = "number")
+    private Integer number;
+
+    @Schema(description = "收益币种")
+    @TableField(value = "symbol")
+    private String symbol;
+
+    @Schema(description = "日利率（年化利率/周期）")
+    @TableField(value = "rate")
+    private BigDecimal rate;
+
+    @Schema(description = "价格")
+    @TableField(value = "price")
+    private BigDecimal price;
+
+    @Schema(description = "收益金额，保留10位")
     @TableField(value = "income")
     private BigDecimal income;
 
-    @Schema(description = "收益日期")
-    @TableField(value = "income_date")
-    private LocalDate incomeDate;
+    @Schema(description = "是否处理")
+    @TableField(value = "process_enabled")
+    private Boolean processEnabled;
+
+    @Schema(description = "处理日期")
+    @TableField(value = "process_date")
+    private LocalDate processDate;
 
     @Schema(description = "创建日期")
     @TableField(value = "created_date")

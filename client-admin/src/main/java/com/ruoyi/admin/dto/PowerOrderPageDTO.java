@@ -9,4 +9,8 @@ public class PowerOrderPageDTO {
 
     private Integer pageSize = 10;
 
+    private String wallet;
+
+    private String symbol;
+
 }
