@@ -20,6 +20,6 @@ public class StoreIncomePageDTO {
 
     private String wallet;
 
-    private String orderNo;
+    private String refNo;
 
 }

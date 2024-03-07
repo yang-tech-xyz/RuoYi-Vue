@@ -31,8 +31,8 @@
             <if test="dto.wallet != null and dto.wallet != ''">
                 and tu.wallet = #{dto.wallet}
             </if>
-            <if test="dto.orderNo != null and dto.orderNo != ''">
-                and tat.ref_no = #{dto.orderNo}
+            <if test="dto.refNo != null and dto.refNo != ''">
+                and tat.ref_no = #{dto.refNo}
             </if>
         </where>
         order by tat.id desc
