@@ -264,12 +264,6 @@
                 <configuration>
                     <classesDirectory>${project.build.directory}/classes</classesDirectory>
                     <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.alibaba.dubbo.container.Main</mainClass>
-                            <useUniqueVersions>false</useUniqueVersions>
-                        </manifest>
                         <manifestEntries>
                             <Class-Path>. lib/abi-0.3.0.jar lib/core-0.3.0.jar lib/utils-0.3.0</Class-Path>
                         </manifestEntries>
