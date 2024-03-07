@@ -1,12 +1,13 @@
 package com.ruoyi.admin.controller;
 
-import com.ruoyi.admin.dto.AdminLoginDTO;
-import com.ruoyi.admin.vo.AdminLoginVO;
-import com.ruoyi.common.AjaxResult;
 import com.ruoyi.admin.dto.AdminAddDTO;
+import com.ruoyi.admin.dto.AdminLoginDTO;
 import com.ruoyi.admin.dto.AdminUpdateDTO;
 import com.ruoyi.admin.service.TopAdminService;
+import com.ruoyi.admin.utils.RequestUtil;
+import com.ruoyi.admin.vo.AdminLoginVO;
 import com.ruoyi.admin.vo.AdminVO;
+import com.ruoyi.common.AjaxResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +32,13 @@ public class TopAdminController {
     @Operation(summary = "新增")
     @PostMapping("/add")
     public AjaxResult<Boolean> add(@RequestBody AdminAddDTO dto) {
-        return AjaxResult.success(service.add(dto));
+        return AjaxResult.success(service.add(RequestUtil.getAdminId(), dto));
     }
 
     @Operation(summary = "修改")
     @PostMapping("/edit")
     public AjaxResult<Boolean> edit(@RequestBody AdminUpdateDTO dto) {
-        return AjaxResult.success(service.edit(dto));
+        return AjaxResult.success(service.edit(RequestUtil.getAdminId(), dto));
     }
 
     @Operation(summary = "获取谷歌密钥")

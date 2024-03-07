@@ -11,11 +11,11 @@ import com.ruoyi.admin.enums.Status;
 import com.ruoyi.admin.exception.ServiceException;
 import com.ruoyi.admin.mapper.TopAdminMapper;
 import com.ruoyi.admin.otp.OtpAuthenticator;
+import com.ruoyi.admin.utils.LoginUtil;
 import com.ruoyi.admin.utils.RequestUtil;
 import com.ruoyi.admin.utils.StringUtils;
 import com.ruoyi.admin.vo.AdminLoginVO;
 import com.ruoyi.admin.vo.AdminVO;
-import com.ruoyi.admin.utils.LoginUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -54,7 +54,10 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         return baseMapper.selectListVO();
     }
 
-    public Boolean add(AdminAddDTO dto) {
+    public Boolean add(String adminId, AdminAddDTO dto) {
+        if (!adminId.equals("admin")) {
+            throw new ServiceException("限制admin操作", 500);
+        }
         TopAdmin admin = new TopAdmin();
         BeanUtils.copyProperties(dto, admin);
         admin.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -66,7 +69,12 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         return true;
     }
 
-    public Boolean edit(AdminUpdateDTO dto) {
+    public Boolean edit(String adminId, AdminUpdateDTO dto) {
+        if (!adminId.equals(dto.getAccount())){
+            if (!adminId.equals("admin")) {
+                throw new ServiceException("限制admin操作", 500);
+            }
+        }
         TopAdmin admin = baseMapper.selectOne(new LambdaQueryWrapper<TopAdmin>().eq(TopAdmin::getAccount, dto.getAccount()));
         if (StringUtils.isNotBlank(dto.getPassword())) {
             admin.setPassword(passwordEncoder.encode(dto.getPassword()));
