@@ -195,6 +195,103 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
         return ajax;
     }
+    @Transactional
+    public AjaxResult rechargeTRX(RechargeBody rechargeBody) throws Exception {
+        try {
+
+            TopTransaction topTransaction = new TopTransaction();
+            Long chainId = rechargeBody.getChainId();
+            topTransaction.setChainId(chainId);
+            Optional<TopChain> topChainOpt = topChainService.getOptByChainId(chainId);
+            if (!topChainOpt.isPresent()) {
+                return AjaxResult.error("chain not exist!");
+            }
+            // chainId is 0;
+            TopChain topChain = topChainOpt.get();
+            String rpcEndpoint = topChain.getRpcEndpoint();
+            topTransaction.setRpcEndpoint(rpcEndpoint);
+            String receiveAddress = topChain.getReceiveAddress();
+            Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+            String hash = rechargeBody.getHash();
+            topTransaction.setHash(hash);
+            //通过hash获取交易
+            Optional<Transaction> transactionOptional = web3j.ethGetTransactionByHash(hash).send().getTransaction();
+            if (!transactionOptional.isPresent()) {
+                return AjaxResult.error("get transaction error!");
+            }
+            Transaction transaction = transactionOptional.get();
+            String from = transaction.getFrom();
+
+            TopUser topUserEntity = topUserService.getByWallet(from);
+            Long userId = topUserEntity.getId();
+            topTransaction.setUserId(userId);
+            // 设置充值状态为未成功.事务成功状态为0x1
+            topTransaction.setStatus(CommonStatus.STATES_COMMIT);
+
+            // 获取币种信息
+            Optional<TopToken> topTokenOpt = this.queryTokenBySymbol(rechargeBody.getTokenSymbol());
+            if (!topTokenOpt.isPresent()) {
+                return AjaxResult.error("token not exist");
+            }
+            TopToken topToken = topTokenOpt.get();
+            Integer tokenId = topToken.getId();
+            topTransaction.setTokenId(tokenId);
+            topTransaction.setSymbol(topToken.getSymbol());
+            Optional<TopTokenChainVO> topTokenChainVOOptional = this.queryTokenByTokenIdAndChainId(tokenId, topChain.getChainId());
+            if (!topTokenChainVOOptional.isPresent()) {
+                return AjaxResult.error("tokenChain not exist");
+            }
+            String erc20AddressConfig = topTokenChainVOOptional.get().getErc20Address();
+            String erc20Address = transaction.getTo();
+            // 如果该币种不是对应的这个erc20的地址.则该笔充值为伪造的充值.
+            if (!erc20AddressConfig.equalsIgnoreCase(erc20Address)) {
+                log.error("erc20 address error! erc20AddressConfig is:{},erc20Address is:{}", erc20AddressConfig, erc20Address);
+                return AjaxResult.error("recharge chain erc20 address not match error");
+            }
+//            String jsonString = JSONObject.toJSONString(transaction);
+            log.info("transaction is:{}", transaction);
+            String inputData = transaction.getInput();
+            log.info("input is:{}", inputData);
+            String method = inputData.substring(0, 10);
+            log.info("method is:{}", method);
+            String to = inputData.substring(10, 74);
+            String value = inputData.substring(74);
+            Method refMethod = TypeDecoder.class.getDeclaredMethod("decode", String.class, int.class, Class.class);
+            refMethod.setAccessible(true);
+            Address address = (Address) refMethod.invoke(null, to, 0, Address.class);
+            log.info("address is transfer address???:{}", address.getValue());
+            // TODO 检查项目方的地址
+            if (!receiveAddress.equalsIgnoreCase(address.getValue())) {
+                return AjaxResult.error("the address is not the project wallet address");
+            }
+            Uint256 amount = (Uint256) refMethod.invoke(null, value, 0, Uint256.class);
+            BigInteger decimalOfContract = getDecimalOfContract(web3j, erc20AddressConfig, address.getValue());
+            // TODO 修改此处的小数位为合约的小数位.
+            BigDecimal pow = new BigDecimal(10).pow(decimalOfContract.intValue());
+            BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow, 10, 1);
+            topTransaction.setTokenAmount(tokenAmount);
+            EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
+            BigInteger currentHeight = ethBlockNumber.getBlockNumber();
+            topTransaction.setHeight(currentHeight);
+
+            log.info("tokenAmount is:{}", tokenAmount);
+            topTransaction.setIsConfirm(0);
+            topTransaction.setCreateTime(LocalDateTime.now());
+            topTransaction.setUpdateTime(LocalDateTime.now());
+            topTransaction.setCreateBy(userId.toString());
+            topTransaction.setUpdateBy(userId.toString());
+            topTransaction.setBlockConfirm(topChain.getBlockConfirm());
+            topTransaction.setType(TransactionType.Recharge);
+            topTransactionService.save(topTransaction);
+
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
+        } catch (Exception e) {
+            log.error("system error", e);
+            throw e;
+        }
+
+        return AjaxResult.success();
+    }
 
     private BigInteger getDecimalOfContract(Web3j web3j, String contractAddress, String from) throws IOException {
         // Define the function we want to invoke from the smart contract

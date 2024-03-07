@@ -63,7 +63,13 @@ public class TopTokenController {
         if (topTransactionOptional.isPresent()) {
             return AjaxResult.error("transaction has exist!");
         }
-        return topTokenService.recharge(rechargeBody);
+        Long chainId = rechargeBody.getChainId();
+        if(chainId==0){
+            //波场链充值
+            return topTokenService.rechargeTRX(rechargeBody);
+        }else{
+            return topTokenService.recharge(rechargeBody);
+        }
     }
 
     /**

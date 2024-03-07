@@ -19,7 +19,7 @@ public class RechargeBody
     private String hash;
 
     /**
-     * 用户签名后信息
+     * 链id,TRON定义为0号链
      */
     @Schema(description="链id", example= "11155111")
     private Long chainId;
