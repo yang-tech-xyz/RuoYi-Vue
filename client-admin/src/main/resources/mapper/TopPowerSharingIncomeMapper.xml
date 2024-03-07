@@ -17,7 +17,7 @@
                 and tpsi.process_date between #{dto.startDate} and #{dto.endDate}
             </if>
             <if test="dto.orderNo != null and dto.orderNo != ''">
-                and tpsi.order_no = #{dto.orderNo}
+                and tpsi.provider_order_no = #{dto.orderNo}
             </if>
         </where>
         order by tpsi.process_date desc
