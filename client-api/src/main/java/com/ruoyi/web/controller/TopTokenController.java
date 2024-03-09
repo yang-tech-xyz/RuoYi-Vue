@@ -2,6 +2,7 @@ package com.ruoyi.web.controller;
 
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.common.CommonSymbols;
+import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.entity.TopTransaction;
 import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.service.TopTokenService;
@@ -64,7 +65,7 @@ public class TopTokenController {
             return AjaxResult.error("transaction has exist!");
         }
         Long chainId = rechargeBody.getChainId();
-        if(chainId==0){
+        if(chainId== CommonStatus.TRON_CHAIN_ID){
             //波场链充值
             return topTokenService.rechargeTRX(rechargeBody);
         }else{

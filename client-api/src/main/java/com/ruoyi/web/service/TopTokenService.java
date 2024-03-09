@@ -206,12 +206,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             if (!topChainOpt.isPresent()) {
                 return AjaxResult.error("chain not exist!");
             }
-            // chainId is 0;
+            // chainId is -1;
             TopChain topChain = topChainOpt.get();
             String rpcEndpoint = topChain.getRpcEndpoint();
             topTransaction.setRpcEndpoint(rpcEndpoint);
             String receiveAddress = topChain.getReceiveAddress();
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+
             String hash = rechargeBody.getHash();
             topTransaction.setHash(hash);
             //通过hash获取交易

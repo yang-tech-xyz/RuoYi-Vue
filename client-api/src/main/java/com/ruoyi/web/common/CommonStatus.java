@@ -13,4 +13,9 @@ public class CommonStatus {
      * 已确认状态
      */
     public static Integer IS_CONFIRM = 1;
+
+    /**
+     * TRON链id
+     */
+    public static Long TRON_CHAIN_ID = -1L;
 }

@@ -43,12 +43,12 @@ public class TopTestController {
 
     @Operation(summary = "测试tron", description = "测试tron")
     @GetMapping("")
-    public AjaxResult<?> test(){
+    public AjaxResult<?> test(@RequestParam(defaultValue = "c6730c68402c239f3001d9c20f67b1ce1f2ab0fc318e87b4eef70a5b6d1cdba3") String hash){
         // main net, using TronGrid
+        // api key 13cba328-e4df-4c14-b5fd-77d9f92df2f7
         // ApiWrapper wrapper = ApiWrapper.ofMainnet("hex private key", "API key");
         // Nile test net, using a node from Nile official website
         ApiWrapper wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
-        String hash = "24337b660790301a7c7919f11d910fa67db608ff9399a08e804fe067d9ecc91e";
         topTRONService.queryTransactionInfoByHash(wrapper,hash);
         return AjaxResult.success();
     }
