@@ -28,6 +28,10 @@ public class TopUser {
     @TableField(value = "wallet")
     private String wallet;
 
+    @Schema(description = "波场钱包地址钱包地址")
+    @TableField(value = "tron_wallet")
+    private String tronWallet;
+
     @Schema(description = "等级")
     @TableField(value = "grade")
     private Integer grade;

@@ -38,6 +38,12 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
         return this.getOneOpt(queryWallet);
     }
 
+    public Optional<TopUser> getByTronWalletOptional(String walletAddress) {
+        LambdaQueryWrapper<TopUser> queryWallet = Wrappers.lambdaQuery();
+        queryWallet.eq(TopUser::getTronWallet, walletAddress);
+        return this.getOneOpt(queryWallet);
+    }
+
     public Optional<TopUser> getByInviteCode(String invitedCode) {
         LambdaQueryWrapper<TopUser> query = Wrappers.lambdaQuery();
         query.eq(TopUser::getInvitedCode, invitedCode);

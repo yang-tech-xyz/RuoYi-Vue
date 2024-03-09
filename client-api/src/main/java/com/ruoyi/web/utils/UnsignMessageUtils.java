@@ -1,5 +1,8 @@
 package com.ruoyi.web.utils;
 
+import org.bouncycastle.util.encoders.Hex;
+import org.tron.trident.core.key.KeyPair;
+import org.tron.trident.core.transaction.SignatureValidator;
 import org.web3j.crypto.Credentials;
 import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
@@ -21,11 +24,12 @@ public class UnsignMessageUtils {
 
     public static void main(String[] args) {
         try {
-            String signMsg = signPrefixedMessage(content,priKey);
-            System.out.println("signMsg is ："+signMsg);
-            boolean result = validate(signMsg,content,walletAddress);
-            System.out.println("result is ："+result);
-        } catch (SignatureException e) {
+            validateTronTest();
+//            String signMsg = signPrefixedMessage(content,priKey);
+//            System.out.println("signMsg is ："+signMsg);
+//            boolean result = validate(signMsg,content,walletAddress);
+//            System.out.println("result is ："+result);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -94,5 +98,35 @@ public class UnsignMessageUtils {
         return parseAddress.equalsIgnoreCase(walletAddress);
     }
 
+
+    /**
+     * 验证签名
+     *
+     * @param signature     验签数据
+     * @param content       原文数据
+     * @param walletAddress 钱包地址
+     * @return 结果
+     */
+    public static Boolean validateTron(String signature, String content, String walletAddress) throws SignatureException {
+        if (content == null) {
+            return false;
+        }
+        return SignatureValidator.verify(signature,content,walletAddress);
+    }
+
+
+    public static boolean validateTronTest(){
+        KeyPair keyPair = KeyPair.generate();
+        String txid = "3f41ea1947027fd0b30f32f1fdddf3236f00fbb090a5223a1888c74995ea70e9";
+        System.out.println(txid);
+        byte[] signature = KeyPair.signTransaction(Hex.decode(txid), keyPair);
+        String signatureValue = new String(Hex.encode(signature));
+        System.out.println(signatureValue);
+        String hexAddress = keyPair.toHexAddress();
+        System.out.println(hexAddress);
+        boolean verify = SignatureValidator.verify(Hex.decode(txid), Hex.decode(signatureValue), Hex.decode(hexAddress));
+        System.out.println("verify is:"+verify);
+        return false;
+    }
 
 }

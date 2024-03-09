@@ -71,41 +71,81 @@ public class TopUserController {
 //    @TransactionVerifyCheck
     @PostMapping("/register")
     public AjaxResult register(@RequestBody WalletRegisterBody loginBody) {
-        try {
-            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(), loginBody.getContent(), loginBody.getWallet());
-            if (!validateResult) {
-                return AjaxResult.error("validate sign error!");
+        if("GatPool-sign".equalsIgnoreCase(loginBody.getContent())){
+            //check the user wallet is existed.
+            Optional<TopUser> byWalletOptional = topUserService.getByWalletOptional(loginBody.getWallet());
+            if (byWalletOptional.isPresent()) {
+                return AjaxResult.error("wallet is exist");
             }
-        } catch (SignatureException e) {
-            log.error("签名错误", e);
-            throw new ServiceException("签名错误");
-        }
-        //check the user wallet is existed.
-        Optional<TopUser> byWalletOptional = topUserService.getByWalletOptional(loginBody.getWallet());
-        if (byWalletOptional.isPresent()) {
-            return AjaxResult.error("wallet is exist");
+            try {
+                boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(), loginBody.getContent(), loginBody.getWallet());
+                if (!validateResult) {
+                    return AjaxResult.error("validate sign error!");
+                }
+            } catch (SignatureException e) {
+                log.error("签名错误", e);
+                throw new ServiceException("签名错误");
+            }
+
+            //检查邀请码用户是否存在
+            Optional<TopUser> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
+            if (!inviteOpt.isPresent()) {
+                return AjaxResult.error("invite code is not exist");
+            }
+
+            TopUser topUserEntity = new TopUser();
+//            BeanUtils.copyProperties(loginBody, topUserEntity);
+            topUserEntity.setWallet(loginBody.getWallet().toLowerCase());
+            topUserEntity.setGrade(0);
+            topUserEntity.setCreateTime(LocalDateTime.now());
+            topUserEntity.setUpdateTime(LocalDateTime.now());
+            topUserEntity.setInvitedUserId(inviteOpt.get().getId());
+            topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
+            // 生成邀请码.
+            topUserEntity.setInvitedCode(NumbersUtils.createInvite());
+            topUserService.save(topUserEntity);
+            // 绑定邀请数据
+            inviteService.process(topUserEntity.getId(), topUserEntity.getInvitedUserId());
+            return AjaxResult.success("Success");
+
+        }else{ //波场钱包注册
+            //check the user wallet is existed.
+            Optional<TopUser> byWalletOptional = topUserService.getByTronWalletOptional(loginBody.getWallet());
+            if (byWalletOptional.isPresent()) {
+                return AjaxResult.error("wallet is exist");
+            }
+            try {
+                boolean validateResult = UnsignMessageUtils.validateTron(loginBody.getContent(),loginBody.getSignMsg(), loginBody.getWallet());
+                if (!validateResult) {
+                    return AjaxResult.error("validate tron sign error!");
+                }
+            } catch (SignatureException e) {
+                log.error("签名错误", e);
+                throw new ServiceException("签名错误");
+            }
+
+            //检查邀请码用户是否存在
+            Optional<TopUser> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
+            if (!inviteOpt.isPresent()) {
+                return AjaxResult.error("invite code is not exist");
+            }
+
+            TopUser topUserEntity = new TopUser();
+//            BeanUtils.copyProperties(loginBody, topUserEntity);
+            topUserEntity.setTronWallet(loginBody.getWallet().toLowerCase());
+            topUserEntity.setGrade(0);
+            topUserEntity.setCreateTime(LocalDateTime.now());
+            topUserEntity.setUpdateTime(LocalDateTime.now());
+            topUserEntity.setInvitedUserId(inviteOpt.get().getId());
+            topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
+            // 生成邀请码.
+            topUserEntity.setInvitedCode(NumbersUtils.createInvite());
+            topUserService.save(topUserEntity);
+            // 绑定邀请数据
+            inviteService.process(topUserEntity.getId(), topUserEntity.getInvitedUserId());
+            return AjaxResult.success("Success");
         }
 
-        //检查邀请码用户是否存在
-        Optional<TopUser> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
-        if (!inviteOpt.isPresent()) {
-            return AjaxResult.error("invite code is not exist");
-        }
-
-        TopUser topUserEntity = new TopUser();
-        BeanUtils.copyProperties(loginBody, topUserEntity);
-        topUserEntity.setWallet(topUserEntity.getWallet().toLowerCase());
-        topUserEntity.setGrade(0);
-        topUserEntity.setCreateTime(LocalDateTime.now());
-        topUserEntity.setUpdateTime(LocalDateTime.now());
-        topUserEntity.setInvitedUserId(inviteOpt.get().getId());
-        topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
-        // 生成邀请码.
-        topUserEntity.setInvitedCode(NumbersUtils.createInvite());
-        topUserService.save(topUserEntity);
-        // 绑定邀请数据
-        inviteService.process(topUserEntity.getId(), topUserEntity.getInvitedUserId());
-        return AjaxResult.success("Success");
     }
 
     @Operation(summary = "设置用户的BTC提现地址")
