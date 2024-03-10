@@ -46,4 +46,7 @@ public class TopPowerConfig extends BaseEntity
     @Schema(description = "提现费率统一10%")
     private BigDecimal feeRatio;
 
+    @Schema(description = "项目方波场usdt收款地址")
+    private String usdtReceivedWallet;
+
 }
