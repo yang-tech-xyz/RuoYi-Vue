@@ -76,7 +76,7 @@ public class UnsignMessageUtils {
         }
         //验证tron钱包
         if(!"GatPool-sign".equalsIgnoreCase(content)){
-            return SignatureValidator.verify(signature,content,walletAddress);
+            return SignatureValidator.verify(content,signature,walletAddress);
         }
         // todo 如果验签不成功，就不需要Hash.sha3 直接content.getBytes()就可以了
         // 原文字节数组
@@ -105,16 +105,19 @@ public class UnsignMessageUtils {
 
 
     public static boolean validateTronTest(){
-        KeyPair keyPair = KeyPair.generate();
+        KeyPair keyPair = new KeyPair("dcfc65fc8628612bd47cb5ebbbf495046134b46b98743289f14a641aea3a5fc6");
         String txid = "3f41ea1947027fd0b30f32f1fdddf3236f00fbb090a5223a1888c74995ea70e9";
+        System.out.println("签名原信息:");
         System.out.println(txid);
         byte[] signature = KeyPair.signTransaction(Hex.decode(txid), keyPair);
         String signatureValue = new String(Hex.encode(signature));
+        System.out.println("签名信息:");
         System.out.println(signatureValue);
         String hexAddress = keyPair.toHexAddress();
+        System.out.println("钱包地址:");
         System.out.println(hexAddress);
         boolean verify = SignatureValidator.verify(Hex.decode(txid), Hex.decode(signatureValue), Hex.decode(hexAddress));
-        System.out.println("verify is:"+verify);
+        System.out.println("签名验证结果:"+verify);
         return false;
     }
 

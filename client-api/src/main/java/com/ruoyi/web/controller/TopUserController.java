@@ -11,11 +11,11 @@ import com.ruoyi.web.utils.NumbersUtils;
 import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.BTCAddressBody;
+import com.ruoyi.web.vo.TronUsdtAddressBody;
 import com.ruoyi.web.vo.WalletRegisterBody;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -109,19 +109,19 @@ public class TopUserController {
             return AjaxResult.success("Success");
 
         }else{ //波场钱包注册
-            TopUser topUserEntity = new TopUser();
-//            BeanUtils.copyProperties(loginBody, topUserEntity);
-            topUserEntity.setTronWallet(loginBody.getWallet().toLowerCase());
-            topUserEntity.setGrade(0);
-            topUserEntity.setCreateTime(LocalDateTime.now());
-            topUserEntity.setUpdateTime(LocalDateTime.now());
-            topUserEntity.setInvitedUserId(inviteOpt.get().getId());
-            topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
-            // 生成邀请码.
-            topUserEntity.setInvitedCode(NumbersUtils.createInvite());
-            topUserService.save(topUserEntity);
-            // 绑定邀请数据
-            inviteService.process(topUserEntity.getId(), topUserEntity.getInvitedUserId());
+//            TopUser topUserEntity = new TopUser();
+////            BeanUtils.copyProperties(loginBody, topUserEntity);
+//            topUserEntity.setTronWallet(loginBody.getWallet().toLowerCase());
+//            topUserEntity.setGrade(0);
+//            topUserEntity.setCreateTime(LocalDateTime.now());
+//            topUserEntity.setUpdateTime(LocalDateTime.now());
+//            topUserEntity.setInvitedUserId(inviteOpt.get().getId());
+//            topUserEntity.setInvitedUserCode(loginBody.getInvitedCode());
+//            // 生成邀请码.
+//            topUserEntity.setInvitedCode(NumbersUtils.createInvite());
+//            topUserService.save(topUserEntity);
+//            // 绑定邀请数据
+//            inviteService.process(topUserEntity.getId(), topUserEntity.getInvitedUserId());
             return AjaxResult.success("Success");
         }
 
@@ -143,6 +143,26 @@ public class TopUserController {
 
         TopUser topUserEntity = topUserService.getByWallet(btcAddressBody.getWallet());
         topUserEntity.setBtcTransferAddress(btcTransferAddress);
+        topUserService.updateById(topUserEntity);
+        return AjaxResult.success("Success");
+    }
+
+    @Operation(summary = "设置用户的波场钱包地址")
+    @PostMapping("updateTRONUSDTAddress")
+    public AjaxResult<String> updateTRONUSDTAddress(@RequestBody TronUsdtAddressBody tronUsdtAddressBody) {
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(tronUsdtAddressBody.getSignMsg(), tronUsdtAddressBody.getContent(), tronUsdtAddressBody.getWallet());
+            if (!validateResult) {
+                return AjaxResult.error("validate sign error!");
+            }
+        } catch (SignatureException e) {
+            log.error("签名错误", e);
+            throw new ServiceException("签名错误");
+        }
+        String tronUsdtAddress = tronUsdtAddressBody.getTronUsdtaddress();
+
+        TopUser topUserEntity = topUserService.getByWallet(tronUsdtAddressBody.getWallet());
+        topUserEntity.setTronWallet(tronUsdtAddress);
         topUserService.updateById(topUserEntity);
         return AjaxResult.success("Success");
     }
