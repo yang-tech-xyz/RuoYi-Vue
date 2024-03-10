@@ -57,7 +57,7 @@ public class TopTokenController {
      * @param rechargeBody 充值hash值
      * @return 结果
      */
-    @Operation(summary = "充值到账")
+    @Operation(summary = "充值到账,兼容波场USDT")
     @PostMapping("/recharge")
     public AjaxResult recharge(@RequestBody RechargeBody rechargeBody) throws Exception {
         Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(rechargeBody.getHash());
@@ -72,6 +72,7 @@ public class TopTokenController {
             return topTokenService.recharge(rechargeBody);
         }
     }
+
 
     /**
      * 提币申请.

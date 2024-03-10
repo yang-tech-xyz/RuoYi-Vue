@@ -11,6 +11,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.protobuf.ByteString;
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.dto.AccountRequest;
@@ -29,6 +30,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+import org.tron.trident.core.ApiWrapper;
+import org.tron.trident.proto.Response;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.TypeDecoder;
 import org.web3j.abi.TypeReference;
@@ -58,11 +61,17 @@ import java.util.*;
 @Service
 public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
+
+    @Value("${spring.profiles.active}")
+    private String env;
     static SystemTimer systemTimer = new SystemTimer();
 
     static {
         systemTimer.start();
     }
+
+    @Autowired
+    private TopTRONService topTRONService;
 
     @Autowired
     private TopChainService topChainService;
@@ -210,20 +219,37 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             TopChain topChain = topChainOpt.get();
             String rpcEndpoint = topChain.getRpcEndpoint();
             topTransaction.setRpcEndpoint(rpcEndpoint);
-            String receiveAddress = topChain.getReceiveAddress();
-            Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+            TopPowerConfig topPowerConfig = topPowerConfigService.list().get(0);
+            String usdtReceivedWallet = topPowerConfig.getUsdtReceivedWallet();
+            if(StringUtils.isEmpty(usdtReceivedWallet)){
+                throw new ServiceException("usdtReceivedWallet not exist!");
+            }
+            ApiWrapper wrapper = null;
+            if("dev".equalsIgnoreCase(env)){
+                wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
+            }else{
+                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351","13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+            }
+
 
             String hash = rechargeBody.getHash();
             topTransaction.setHash(hash);
             //通过hash获取交易
-            Optional<Transaction> transactionOptional = web3j.ethGetTransactionByHash(hash).send().getTransaction();
-            if (!transactionOptional.isPresent()) {
+            Response.TransactionInfo transactionInfo = wrapper.getTransactionInfoById(hash);
+
+            if (!"Success".equalsIgnoreCase(transactionInfo.getResult().toString())) {
                 return AjaxResult.error("get transaction error!");
             }
-            Transaction transaction = transactionOptional.get();
-            String from = transaction.getFrom();
+            Response.TransactionInfo.Log log1 = transactionInfo.getLog(0);
+            ByteString data = log1.getData();
 
-            TopUser topUserEntity = topUserService.getByWallet(from);
+            String from = Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(1).toByteArray())),40);
+            String to = Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(2).toByteArray())),40);
+            BigInteger value = Numeric.decodeQuantity((Numeric.toHexString(data.toByteArray())));
+            ByteString contractAddress = transactionInfo.getContractAddress();
+            String erc20Address = Numeric.toHexString(contractAddress.toByteArray());
+
+            TopUser topUserEntity = topUserService.getByTronWallet(from);
             Long userId = topUserEntity.getId();
             topTransaction.setUserId(userId);
             // 设置充值状态为未成功.事务成功状态为0x1
@@ -243,37 +269,24 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 return AjaxResult.error("tokenChain not exist");
             }
             String erc20AddressConfig = topTokenChainVOOptional.get().getErc20Address();
-            String erc20Address = transaction.getTo();
+
             // 如果该币种不是对应的这个erc20的地址.则该笔充值为伪造的充值.
             if (!erc20AddressConfig.equalsIgnoreCase(erc20Address)) {
                 log.error("erc20 address error! erc20AddressConfig is:{},erc20Address is:{}", erc20AddressConfig, erc20Address);
                 return AjaxResult.error("recharge chain erc20 address not match error");
             }
-//            String jsonString = JSONObject.toJSONString(transaction);
-            log.info("transaction is:{}", transaction);
-            String inputData = transaction.getInput();
-            log.info("input is:{}", inputData);
-            String method = inputData.substring(0, 10);
-            log.info("method is:{}", method);
-            String to = inputData.substring(10, 74);
-            String value = inputData.substring(74);
-            Method refMethod = TypeDecoder.class.getDeclaredMethod("decode", String.class, int.class, Class.class);
-            refMethod.setAccessible(true);
-            Address address = (Address) refMethod.invoke(null, to, 0, Address.class);
-            log.info("address is transfer address???:{}", address.getValue());
             // TODO 检查项目方的地址
-            if (!receiveAddress.equalsIgnoreCase(address.getValue())) {
+            if (!usdtReceivedWallet.equalsIgnoreCase(to)) {
                 return AjaxResult.error("the address is not the project wallet address");
             }
-            Uint256 amount = (Uint256) refMethod.invoke(null, value, 0, Uint256.class);
-            BigInteger decimalOfContract = getDecimalOfContract(web3j, erc20AddressConfig, address.getValue());
+            BigInteger decimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, erc20AddressConfig, from);
             // TODO 修改此处的小数位为合约的小数位.
             BigDecimal pow = new BigDecimal(10).pow(decimalOfContract.intValue());
-            BigDecimal tokenAmount = new BigDecimal(amount.getValue().toString()).divide(pow, 10, 1);
+            BigDecimal tokenAmount = new BigDecimal(value.toString()).divide(pow, 10, 1);
             topTransaction.setTokenAmount(tokenAmount);
-            EthBlockNumber ethBlockNumber = web3j.ethBlockNumber().sendAsync().get();
-            BigInteger currentHeight = ethBlockNumber.getBlockNumber();
-            topTransaction.setHeight(currentHeight);
+
+            long currentBlockNumber = wrapper.getNowBlock().getBlockHeader().getRawData().getNumber();
+            topTransaction.setHeight(BigInteger.valueOf(currentBlockNumber));
 
             log.info("tokenAmount is:{}", tokenAmount);
             topTransaction.setIsConfirm(0);
@@ -315,6 +328,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
         return Numeric.toBigInt(response.getValue());
     }
+
 
     private boolean validateTransactionReceipt(String hash, Web3j web3j) throws Exception {
         Optional<TransactionReceipt> transactionReceiptOptional = web3j.ethGetTransactionReceipt(hash).send().getTransactionReceipt();

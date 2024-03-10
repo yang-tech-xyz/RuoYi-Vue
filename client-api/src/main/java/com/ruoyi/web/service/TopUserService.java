@@ -32,6 +32,17 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
         return topUserEntityOptional.get();
     }
 
+    public TopUser getByTronWallet(String walletAddress) {
+        LambdaQueryWrapper<TopUser> queryWallet = Wrappers.lambdaQuery();
+        queryWallet.eq(TopUser::getTronWallet, walletAddress);
+        Optional<TopUser> topUserEntityOptional = this.getOneOpt(queryWallet);
+        if (!topUserEntityOptional.isPresent()) {
+            log.error("user not exist,the wallet is:{}", walletAddress);
+            throw new ServiceException("user not exist!");
+        }
+        return topUserEntityOptional.get();
+    }
+
     public Optional<TopUser> getByWalletOptional(String walletAddress) {
         LambdaQueryWrapper<TopUser> queryWallet = Wrappers.lambdaQuery();
         queryWallet.eq(TopUser::getWallet, walletAddress);

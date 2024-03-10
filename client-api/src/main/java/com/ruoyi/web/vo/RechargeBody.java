@@ -23,14 +23,14 @@ public class RechargeBody
     /**
      * 链id,TRON定义为0号链
      */
-    @Schema(description="链id", example= "11155111")
+    @Schema(description="链id", example= "-1")
     @NotNull
     private Long chainId;
 
     /**
      * 币种标记
      */
-    @Schema(description="币种标记", example= "SUI")
+    @Schema(description="币种标记", example= "USDT")
     @NotNull
     private String tokenSymbol;
 

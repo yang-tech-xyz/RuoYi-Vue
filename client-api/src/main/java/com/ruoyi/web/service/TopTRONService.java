@@ -1,27 +1,25 @@
 package com.ruoyi.web.service;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.protobuf.ByteString;
-import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.exception.ServiceException;
-import com.ruoyi.web.mapper.TopUserMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.tron.trident.abi.TypeDecoder;
 import org.tron.trident.abi.TypeReference;
-import org.tron.trident.abi.datatypes.Address;
+import org.tron.trident.abi.datatypes.Function;
+import org.tron.trident.abi.datatypes.generated.Uint256;
 import org.tron.trident.core.ApiWrapper;
-import org.tron.trident.core.key.KeyPair;
-import org.tron.trident.crypto.SECP256K1;
 import org.tron.trident.proto.Chain;
 import org.tron.trident.proto.Response;
 import org.tron.trident.utils.Base58Check;
 import org.tron.trident.utils.Numeric;
-import org.tron.trident.utils.Strings;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Arrays;
 
 @Slf4j
 @Service
-public class TopTRONService extends ServiceImpl<TopUserMapper, TopUser> {
+public class TopTRONService {
     public void queryTransactionInfoByHash(ApiWrapper wrapper, String hash){
         try{
             long number = wrapper.getNowBlock().getBlockHeader().getRawData().getNumber();
@@ -55,20 +53,21 @@ public class TopTRONService extends ServiceImpl<TopUserMapper, TopUser> {
         }
     }
 
-    /**
-     * 字节数组转16进制
-     * @param bytes 需要转换的byte数组
-     * @return  转换后的Hex字符串
-     */
-    public static String bytesToHex(byte[] bytes) {
-        StringBuffer sb = new StringBuffer();
-        for(int i = 0; i < bytes.length; i++) {
-            String hex = Integer.toHexString(bytes[i] & 0xFF);
-            if(hex.length() < 2){
-                sb.append(0);
-            }
-            sb.append(hex);
-        }
-        return sb.toString();
+    public BigInteger getTronDecimalOfContract(ApiWrapper wrapper, String contractAddress, String from) throws IOException {
+        // Define the function we want to invoke from the smart contract
+        Function function = new Function("decimals", Arrays.asList(),
+                Arrays.asList(new TypeReference<Uint256>() {
+                }));
+
+
+        /*
+        Send the request and wait for the response using eth call since
+        it's a read only transaction with no cost associated
+        */
+        Response.TransactionExtention extension = wrapper.constantCall(from,
+                contractAddress,
+                function);
+
+        return BigInteger.valueOf(Long.parseLong(Numeric.toHexString(extension.getConstantResult(0).toByteArray())));
     }
 }
