@@ -19,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import org.tron.trident.abi.datatypes.primitive.Number;
 import org.tron.trident.core.ApiWrapper;
 
 import java.security.SignatureException;
@@ -52,6 +53,5 @@ public class TopTestController {
         topTRONService.queryTransactionInfoByHash(wrapper,hash);
         return AjaxResult.success();
     }
-
 
 }

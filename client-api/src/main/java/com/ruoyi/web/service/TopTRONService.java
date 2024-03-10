@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.tron.trident.abi.TypeReference;
 import org.tron.trident.abi.datatypes.Function;
 import org.tron.trident.abi.datatypes.generated.Uint256;
+import org.tron.trident.abi.datatypes.primitive.Number;
 import org.tron.trident.core.ApiWrapper;
 import org.tron.trident.proto.Chain;
 import org.tron.trident.proto.Response;
@@ -69,5 +70,10 @@ public class TopTRONService {
                 function);
 
         return BigInteger.valueOf(Long.parseLong(Numeric.toHexString(extension.getConstantResult(0).toByteArray())));
+    }
+
+    public static void main(String[] args) {
+        String hexString = Numeric.toHexString(Base58Check.base58ToBytes("TEaDXcKqFBuZXVxb5gCqNYmUvcNZASZPLH"));
+        System.out.println("hexString is:"+hexString);
     }
 }
