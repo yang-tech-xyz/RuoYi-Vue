@@ -71,27 +71,27 @@ public class TopUserController {
 //    @TransactionVerifyCheck
     @PostMapping("/register")
     public AjaxResult register(@RequestBody WalletRegisterBody loginBody) {
-        if("GatPool-sign".equalsIgnoreCase(loginBody.getContent())){
-            //check the user wallet is existed.
-            Optional<TopUser> byWalletOptional = topUserService.getByWalletOptional(loginBody.getWallet());
-            if (byWalletOptional.isPresent()) {
-                return AjaxResult.error("wallet is exist");
+        //check the user wallet is existed.
+        Optional<TopUser> byWalletOptional = topUserService.getByWalletOptional(loginBody.getWallet());
+        if (byWalletOptional.isPresent()) {
+            return AjaxResult.error("wallet is exist");
+        }
+        try {
+            boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(), loginBody.getContent(), loginBody.getWallet());
+            if (!validateResult) {
+                return AjaxResult.error("validate sign error!");
             }
-            try {
-                boolean validateResult = UnsignMessageUtils.validate(loginBody.getSignMsg(), loginBody.getContent(), loginBody.getWallet());
-                if (!validateResult) {
-                    return AjaxResult.error("validate sign error!");
-                }
-            } catch (SignatureException e) {
-                log.error("签名错误", e);
-                throw new ServiceException("签名错误");
-            }
+        } catch (SignatureException e) {
+            log.error("签名错误", e);
+            throw new ServiceException("签名错误");
+        }
+        //检查邀请码用户是否存在
+        Optional<TopUser> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
+        if (!inviteOpt.isPresent()) {
+            return AjaxResult.error("invite code is not exist");
+        }
 
-            //检查邀请码用户是否存在
-            Optional<TopUser> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
-            if (!inviteOpt.isPresent()) {
-                return AjaxResult.error("invite code is not exist");
-            }
+        if("GatPool-sign".equalsIgnoreCase(loginBody.getContent())){
 
             TopUser topUserEntity = new TopUser();
 //            BeanUtils.copyProperties(loginBody, topUserEntity);
@@ -109,27 +109,6 @@ public class TopUserController {
             return AjaxResult.success("Success");
 
         }else{ //波场钱包注册
-            //check the user wallet is existed.
-            Optional<TopUser> byWalletOptional = topUserService.getByTronWalletOptional(loginBody.getWallet());
-            if (byWalletOptional.isPresent()) {
-                return AjaxResult.error("wallet is exist");
-            }
-            try {
-                boolean validateResult = UnsignMessageUtils.validateTron(loginBody.getContent(),loginBody.getSignMsg(), loginBody.getWallet());
-                if (!validateResult) {
-                    return AjaxResult.error("validate tron sign error!");
-                }
-            } catch (SignatureException e) {
-                log.error("签名错误", e);
-                throw new ServiceException("签名错误");
-            }
-
-            //检查邀请码用户是否存在
-            Optional<TopUser> inviteOpt = topUserService.getByInviteCode(loginBody.getInvitedCode());
-            if (!inviteOpt.isPresent()) {
-                return AjaxResult.error("invite code is not exist");
-            }
-
             TopUser topUserEntity = new TopUser();
 //            BeanUtils.copyProperties(loginBody, topUserEntity);
             topUserEntity.setTronWallet(loginBody.getWallet().toLowerCase());

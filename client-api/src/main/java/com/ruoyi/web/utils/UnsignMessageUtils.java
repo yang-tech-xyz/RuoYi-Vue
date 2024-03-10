@@ -74,6 +74,10 @@ public class UnsignMessageUtils {
         if (content == null) {
             return false;
         }
+        //验证tron钱包
+        if(!"GatPool-sign".equalsIgnoreCase(content)){
+            return SignatureValidator.verify(signature,content,walletAddress);
+        }
         // todo 如果验签不成功，就不需要Hash.sha3 直接content.getBytes()就可以了
         // 原文字节数组
 //        byte[] msgHash = Hash.sha3(content.getBytes());
@@ -98,21 +102,6 @@ public class UnsignMessageUtils {
         return parseAddress.equalsIgnoreCase(walletAddress);
     }
 
-
-    /**
-     * 验证签名
-     *
-     * @param signature     验签数据
-     * @param content       原文数据
-     * @param walletAddress 钱包地址
-     * @return 结果
-     */
-    public static Boolean validateTron(String signature, String content, String walletAddress) throws SignatureException {
-        if (content == null) {
-            return false;
-        }
-        return SignatureValidator.verify(signature,content,walletAddress);
-    }
 
 
     public static boolean validateTronTest(){
