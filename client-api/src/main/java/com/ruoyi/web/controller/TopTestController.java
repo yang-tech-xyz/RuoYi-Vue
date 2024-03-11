@@ -44,7 +44,7 @@ public class TopTestController {
 
     @Operation(summary = "测试tron", description = "测试tron")
     @GetMapping("")
-    public AjaxResult<?> test(@RequestParam(defaultValue = "c6730c68402c239f3001d9c20f67b1ce1f2ab0fc318e87b4eef70a5b6d1cdba3") String hash){
+    public AjaxResult<?> test(@RequestParam(defaultValue = "c27f188edbf7a15b1f45982434eb4e5850c33b651483da33047079b94c1cc34c") String hash){
         // main net, using TronGrid
         // api key 13cba328-e4df-4c14-b5fd-77d9f92df2f7
         // ApiWrapper wrapper = ApiWrapper.ofMainnet("hex private key", "API key");

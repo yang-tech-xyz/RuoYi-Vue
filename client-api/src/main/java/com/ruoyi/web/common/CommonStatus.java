@@ -15,6 +15,11 @@ public class CommonStatus {
     public static Integer IS_CONFIRM = 1;
 
     /**
+     * 已确认失败状态
+     */
+    public static Integer ERROR_CONFIRM = 2;
+
+    /**
      * TRON链id
      */
     public static Long TRON_CHAIN_ID = -1L;

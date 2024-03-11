@@ -35,6 +35,7 @@ public interface Account {
         INTERNAL_TRANSFER("INTERNAL_TRANSFER", "内部转账"),
         EXCHANGE("EXCHANGE", "交易"),
         RECHARGE_IN("RECHARGE_IN", "充值"),
+        TRON_RECHARGE_IN("TRON_RECHARGE_IN", "TRON充值"),
         WITHDRAW("WITHDRAW", "提现"),
         WITHDRAW_REJECT("WITHDRAW_REJECT", "提现拒绝"),
         WITHDRAW_BTC("WITHDRAW_BTC", "提现BTC"),

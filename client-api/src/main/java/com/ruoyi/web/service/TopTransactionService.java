@@ -20,7 +20,12 @@ import java.util.Optional;
 public class TopTransactionService extends ServiceImpl<TopTransactionMapper, TopTransaction> {
     public List<TopTransaction> queryRechargeUnConfirm() {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getIsConfirm, CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Recharge);
+        query.eq(TopTransaction::getIsConfirm, CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Recharge).ne(TopTransaction::getChainId,-1);
+        return this.list(query);
+    }
+    public List<TopTransaction> queryTronRechargeUnConfirm() {
+        LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
+        query.eq(TopTransaction::getIsConfirm, CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Recharge).eq(TopTransaction::getChainId,-1);
         return this.list(query);
     }
 
@@ -42,6 +47,14 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
      */
     public void updateConfirm(TopTransaction topTransaction) {
         this.baseMapper.updateConfirm(topTransaction.getId());
+    }
+
+    /**
+     * 事务确认
+     * @param topTransaction
+     */
+    public void updateFailed(String hash) {
+        this.baseMapper.updateFailed(hash);
     }
 
     public IPage<TopTransaction> getTransaction(TopTransactionDTO topTransaction) {

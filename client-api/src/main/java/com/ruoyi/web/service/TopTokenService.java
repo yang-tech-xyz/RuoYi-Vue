@@ -97,6 +97,27 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     @Value("${token.secret}")
     private String secret;
 
+    /**
+     * 重新加载所有未执行的延时任务
+     */
+    @PostConstruct
+    public void initCountDown() {
+        // 查询tron未确认transaction
+        List<TopTransaction> topTronRechargeTransactionList = topTransactionService.queryTronRechargeUnConfirm();
+        topTronRechargeTransactionList.stream().forEach(t -> {
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(t.getHash()), 10000));
+        });
+        //查询未确认的hash
+        List<TopTransaction> topRechargeTransactionList = topTransactionService.queryRechargeUnConfirm();
+        topRechargeTransactionList.stream().forEach(t -> {
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(t.getHash()), 10000));
+        });
+//        List<TopTransaction> topWithdrawTransactionList = topTransactionService.queryWithdrawUnConfirm();
+//        topWithdrawTransactionList.stream().forEach(t -> {
+//            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 10000));
+//        });
+    }
+
     public List<TopTokenChainVO> queryTokensByChainId(String chainId) {
         return this.baseMapper.queryTokensByChainId(chainId);
     }
@@ -226,6 +247,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             }
             ApiWrapper wrapper = null;
             if("dev".equalsIgnoreCase(env)){
+                // 随便给一个私钥即可
                 wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
             }else{
                 wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351","13cba328-e4df-4c14-b5fd-77d9f92df2f7");
@@ -295,7 +317,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setCreateBy(userId.toString());
             topTransaction.setUpdateBy(userId.toString());
             topTransaction.setBlockConfirm(topChain.getBlockConfirm());
-            topTransaction.setType(TransactionType.Recharge);
+            topTransaction.setType(TransactionType.TronRecharge);
             topTransactionService.save(topTransaction);
 
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(hash), 10000));
@@ -356,6 +378,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         log.info("transactionReceiptOptional is:{}", transactionReceiptOptional);
         // 获取用户信息
         Response.TransactionInfo.code result = transactionReceiptOptional.getResult();
+        // FAILED is failed
+        if("FAILED".equalsIgnoreCase(result.toString())){
+            topTransactionService.updateFailed(hash);
+        }
         if(!"SUCESS".equalsIgnoreCase(result.toString())){
             return false;
         }
@@ -373,21 +399,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         return this.baseMapper.queryTokenByTokenIdAndChainId(tokenId, chainId);
     }
 
-    /**
-     * 重新加载所有未执行的延时任务
-     */
-    @PostConstruct
-    public void initCountDown() {
-        //查询未确认的hash
-        List<TopTransaction> topRechargeTransactionList = topTransactionService.queryRechargeUnConfirm();
-        topRechargeTransactionList.stream().forEach(t -> {
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(t.getHash()), 10000));
-        });
-//        List<TopTransaction> topWithdrawTransactionList = topTransactionService.queryWithdrawUnConfirm();
-//        topWithdrawTransactionList.stream().forEach(t -> {
-//            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 10000));
-//        });
-    }
 
 //    @Transactional(rollbackFor = Exception.class)
 //    public boolean confirmRechargeToken(String hash) {
@@ -510,15 +521,15 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 accountService.processAccount(
                         Arrays.asList(
                                 AccountRequest.builder()
-                                        .uniqueId(hash.concat("_" + userId).concat("_" + Account.TxType.RECHARGE_IN.typeCode))
+                                        .uniqueId(hash.concat("_" + userId).concat("_" + Account.TxType.TRON_RECHARGE_IN.typeCode))
                                         .userId(userId)
                                         .token(topTransaction.getSymbol())
                                         .fee(BigDecimal.ZERO)
                                         .balanceChanged(topTransaction.getTokenAmount())
                                         .balanceTxType(Account.Balance.AVAILABLE)
-                                        .txType(Account.TxType.RECHARGE_IN)
+                                        .txType(Account.TxType.TRON_RECHARGE_IN)
                                         .refNo(hash)
-                                        .remark("充值")
+                                        .remark("波场充值")
                                         .build()
                         )
                 );

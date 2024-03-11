@@ -27,6 +27,9 @@ public class TopTRONService {
             log.info("nowBlock is:{}",number);
             Response.TransactionInfo transactionInfoById = wrapper.getTransactionInfoById(hash);
             log.info("transactionInfoById is:{}",transactionInfoById);
+            if("FAILED".equalsIgnoreCase(transactionInfoById.getResult().toString())){
+                log.info("transaction failed");
+            }
             ByteString contractAddress = transactionInfoById.getContractAddress();
             Response.TransactionInfo.Log log1 = transactionInfoById.getLog(0);
             ByteString data = log1.getData();
@@ -78,7 +81,7 @@ public class TopTRONService {
 
     public static void main(String[] args) {
 //        "TRiSqezuHyKsV1LmLG9vaREqbLPYgdKK6q" zhiyan account
-        String hexString = Numeric.toHexString(Base58Check.base58ToBytes("TRiSqezuHyKsV1LmLG9vaREqbLPYgdKK6q"));
+        String hexString = Numeric.toHexString(Base58Check.base58ToBytes("TSdpXUP3vzPJBPV2yGvNit7ERmTqFsWipH"));
         System.out.println("hexString is:"+hexString);
         String s = Base58Check.bytesToBase58(Numeric.hexStringToByteArray("41acb7530b6acfd70006b85ba25b45d9f0d624aceb"));
         System.out.println("s is:"+s);
