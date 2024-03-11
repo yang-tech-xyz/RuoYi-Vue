@@ -90,6 +90,10 @@ public class TopTokenController {
             throw new ServiceException("签名错误");
         }
         String symbol = withdrawBody.getSymbol();
+        Long chainId = withdrawBody.getChainId();
+        if(chainId==-1){
+            return topTokenService.withdrawTron(withdrawBody);
+        }
         if (symbol.equalsIgnoreCase(CommonSymbols.BTC_SYMBOL)) {
             return topTokenService.withdrawBTC(withdrawBody);
         } else {

@@ -24,13 +24,13 @@ public class WithdrawBody extends SignBaseEntity
     /**
      * 用户签名后信息
      */
-    @Schema(description="链id", example= "11155111")
+    @Schema(description="链id", example= "-1")
     private Long chainId;
 
     /**
      * 币种标记
      */
-    @Schema(description="币种标记", example= "SUI")
+    @Schema(description="币种标记", example= "USDT")
     private String symbol;
 
 

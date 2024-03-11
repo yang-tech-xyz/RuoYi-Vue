@@ -696,6 +696,137 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 //        systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
         return AjaxResult.success("success");
     }
+    @Transactional
+    public AjaxResult withdrawTron(WithdrawBody withdrawBody) throws Exception {
+        TopTransaction topTransaction = new TopTransaction();
+        //查询用户的账户信息
+        String wallet = withdrawBody.getWallet();
+        TopUser topUserEntity = topUserService.getByWallet(wallet);
+        // 重新设置提币地址为波场钱包地址
+        wallet = topUserEntity.getTronWallet();
+        if(org.apache.commons.lang3.StringUtils.isBlank(wallet)){
+            throw new ServiceException("tron wallet is empty");
+        }
+        Long userId = topUserEntity.getId();
+        String symbol = withdrawBody.getSymbol();
+        TopAccount account = accountService.getAccount(userId, symbol);
+        if (account == null) {
+            log.error("account not exist,userId is:{},symbol is:{}", userId, symbol);
+            throw new ServiceException("account not exist");
+        }
+        BigDecimal withdrawAmount = withdrawBody.getAmount();
+        // 检查账户中的资金是否充足
+        if (account.getAvailableBalance().compareTo(withdrawAmount) < 0) {
+            log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), withdrawAmount);
+            throw new ServiceException("account exceed balance");
+        }
+
+        // 链上转账
+        Optional<TopToken> topTokenOptional = topTokenService.queryTokenBySymbol(symbol);
+        if (!topTokenOptional.isPresent()) {
+            log.error("token not exist!,symbol is:{}", symbol);
+            throw new ServiceException("token not exist!");
+        }
+        TopToken topToken = topTokenOptional.get();
+        Integer topTokenId = topToken.getId();
+        Long chainId = withdrawBody.getChainId();
+        Optional<TopTokenChainVO> topTokenChainVOOptional = this.queryTokenByTokenIdAndChainId(topTokenId, chainId);
+        if (!topTokenChainVOOptional.isPresent()) {
+            log.error("token chain config is not exist,tokenId is:{},chainId is:{}", topTokenId, chainId);
+            throw new ServiceException("token chain config is not exist");
+        }
+        TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
+        if (topPowerConfig == null) {
+            throw new ServiceException("power config is not exist");
+        }
+
+        TopTokenChainVO topTokenChainVO = topTokenChainVOOptional.get();
+        String contractAddress = topTokenChainVO.getErc20Address();
+        Optional<TopChain> optByChainIdOptional = topChainService.getOptByChainId(chainId);
+        if (!optByChainIdOptional.isPresent()) {
+            log.error("chain is not exist,chainId is:{}", chainId);
+            throw new ServiceException("chain is not exist");
+        }
+        TopChain topChain = optByChainIdOptional.get();
+        String rpcEndpoint = topChain.getRpcEndpoint();
+        String to = wallet; //为了保护资金安全,转账只能转到用户注册的钱包地址
+//        Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+        ApiWrapper wrapper = null;
+        if("dev".equalsIgnoreCase(env)){
+            // 随便给一个私钥即可
+            wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
+        }else{
+            wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351","13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+        }
+        BigInteger tronDecimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, contractAddress, wallet);
+//        BigInteger decimalOfContract = getDecimalOfContract(web3j, contractAddress, wallet);
+
+
+
+        BigDecimal feeRatio = topPowerConfig.getFeeRatio();
+        if (feeRatio == null) {
+            throw new ServiceException("fee ratio is null");
+        }
+        BigDecimal fee = withdrawAmount.multiply(feeRatio);
+        // 实际到账金额应该减去手续费
+//        BigDecimal transferAmount = withdrawAmount.subtract(fee);
+        BigDecimal transferAmount = withdrawAmount.subtract(fee);
+
+
+        BigInteger tokenAmount = transferAmount.multiply(new BigDecimal("10").pow(tronDecimalOfContract.intValue())).toBigInteger();
+        // TODO get the privateKey;
+
+//        String curve = topPowerConfig.getCurve();
+//        String iv = "1234567812345678";
+//        String key = secret.substring(0, 16);
+//        AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
+//        String s = aes.decryptStr(curve);
+//        String transactionHash = transferToken(web3j, contractAddress, s, to, tokenAmount);
+
+        String uuid = UUID.fastUUID().toString();
+
+        //扣除用户的资金
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.TRON_WITHDRAW.typeCode))
+                                .userId(userId)
+                                .token(symbol)
+                                .fee(fee.negate())
+                                .balanceChanged(transferAmount.negate())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.TRON_WITHDRAW)
+                                .refNo(uuid)
+                                .remark("提现")
+                                .build()
+                )
+        );
+//        topTransaction.setHash(transactionHash);
+        topTransaction.setWithdrawReceiveAddress(to);
+        topTransaction.setErc20Address(contractAddress);
+        topTransaction.setTransNo(uuid);
+        topTransaction.setChainId(chainId);
+        topTransaction.setTokenId(topTokenId);
+        topTransaction.setRpcEndpoint(rpcEndpoint);
+        topTransaction.setStatus(CommonStatus.STATES_COMMIT);
+        topTransaction.setUserId(userId);
+        topTransaction.setSymbol(symbol);
+        topTransaction.setTokenAmount(transferAmount);
+        topTransaction.setWithdrawAmount(tokenAmount);
+        topTransaction.setIsConfirm(CommonStatus.UN_CONFIRM);
+        long number = wrapper.getNowBlock().getBlockHeader().getRawData().getNumber();
+        BigInteger currentHeight = BigInteger.valueOf(number);
+        topTransaction.setHeight(currentHeight);
+        topTransaction.setCreateTime(LocalDateTime.now());
+        topTransaction.setUpdateTime(LocalDateTime.now());
+        topTransaction.setCreateBy(userId.toString());
+        topTransaction.setUpdateBy(userId.toString());
+        topTransaction.setBlockConfirm(topChain.getBlockConfirm());
+        topTransaction.setType(TransactionType.Tron_Withdraw);
+        topTransactionService.save(topTransaction);
+//        systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
+        return AjaxResult.success("success");
+    }
 
     /**
      * btc 提现

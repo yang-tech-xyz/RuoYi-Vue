@@ -81,7 +81,7 @@ public class TopTRONService {
 
     public static void main(String[] args) {
 //        "TRiSqezuHyKsV1LmLG9vaREqbLPYgdKK6q" zhiyan account
-        String hexString = Numeric.toHexString(Base58Check.base58ToBytes("TSdpXUP3vzPJBPV2yGvNit7ERmTqFsWipH"));
+        String hexString = Numeric.toHexString(Base58Check.base58ToBytes("TBWwF1onMHGbFNYSAma4mDWKWAezN96uS2"));
         System.out.println("hexString is:"+hexString);
         String s = Base58Check.bytesToBase58(Numeric.hexStringToByteArray("41acb7530b6acfd70006b85ba25b45d9f0d624aceb"));
         System.out.println("s is:"+s);
