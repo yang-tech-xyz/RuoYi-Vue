@@ -237,14 +237,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             //通过hash获取交易
             Response.TransactionInfo transactionInfo = wrapper.getTransactionInfoById(hash);
 
-            if (!"Success".equalsIgnoreCase(transactionInfo.getResult().toString())) {
-                return AjaxResult.error("get transaction error!");
-            }
+//            if (!"Success".equalsIgnoreCase(transactionInfo.getResult().toString())) {
+//                return AjaxResult.error("get transaction error!");
+//            }
             Response.TransactionInfo.Log log1 = transactionInfo.getLog(0);
             ByteString data = log1.getData();
 
-            String from = Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(1).toByteArray())),40);
-            String to = Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(2).toByteArray())),40);
+            String from = "41"+Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(1).toByteArray())),40);
+            String to = "41"+Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(2).toByteArray())),40);
             BigInteger value = Numeric.decodeQuantity((Numeric.toHexString(data.toByteArray())));
             ByteString contractAddress = transactionInfo.getContractAddress();
             String erc20Address = Numeric.toHexString(contractAddress.toByteArray());
@@ -271,7 +271,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             String erc20AddressConfig = topTokenChainVOOptional.get().getErc20Address();
 
             // 如果该币种不是对应的这个erc20的地址.则该笔充值为伪造的充值.
-            if (!erc20AddressConfig.equalsIgnoreCase(erc20Address)) {
+            if (!("0x"+erc20AddressConfig).equalsIgnoreCase(erc20Address)) {
                 log.error("erc20 address error! erc20AddressConfig is:{},erc20Address is:{}", erc20AddressConfig, erc20Address);
                 return AjaxResult.error("recharge chain erc20 address not match error");
             }
@@ -298,7 +298,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setType(TransactionType.Recharge);
             topTransactionService.save(topTransaction);
 
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(hash), 10000));
         } catch (Exception e) {
             log.error("system error", e);
             throw e;
@@ -347,6 +347,23 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         }
         if (transactionReceipt.getLogs().size() == 0) {
             log.error("transaction have no logs");
+            return false;
+        }
+        return true;
+    }
+    private boolean validateTronTransactionReceipt(String hash, ApiWrapper wrap,Long chainId) throws Exception {
+        Response.TransactionInfo transactionReceiptOptional = wrap.getTransactionInfoById(hash);
+        log.info("transactionReceiptOptional is:{}", transactionReceiptOptional);
+        // 获取用户信息
+        Response.TransactionInfo.code result = transactionReceiptOptional.getResult();
+        if(!"SUCESS".equalsIgnoreCase(result.toString())){
+            return false;
+        }
+        long transactionBlockNumber = transactionReceiptOptional.getBlockNumber();
+        long currentBlockNumber = wrap.getNowBlock().getBlockHeader().getRawData().getNumber();
+        TopChain topChain = topChainService.getOptByChainId(chainId).get();
+        Long blockConfirm = topChain.getBlockConfirm();
+        if(currentBlockNumber-transactionBlockNumber<blockConfirm){
             return false;
         }
         return true;
@@ -463,6 +480,57 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         } catch (Exception e) {
             log.error("confirmRechargeToken error:", e);
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
+            throw new ServiceException(e);
+        }
+    }
+    @Transactional(rollbackFor = Exception.class)
+    public boolean confirmTronRechargeToken(String hash) {
+        try {
+            Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(hash);
+            if (!topTransactionOptional.isPresent()) {
+                throw new ServiceException("transaction not exist!");
+            }
+            TopTransaction topTransaction = topTransactionOptional.get();
+            // 重复检查transaction是否已经确认交易.已经充值的transaction防止用户重复充值
+            if (topTransaction.getIsConfirm() == 1) {
+                throw new ServiceException("transaction had been confirmed!");
+            }
+            ApiWrapper wrapper = null;
+            if("dev".equalsIgnoreCase(env)){
+                wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
+            }else{
+                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351","13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+            }
+
+            //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
+            if (validateTronTransactionReceipt(hash, wrapper,topTransaction.getChainId())) {
+                topTransaction.setIsConfirm(1);
+                topTransaction.setStatus("0x1");
+                Long userId = topTransaction.getUserId().longValue();
+                accountService.processAccount(
+                        Arrays.asList(
+                                AccountRequest.builder()
+                                        .uniqueId(hash.concat("_" + userId).concat("_" + Account.TxType.RECHARGE_IN.typeCode))
+                                        .userId(userId)
+                                        .token(topTransaction.getSymbol())
+                                        .fee(BigDecimal.ZERO)
+                                        .balanceChanged(topTransaction.getTokenAmount())
+                                        .balanceTxType(Account.Balance.AVAILABLE)
+                                        .txType(Account.TxType.RECHARGE_IN)
+                                        .refNo(hash)
+                                        .remark("充值")
+                                        .build()
+                        )
+                );
+
+                topTransactionService.updateConfirm(topTransaction);
+            } else {
+                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(hash), 10000));
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("confirmRechargeToken error:", e);
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(hash), 10000));
             throw new ServiceException(e);
         }
     }

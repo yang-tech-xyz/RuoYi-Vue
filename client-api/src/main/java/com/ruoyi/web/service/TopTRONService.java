@@ -36,9 +36,13 @@ public class TopTRONService {
 
             log.info("contractAddress is:{}",Numeric.toHexString(Base58Check.base58ToBytes(myContractAddress)));
             log.info("contractAddress is:{}",Numeric.toHexString(contractAddress.toByteArray()));
-            log.info("log1 is:{}", Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(1).toByteArray())),40));
+
+            log.info("log1 is:{}", Numeric.toHexString(log1.getTopics(1).toByteArray()));
+            log.info("log1 is:{}", Numeric.toHexString(log1.getTopics(2).toByteArray()));
+
+            log.info("log1 is:{}", "41"+Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(1).toByteArray())),40));
 //            log.info("decode from is:{}", TypeDecoder.decodeAddress("0x41"+Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity(Numeric.toHexString(log1.getTopics(1).toByteArray())),40)));
-            log.info("log2 is:{}",Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity( Numeric.toHexString(log1.getTopics(2).toByteArray())),40));
+            log.info("log2 is:{}","41"+Numeric.toHexStringNoPrefixZeroPadded(Numeric.decodeQuantity( Numeric.toHexString(log1.getTopics(2).toByteArray())),40));
             log.info("data is:{}", Numeric.decodeQuantity((Numeric.toHexString(data.toByteArray()))));
 
 
@@ -69,11 +73,14 @@ public class TopTRONService {
                 contractAddress,
                 function);
 
-        return BigInteger.valueOf(Long.parseLong(Numeric.toHexString(extension.getConstantResult(0).toByteArray())));
+        return Numeric.toBigInt(extension.getConstantResult(0).toByteArray());
     }
 
     public static void main(String[] args) {
-        String hexString = Numeric.toHexString(Base58Check.base58ToBytes("TEaDXcKqFBuZXVxb5gCqNYmUvcNZASZPLH"));
+//        "TRiSqezuHyKsV1LmLG9vaREqbLPYgdKK6q" zhiyan account
+        String hexString = Numeric.toHexString(Base58Check.base58ToBytes("TRiSqezuHyKsV1LmLG9vaREqbLPYgdKK6q"));
         System.out.println("hexString is:"+hexString);
+        String s = Base58Check.bytesToBase58(Numeric.hexStringToByteArray("41acb7530b6acfd70006b85ba25b45d9f0d624aceb"));
+        System.out.println("s is:"+s);
     }
 }

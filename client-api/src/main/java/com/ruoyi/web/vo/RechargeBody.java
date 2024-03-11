@@ -16,7 +16,7 @@ public class RechargeBody
     /**
      * 用户钱包地址
      */
-    @Schema(description="充值hash值",example = "0xa91a4483c075e3affcf3f7018ea488b57adab17924d8e9af67fc4bfc7b409af4")
+    @Schema(description="充值hash值",example = "288f102ad368eac132e61f2cb68ea70920ccfa7845e9e3e34b26321c3185b382")
     @NotNull
     private String hash;
 
