@@ -50,4 +50,8 @@ public class TopPowerConfig extends BaseEntity
     @JsonIgnore
     @Schema(description = "审核签名钱包,必须由改地址进行签名才可放行")
     private String auditWallet;
+
+    @JsonIgnore
+    @Schema(description = "波场信息")
+    private String tronCurve;
 }

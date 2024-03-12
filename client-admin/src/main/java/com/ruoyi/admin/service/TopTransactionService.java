@@ -23,6 +23,14 @@ import java.util.Optional;
 @Service
 public class TopTransactionService extends ServiceImpl<TopTransactionMapper, TopTransaction> {
 
+    /**
+     * 事务确认
+     * @param hash
+     */
+    public void updateFailed(String hash) {
+        this.baseMapper.updateFailed(hash);
+    }
+
     public TopTransaction getOptByTransactionNo(String transactionNo) {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
         query.eq(TopTransaction::getTransNo,transactionNo);

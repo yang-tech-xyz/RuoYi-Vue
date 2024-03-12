@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.dto.TokenAddDTO;
 import com.ruoyi.admin.dto.TokenUpdateDTO;
+import com.ruoyi.admin.entity.TopChain;
 import com.ruoyi.admin.entity.TopPowerConfig;
 import com.ruoyi.admin.entity.TopToken;
 import com.ruoyi.admin.entity.TopTransaction;
@@ -24,6 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.tron.trident.core.ApiWrapper;
+import org.tron.trident.core.contract.Contract;
+import org.tron.trident.core.contract.Trc20Contract;
+import org.tron.trident.core.key.KeyPair;
+import org.tron.trident.proto.Response;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
@@ -42,20 +48,18 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Numeric;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
 public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
-
+    @Value("${spring.profiles.active}")
+    private String env;
     static SystemTimer systemTimer = new SystemTimer();
 
     static {
@@ -64,6 +68,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Value("${token.secret}")
     private String secret;
+
+    @Autowired
+    private TopChainService topChainService;
+
     @Autowired
     private TopPowerConfigService topPowerConfigService;
 
@@ -75,6 +83,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Autowired
     private TopAccountService topAccountService;
+
+    @Autowired
+    private TopTRONService topTRONService;
 
 
     /**
@@ -153,6 +164,50 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
     }
 
+    public void tronWithdrawAuditPass(TopTransaction topTransaction) {
+        try {
+            String contractAddress = topTransaction.getErc20Address();
+//        String rpcEndpoint = topTransaction.getRpcEndpoint();
+            String to = topTransaction.getWithdrawReceiveAddress(); //为了保护资金安全,转账只能转到用户注册的钱包地址
+            Long chainId = topTransaction.getChainId();
+//        Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+            ApiWrapper wrapper = null;
+            if ("dev".equalsIgnoreCase(env)) {
+                // 随便给一个私钥即可
+                wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
+            } else {
+                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+            }
+
+            TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
+            String tronCurve = topPowerConfig.getTronCurve();
+            KeyPair keyPair = new KeyPair(tronCurve);
+            String from = keyPair.toHexAddress();
+            BigInteger tokenAmount = topTransaction.getWithdrawAmount();
+            if (topPowerConfig == null) {
+                throw new ServiceException("power config is not exist");
+            }
+
+            // 检查提现账户是否有足够的金额
+            boolean amountCheckResult = topTokenService.checkTronTransferValueEnough(wrapper, contractAddress, tokenAmount, from);
+            if (!amountCheckResult) {
+                throw new ServiceException("amountCheckResult failed");
+            }
+            BigInteger tronDecimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, contractAddress, from);
+            String transactionHash = transferTronToken(wrapper, contractAddress, keyPair, to, tokenAmount.longValue(), tronDecimalOfContract.intValue());
+            TopTransaction topTransactionEntity = new TopTransaction();
+            topTransactionEntity.setId(topTransaction.getId());
+            topTransactionEntity.setHash(transactionHash);
+
+            topTransactionService.updateById(topTransactionEntity);
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(transactionHash), 10000));
+
+        }catch (Exception e){
+            log.error("withdraw tron usdt failed",e);
+            throw new ServiceException("withdraw tron usdt failed");
+        }
+    }
+
     public void withdrawBTCAuditPass(TopTransaction topTransaction) {
         TopTransaction topTransactionEntity = new TopTransaction();
         topTransactionEntity.setId(topTransaction.getId());
@@ -180,6 +235,29 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         }
         if (transactionReceipt.getLogs().size() == 0) {
             log.error("transaction have no logs");
+            return false;
+        }
+        return true;
+    }
+
+
+    private boolean validateTronTransactionReceipt(String hash, ApiWrapper wrap,Long chainId) throws Exception {
+        Response.TransactionInfo transactionReceiptOptional = wrap.getTransactionInfoById(hash);
+        log.info("transactionReceiptOptional is:{}", transactionReceiptOptional);
+        // 获取用户信息
+        Response.TransactionInfo.code result = transactionReceiptOptional.getResult();
+        // FAILED is failed
+        if("FAILED".equalsIgnoreCase(result.toString())){
+            topTransactionService.updateFailed(hash);
+        }
+        if(!"SUCESS".equalsIgnoreCase(result.toString())){
+            return false;
+        }
+        long transactionBlockNumber = transactionReceiptOptional.getBlockNumber();
+        long currentBlockNumber = wrap.getNowBlock().getBlockHeader().getRawData().getNumber();
+        TopChain topChain = topChainService.getOptByChainId(chainId).get();
+        Long blockConfirm = topChain.getBlockConfirm();
+        if(currentBlockNumber-transactionBlockNumber<blockConfirm){
             return false;
         }
         return true;
@@ -217,6 +295,49 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         } catch (Exception e) {
             log.error("confirmRechargeToken error:", e);
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(hash), 10000));
+            throw new ServiceException(e);
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public boolean confirmTronWithdrawToken(String hash) {
+        try {
+            Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(hash);
+            if (!topTransactionOptional.isPresent()) {
+                throw new ServiceException("transaction not exist!");
+            }
+            TopTransaction topTransaction = topTransactionOptional.get();
+            // 重复检查transaction是否已经确认交易.已经充值的transaction防止用户重复提现
+            if (topTransaction.getIsConfirm() == 1) {
+                throw new ServiceException("transaction had been confirmed!");
+            }
+            String rpcEndpoint = topTransaction.getRpcEndpoint();
+            Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
+
+            ApiWrapper wrapper = null;
+            if("dev".equalsIgnoreCase(env)){
+                wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
+            }else{
+                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351","13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+            }
+
+            //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
+            if (validateTronTransactionReceipt(hash, wrapper,topTransaction.getChainId())) {
+                TopTransaction topTransactionEntity = new TopTransaction();
+                topTransactionEntity.setId(topTransaction.getId());
+                topTransactionEntity.setIsConfirm(CommonStatus.IS_CONFIRM);
+                topTransactionEntity.setStatus(CommonStatus.STATES_SUCCESS);
+                Long userId = topTransaction.getUserId().longValue();
+                topTransactionService.updateById(topTransactionEntity);
+//                topTransactionService.updateConfirm(topTransaction);
+            } else {
+                //获取当前的区块高度
+                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(hash), 10000));
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("confirmRechargeToken error:", e);
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(hash), 10000));
             throw new ServiceException(e);
         }
     }
@@ -271,6 +392,17 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException("transfer error");
         }
     }
+    public String transferTronToken(ApiWrapper wrapper, String contractAddress, KeyPair keyPair, String to, Long amount,Integer power) throws ServiceException {
+        try {
+            Contract contract = wrapper.getContract(contractAddress);
+            Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
+            String hash = token.transfer(to, amount, power, "memo", 100000000L);
+            return hash;
+        } catch (Exception e) {
+            log.error("transfer error!", e);
+            throw new ServiceException("transfer error");
+        }
+    }
 
     /**
      * 标记为审核失败并退款
@@ -313,6 +445,15 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                     response.getValue(), function.getOutputParameters());
             BigInteger balance = (BigInteger) balanceOf.getFirst().getValue();
             return balance.compareTo(transferAmount)>0;
+        } catch (Exception e) {
+            log.error("check balance of amount error!", e);
+            throw new ServiceException(e.getMessage());
+        }
+    }
+    public boolean checkTronTransferValueEnough(ApiWrapper wrapper, String contractAddress,BigInteger transferAmount,String from) {
+        try {
+            BigInteger tronBalanceOfContract = topTRONService.getTronBalanceOfContract(wrapper, contractAddress, from);
+            return tronBalanceOfContract.compareTo(transferAmount)>0;
         } catch (Exception e) {
             log.error("check balance of amount error!", e);
             throw new ServiceException(e.getMessage());

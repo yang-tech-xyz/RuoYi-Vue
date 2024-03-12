@@ -20,7 +20,7 @@ public class WithdrawAuditBody extends SignBaseEntity
     /**
      * 币种标记
      */
-    @Schema(description="事务编号", example= "c7b51ba8-bdcd-4a29-bdfb-4841216266be")
+    @Schema(description="事务编号", example= "45a76c29-463b-433a-9983-78f84b71d924")
     private String transactionNo;
 
 

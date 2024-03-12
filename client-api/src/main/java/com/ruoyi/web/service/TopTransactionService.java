@@ -51,7 +51,7 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
 
     /**
      * 事务确认
-     * @param topTransaction
+     * @param hash
      */
     public void updateFailed(String hash) {
         this.baseMapper.updateFailed(hash);

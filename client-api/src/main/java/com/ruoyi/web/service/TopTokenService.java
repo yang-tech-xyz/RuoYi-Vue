@@ -797,7 +797,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.TRON_WITHDRAW)
                                 .refNo(uuid)
-                                .remark("提现")
+                                .remark("波场提现")
                                 .build()
                 )
         );

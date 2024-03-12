@@ -16,6 +16,7 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.common.CommonSymbols;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.annotations.ParameterObject;
@@ -33,6 +34,7 @@ import java.security.SignatureException;
 @RequestMapping("/transaction")
 @Tag(description = "TopTransactionController", name = "事务信息")
 @RestController
+@AllArgsConstructor
 public class TopTransactionController {
 
 
@@ -76,9 +78,11 @@ public class TopTransactionController {
                 log.error("transaction had been audit,hash is:"+topTransaction.getHash());
                 throw new ServiceException("transaction had been audit");
             }
-
-            topTokenService.withdrawAuditPass(topTransaction);
-
+            if(-1 == topTransaction.getChainId()){
+                topTokenService.tronWithdrawAuditPass(topTransaction);
+            }else{
+                topTokenService.withdrawAuditPass(topTransaction);
+            }
         }else{
             // 提现拒绝,
             String status = topTransaction.getStatus();
