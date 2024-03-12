@@ -240,9 +240,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             TopChain topChain = topChainOpt.get();
             String rpcEndpoint = topChain.getRpcEndpoint();
             topTransaction.setRpcEndpoint(rpcEndpoint);
-            // 波场链项目方收款地址可以配置在chain上面,把config里面配置的值取消掉.
-//            TopPowerConfig topPowerConfig = topPowerConfigService.list().get(0);
-//            String usdtReceivedWallet = topPowerConfig.getUsdtReceivedWallet();
             String usdtReceivedWallet = topChain.getReceiveAddress();
             if(StringUtils.isEmpty(usdtReceivedWallet)){
                 throw new ServiceException("usdtReceivedWallet not exist!");
