@@ -56,7 +56,7 @@ spring:
     # 国际化资源文件路径
     basename: i18n/messages
   profiles:
-    active: dev
+    active: ${profile:dev}
   # 文件上传
   servlet:
     multipart:
@@ -93,7 +93,7 @@ spring:
         max-wait: -1ms
   datasource:
     name: kee
-    url: jdbc:mysql://127.0.0.1:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${db_url:127.0.0.1}:3306/ry-vue?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
     username: ${db_user_name:root}
     password: ${db_password:Ab123456}
     # 使用druid数据源
