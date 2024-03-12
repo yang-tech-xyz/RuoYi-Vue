@@ -240,8 +240,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             TopChain topChain = topChainOpt.get();
             String rpcEndpoint = topChain.getRpcEndpoint();
             topTransaction.setRpcEndpoint(rpcEndpoint);
-            TopPowerConfig topPowerConfig = topPowerConfigService.list().get(0);
-            String usdtReceivedWallet = topPowerConfig.getUsdtReceivedWallet();
+            // 波场链项目方收款地址可以配置在chain上面,把config里面配置的值取消掉.
+//            TopPowerConfig topPowerConfig = topPowerConfigService.list().get(0);
+//            String usdtReceivedWallet = topPowerConfig.getUsdtReceivedWallet();
+            String usdtReceivedWallet = topChain.getReceiveAddress();
             if(StringUtils.isEmpty(usdtReceivedWallet)){
                 throw new ServiceException("usdtReceivedWallet not exist!");
             }
@@ -645,12 +647,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         if (topPowerConfig == null) {
             throw new ServiceException("power config is not exist");
         }
-        String curve = topPowerConfig.getCurve();
-        String iv = "1234567812345678";
-        String key = secret.substring(0, 16);
-        AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
-        String s = aes.decryptStr(curve);
-//        String transactionHash = transferToken(web3j, contractAddress, s, to, tokenAmount);
 
         String uuid = UUID.fastUUID().toString();
 
