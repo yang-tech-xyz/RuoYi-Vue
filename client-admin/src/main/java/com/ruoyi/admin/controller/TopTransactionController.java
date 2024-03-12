@@ -64,16 +64,16 @@ public class TopTransactionController {
             }
 
             TopPowerConfig topPowerConfig = topPowerConfigService.list().getFirst();
-            String auditWallet = topPowerConfig.getAuditWallet();
-            try {
-                boolean validateResult = UnsignMessageUtils.validate(withdrawBody.getSignMsg(), withdrawBody.getContent(), auditWallet);
-                if (!validateResult) {
-                    return AjaxResult.error("validate sign error!");
-                }
-            } catch (SignatureException e) {
-                log.error("签名错误", e);
-                throw new ServiceException("签名错误");
-            }
+//            String auditWallet = topPowerConfig.getAuditWallet();
+//            try {
+//                boolean validateResult = UnsignMessageUtils.validate(withdrawBody.getSignMsg(), withdrawBody.getContent(), auditWallet);
+//                if (!validateResult) {
+//                    return AjaxResult.error("validate sign error!");
+//                }
+//            } catch (SignatureException e) {
+//                log.error("签名错误", e);
+//                throw new ServiceException("签名错误");
+//            }
             if(StringUtils.isNotEmpty(topTransaction.getHash())){
                 log.error("transaction had been audit,hash is:"+topTransaction.getHash());
                 throw new ServiceException("transaction had been audit");

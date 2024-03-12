@@ -5,7 +5,9 @@ import com.ruoyi.admin.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.tron.trident.abi.TypeReference;
+import org.tron.trident.abi.datatypes.Address;
 import org.tron.trident.abi.datatypes.Function;
+import org.tron.trident.abi.datatypes.Type;
 import org.tron.trident.abi.datatypes.generated.Uint256;
 import org.tron.trident.core.ApiWrapper;
 import org.tron.trident.proto.Chain;
@@ -80,7 +82,7 @@ public class TopTRONService {
 
     public BigInteger getTronBalanceOfContract(ApiWrapper wrapper, String contractAddress, String from) throws IOException {
         // Define the function we want to invoke from the smart contract
-        Function function = new Function("balanceOf", Arrays.asList(),
+        Function function = new Function("balanceOf", Arrays.asList(new Address(from)),
                 Arrays.asList(new TypeReference<Uint256>() {
                 }));
 
