@@ -144,18 +144,17 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException("power config is not exist");
         }
         String curve = topPowerConfig.getCurve();
-        String iv = "1234567812345678";
-        String key = secret.substring(0, 16);
-        AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
-        String s = aes.decryptStr(curve);
+//        String iv = "1234567812345678";
+//        String key = secret.substring(0, 16);
+//        AES aes = new AES(Mode.CBC, Padding.PKCS5Padding, key.getBytes(), iv.getBytes());
 
         // 检查提现账户是否有足够的金额
-        boolean amountCheckResult = topTokenService.checkTransferValueEnough(s, web3j, contractAddress, tokenAmount);
+        boolean amountCheckResult = topTokenService.checkTransferValueEnough(curve, web3j, contractAddress, tokenAmount);
         if(!amountCheckResult){
             throw new ServiceException("amountCheckResult failed");
         }
 
-        String transactionHash = transferToken(chainId, web3j, contractAddress, s, to, tokenAmount);
+        String transactionHash = transferToken(chainId, web3j, contractAddress, curve, to, tokenAmount);
         TopTransaction topTransactionEntity = new TopTransaction();
         topTransactionEntity.setId(topTransaction.getId());
         topTransactionEntity.setHash(transactionHash);
