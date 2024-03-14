@@ -75,9 +75,9 @@ public class UnsignMessageUtils {
             return false;
         }
         //验证tron钱包
-        if(!"GatPool-sign".equalsIgnoreCase(content)){
-            return SignatureValidator.verify(content,signature,walletAddress);
-        }
+//        if(!"GatPool-sign".equalsIgnoreCase(content)){
+//            return SignatureValidator.verify(content,signature,walletAddress);
+//        }
         // todo 如果验签不成功，就不需要Hash.sha3 直接content.getBytes()就可以了
         // 原文字节数组
 //        byte[] msgHash = Hash.sha3(content.getBytes());

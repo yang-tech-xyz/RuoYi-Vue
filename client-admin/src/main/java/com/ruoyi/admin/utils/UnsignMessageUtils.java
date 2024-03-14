@@ -1,6 +1,7 @@
 package com.ruoyi.admin.utils;
 
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.Hash;
 import org.web3j.crypto.Keys;
 import org.web3j.crypto.Sign;
 import org.web3j.utils.Numeric;
@@ -12,11 +13,11 @@ import java.util.Arrays;
 public class UnsignMessageUtils {
 
     // 钱包私钥
-    private static final String priKey = "e62248374af86aa480f9cebd44f04cd02b915130d4fbda885a201488257b0a17";
+    private static final String priKey = "15de6fbf6fdf886bcef1ab93dbdee04f3584f68df34c821c98921d1110d4abe1";
     // 钱包地址
-    private static final String walletAddress = "0x5ebacac108d665819398e5c37e12b0162d781398";
+    private static final String walletAddress = "0x24dBB38e1d1e9b1A884fFa721F9B65BF932c6da5";
 
-    private static String content = "青年人的责任重大！努力吧...";
+    private static String content = "_sign1710345055563";
 
 
     public static void main(String[] args) {
