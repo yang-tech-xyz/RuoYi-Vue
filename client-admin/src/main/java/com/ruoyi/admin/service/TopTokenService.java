@@ -48,6 +48,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.utils.Numeric;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -187,6 +188,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
 
             BigInteger withdrawAmount = topTransaction.getWithdrawAmount();
+            BigDecimal tokenAmount = topTransaction.getTokenAmount();
 
 
             // 检查提现账户是否有足够的金额
@@ -194,8 +196,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             if (!amountCheckResult) {
                 throw new ServiceException("amountCheckResult failed");
             }
-//            BigInteger tronDecimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, contractAddress, from);
-            String transactionHash = transferTronToken(wrapper, contractAddress, keyPair, to, withdrawAmount.longValue(), 0);
+            BigInteger tronDecimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, contractAddress, from);
+            String transactionHash = transferTronToken(wrapper, contractAddress, keyPair, to, tokenAmount.longValue(), tronDecimalOfContract.intValue());
             TopTransaction topTransactionEntity = new TopTransaction();
             topTransactionEntity.setId(topTransaction.getId());
             topTransactionEntity.setHash(transactionHash);
