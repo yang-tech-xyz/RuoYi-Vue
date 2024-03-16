@@ -40,18 +40,15 @@ public class TopPowerConfig extends BaseEntity
     @Schema(description = "产出比例")
     private BigDecimal outputRatio;
 
-    @JsonIgnore
-    @Schema(description = "不要问我这个是做什么的")
+    @Schema(description = "eht链钱包私钥")
     private String curve;
 
     @Schema(description = "提现费率统一10%")
     private BigDecimal feeRatio;
 
-    @JsonIgnore
     @Schema(description = "审核签名钱包,必须由改地址进行签名才可放行")
     private String auditWallet;
 
-    @JsonIgnore
-    @Schema(description = "波场信息")
+    @Schema(description = "波场钱包私钥")
     private String tronCurve;
 }
