@@ -20,7 +20,6 @@ public class TopPowerConfigVO extends BaseEntity
 {
 
     /** 链信息配置表 */
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /** 链类型 */
