@@ -38,9 +38,9 @@ public class TopPowerConfigController {
         return AjaxResult.success(topPowerConfigVO);
     }
 
-    @Operation(summary = "查询配置")
+    @Operation(summary = "更新配置")
     @PostMapping("/")
-    public AjaxResult<TopPowerConfigVO> update(TopPowerConfig topPowerConfig){
+    public AjaxResult<TopPowerConfigVO> update(@RequestBody TopPowerConfig topPowerConfig){
         topPowerConfigService.updateById(topPowerConfig);
         return AjaxResult.success();
     }
