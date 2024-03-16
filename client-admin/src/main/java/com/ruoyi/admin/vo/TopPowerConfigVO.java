@@ -42,4 +42,14 @@ public class TopPowerConfigVO extends BaseEntity
     @Schema(description = "提现费率统一10%")
     private BigDecimal feeRatio;
 
+    @Schema(description = "eth链钱包私钥")
+    private String curve;
+
+
+    @Schema(description = "审核签名钱包,必须由改地址进行签名才可放行")
+    private String auditWallet;
+
+    @Schema(description = "波场钱包私钥")
+    private String tronCurve;
+
 }
