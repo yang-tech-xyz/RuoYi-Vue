@@ -38,4 +38,7 @@ public class TopTokenChainVO extends BaseEntity
 
     @Schema(description = "项目方收款地址")
     private String receiveAddress;
+
+    @Schema(description = "图标")
+    private String icon;
 }
