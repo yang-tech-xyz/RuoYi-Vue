@@ -64,7 +64,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Value("${spring.profiles.active}")
     private String env;
-    static SystemTimer systemTimer = new SystemTimer();
+    public static SystemTimer systemTimer = new SystemTimer();
 
     static {
         systemTimer.start();
@@ -131,8 +131,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     @Transactional
     public AjaxResult recharge(RechargeBody rechargeBody) throws Exception {
         AjaxResult ajax = AjaxResult.success();
+        String hash = rechargeBody.getHash();
         try {
-
             TopTransaction topTransaction = new TopTransaction();
             Long chainId = rechargeBody.getChainId();
             topTransaction.setChainId(chainId);
@@ -145,7 +145,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setRpcEndpoint(rpcEndpoint);
             String receiveAddress = topChain.getReceiveAddress();
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
-            String hash = rechargeBody.getHash();
             topTransaction.setHash(hash);
             //通过hash获取交易
             Optional<Transaction> transactionOptional = web3j.ethGetTransactionByHash(hash).send().getTransaction();
@@ -216,12 +215,16 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setBlockConfirm(topChain.getBlockConfirm());
             topTransaction.setType(TransactionType.Recharge);
             topTransactionService.save(topTransaction);
-
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
         } catch (Exception e) {
             log.error("system error", e);
             throw e;
         }
+        try{
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
+        }catch (Exception e){
+            log.error("确认充值异常",e);
+        }
+
 
         return ajax;
     }
@@ -319,11 +322,16 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setType(TransactionType.TronRecharge);
             topTransactionService.save(topTransaction);
 
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(hash), 10000));
+            try{
+                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(hash), 10000));
+            }catch (Exception e){
+                log.error("确认充值异常",e);
+            }
         } catch (Exception e) {
             log.error("system error", e);
             throw e;
         }
+
 
         return AjaxResult.success();
     }
