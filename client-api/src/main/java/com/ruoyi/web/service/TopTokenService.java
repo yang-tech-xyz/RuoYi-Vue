@@ -219,13 +219,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.error("system error", e);
             throw e;
         }
-        try{
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(hash), 10000));
-        }catch (Exception e){
-            log.error("确认充值异常",e);
-        }
-
-
         return ajax;
     }
     @Transactional
@@ -322,17 +315,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setType(TransactionType.TronRecharge);
             topTransactionService.save(topTransaction);
 
-            try{
-                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(hash), 10000));
-            }catch (Exception e){
-                log.error("确认充值异常",e);
-            }
         } catch (Exception e) {
             log.error("system error", e);
             throw e;
         }
-
-
         return AjaxResult.success();
     }
 

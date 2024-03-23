@@ -1,5 +1,6 @@
 package com.ruoyi.web.controller;
 
+import cn.hutool.cron.timingwheel.TimerTask;
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.common.CommonSymbols;
 import com.ruoyi.web.common.CommonStatus;
@@ -67,9 +68,21 @@ public class TopTokenController {
         Long chainId = rechargeBody.getChainId();
         if(chainId== CommonStatus.TRON_CHAIN_ID){
             //波场链充值
-            return topTokenService.rechargeTRX(rechargeBody);
+            topTokenService.rechargeTRX(rechargeBody);
+            try{
+                TopTokenService.systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronRechargeToken(rechargeBody.getHash()), 10000));
+            }catch (Exception e){
+                log.error("确认充值异常",e);
+            }
+            return AjaxResult.success();
         }else{
-            return topTokenService.recharge(rechargeBody);
+            topTokenService.recharge(rechargeBody);
+            try{
+                TopTokenService.systemTimer.addTask(new TimerTask(() -> topTokenService.confirmRechargeToken(rechargeBody.getHash()), 10000));
+            }catch (Exception e){
+                log.error("确认充值异常",e);
+            }
+            return AjaxResult.success();
         }
     }
 
