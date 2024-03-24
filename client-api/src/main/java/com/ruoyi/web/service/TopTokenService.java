@@ -64,6 +64,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Value("${spring.profiles.active}")
     private String env;
+
+    static Integer OverCountsRetry = 60;
     public static SystemTimer systemTimer = new SystemTimer();
 
     static {
@@ -448,6 +450,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 throw new ServiceException("transaction not exist!");
             }
             TopTransaction topTransaction = topTransactionOptional.get();
+
+            int retryCounts = topTransaction.getRetryCounts();
+            if(retryCounts>=OverCountsRetry){
+                return false;
+            }
+            topTransaction.setRetryCounts(retryCounts+1);
+            topTransactionService.updateById(topTransaction);
             // 重复检查transaction是否已经确认交易.已经充值的transaction防止用户重复充值
             if (topTransaction.getIsConfirm() == 1) {
                 throw new ServiceException("transaction had been confirmed!");
@@ -499,6 +508,16 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             if (topTransaction.getIsConfirm() == 1) {
                 throw new ServiceException("transaction had been confirmed!");
             }
+
+            //如果重试次数过大,则不再继续重试
+            int retryCounts = topTransaction.getRetryCounts();
+            if(retryCounts>=OverCountsRetry){
+                return false;
+            }
+            topTransaction.setRetryCounts(retryCounts+1);
+            topTransactionService.updateById(topTransaction);
+
+
             ApiWrapper wrapper = null;
             if("dev".equalsIgnoreCase(env)){
                 wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");

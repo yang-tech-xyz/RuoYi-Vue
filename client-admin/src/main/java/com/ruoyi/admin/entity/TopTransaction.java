@@ -79,4 +79,7 @@ public class TopTransaction extends BaseEntity
 
     @Schema(description = "提现数量")
     private BigInteger withdrawAmount;
+
+    @Schema(description = "已经处理次数,仍然未能确认该笔交易")
+    private int retryCounts;
 }
