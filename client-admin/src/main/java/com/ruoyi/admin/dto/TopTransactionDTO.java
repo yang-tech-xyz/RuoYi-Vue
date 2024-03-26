@@ -28,4 +28,12 @@ public class TopTransactionDTO extends BaseDTO
     @Schema(description = "事务状态,0x0:未审核,0x1:审核通过,0x2:审核拒绝",examples = {"0x0","0x1","02"})
     private String status;
 
+//    Recharge("充值"),
+//    TronRecharge("波场充值"),
+//    Withdraw_BTC("提现BTC"),
+//    Withdraw("提现"),
+//    Tron_Withdraw("波场提现");
+    @Schema(description = "事务类型,Recharge:充值,TronRecharge:波场充值,Withdraw_BTC:提现BTC,Withdraw:提现,Tron_Withdraw:波场提现")
+    private TransactionType type;
+
 }

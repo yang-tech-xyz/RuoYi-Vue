@@ -25,6 +25,7 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
 
     /**
      * 事务确认
+     *
      * @param hash
      */
     public void updateFailed(String hash) {
@@ -33,10 +34,10 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
 
     public TopTransaction getOptByTransactionNo(String transactionNo) {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getTransNo,transactionNo);
+        query.eq(TopTransaction::getTransNo, transactionNo);
         Optional<TopTransaction> topTransaction = this.getOneOpt(query);
-        if(topTransaction.isEmpty()){
-            log.warn("transaction is not exist,transactionNo is:{}",transactionNo);
+        if (topTransaction.isEmpty()) {
+            log.warn("transaction is not exist,transactionNo is:{}", transactionNo);
             throw new ServiceException("transaction is not exist");
         }
         return topTransaction.get();
@@ -48,20 +49,20 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
 
     public Optional<TopTransaction> getTransactionByHash(String hash) {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getHash,hash);
+        query.eq(TopTransaction::getHash, hash);
         return this.getOneOpt(query);
     }
 
     public List<TopTransaction> queryWithdrawUnConfirm() {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getIsConfirm,CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Withdraw).ne(TopTransaction::getChainId,-1)
+        query.eq(TopTransaction::getIsConfirm, CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Withdraw).ne(TopTransaction::getChainId, -1)
                 .isNotNull(TopTransaction::getHash);
         return this.list(query);
     }
 
     public List<TopTransaction> queryTronWithdrawUnConfirm() {
         LambdaQueryWrapper<TopTransaction> query = Wrappers.lambdaQuery();
-        query.eq(TopTransaction::getIsConfirm,CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Tron_Withdraw).eq(TopTransaction::getChainId,-1)
+        query.eq(TopTransaction::getIsConfirm, CommonStatus.UN_CONFIRM).eq(TopTransaction::getType, TransactionType.Tron_Withdraw).eq(TopTransaction::getChainId, -1)
                 .isNotNull(TopTransaction::getHash);
         return this.list(query);
     }
@@ -69,9 +70,10 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
     public IPage<TopTransaction> getTransaction(TopTransactionDTO topTransaction) {
         IPage<TopTransaction> page = new Page<>(topTransaction.getPageNum(), topTransaction.getPageSize());
         LambdaQueryWrapper<TopTransaction> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StringUtils.isNotEmpty(topTransaction.getHash()),TopTransaction::getHash,topTransaction.getHash())
-            .eq(StringUtils.isNotEmpty(topTransaction.getStatus()),TopTransaction::getStatus,topTransaction.getStatus())
-            .orderByDesc(TopTransaction::getCreateTime);
-        return this.getBaseMapper().selectPage(page,wrapper);
+        wrapper.eq(StringUtils.isNotEmpty(topTransaction.getHash()), TopTransaction::getHash, topTransaction.getHash())
+                .eq(StringUtils.isNotEmpty(topTransaction.getStatus()), TopTransaction::getStatus, topTransaction.getStatus())
+                .eq((topTransaction.getType() != null), TopTransaction::getType, topTransaction.getType())
+                .orderByDesc(TopTransaction::getCreateTime);
+        return this.getBaseMapper().selectPage(page, wrapper);
     }
 }
