@@ -3,16 +3,12 @@ package com.ruoyi.web.service;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.cron.timingwheel.SystemTimer;
 import cn.hutool.cron.timingwheel.TimerTask;
-import cn.hutool.crypto.Mode;
-import cn.hutool.crypto.Padding;
-import cn.hutool.crypto.symmetric.AES;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.protobuf.ByteString;
-import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.*;
@@ -592,7 +588,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     @Transactional
-    public AjaxResult withdraw(WithdrawBody withdrawBody) throws Exception {
+    public void withdraw(WithdrawBody withdrawBody) throws Exception {
         TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
         String wallet = withdrawBody.getWallet();
@@ -699,10 +695,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topTransaction.setType(TransactionType.Withdraw);
         topTransactionService.save(topTransaction);
 //        systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
-        return AjaxResult.success("success");
     }
     @Transactional
-    public AjaxResult withdrawTron(WithdrawBody withdrawBody) throws Exception {
+    public void withdrawTron(WithdrawBody withdrawBody) throws Exception {
         TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
         String wallet = withdrawBody.getWallet();
@@ -830,7 +825,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topTransaction.setType(TransactionType.Tron_Withdraw);
         topTransactionService.save(topTransaction);
 //        systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
-        return AjaxResult.success("success");
     }
 
     /**
@@ -841,7 +835,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
      * @throws Exception
      */
     @Transactional
-    public AjaxResult withdrawBTC(WithdrawBody withdrawBody) throws Exception {
+    public void withdrawBTC(WithdrawBody withdrawBody) throws Exception {
         TopTransaction topTransaction = new TopTransaction();
         //查询用户的账户信息
         String wallet = withdrawBody.getWallet();
@@ -918,7 +912,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 //        topTransaction.setBlockConfirm(topChain.getBlockConfirm());
         topTransaction.setType(TransactionType.Withdraw_BTC);
         topTransactionService.save(topTransaction);
-        return AjaxResult.success("success");
     }
 
     public String transferToken(Web3j web3j, String contractAddress, String privateKey, String to, BigInteger amount) throws Exception {

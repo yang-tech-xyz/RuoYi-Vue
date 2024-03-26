@@ -105,12 +105,15 @@ public class TopTokenController {
         String symbol = withdrawBody.getSymbol();
         Long chainId = withdrawBody.getChainId();
         if(chainId==-1){
-            return topTokenService.withdrawTron(withdrawBody);
+            topTokenService.withdrawTron(withdrawBody);
+            return AjaxResult.success();
         }
         if (symbol.equalsIgnoreCase(CommonSymbols.BTC_SYMBOL)) {
-            return topTokenService.withdrawBTC(withdrawBody);
+            topTokenService.withdrawBTC(withdrawBody);
+            return AjaxResult.success();
         } else {
-            return topTokenService.withdraw(withdrawBody);
+            topTokenService.withdraw(withdrawBody);
+            return AjaxResult.success();
         }
     }
 
