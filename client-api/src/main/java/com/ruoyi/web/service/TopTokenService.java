@@ -131,9 +131,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     @Transactional
-    public AjaxResult recharge(RechargeBody rechargeBody) throws Exception {
+    public void recharge(RechargeBody rechargeBody) throws Exception {
         log.info("recharge in,hash is:{}",rechargeBody.getHash());
-        AjaxResult ajax = AjaxResult.success();
         String hash = rechargeBody.getHash();
         try {
             TopTransaction topTransaction = new TopTransaction();
@@ -141,7 +140,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setChainId(chainId);
             Optional<TopChain> topChainOpt = topChainService.getOptByChainId(chainId);
             if (!topChainOpt.isPresent()) {
-                return AjaxResult.error("chain not exist!");
+                throw new ServiceException("chain not exist!");
             }
             TopChain topChain = topChainOpt.get();
             String rpcEndpoint = topChain.getRpcEndpoint();
@@ -152,7 +151,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             //通过hash获取交易
             Optional<Transaction> transactionOptional = web3j.ethGetTransactionByHash(hash).send().getTransaction();
             if (!transactionOptional.isPresent()) {
-                return AjaxResult.error("get transaction error!");
+                throw new ServiceException("get transaction error!");
             }
             Transaction transaction = transactionOptional.get();
             String from = transaction.getFrom();
@@ -166,7 +165,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             // 获取币种信息
             Optional<TopToken> topTokenOpt = this.queryTokenBySymbol(rechargeBody.getTokenSymbol());
             if (!topTokenOpt.isPresent()) {
-                return AjaxResult.error("token not exist");
+                throw new ServiceException("token not exist");
             }
             TopToken topToken = topTokenOpt.get();
             Integer tokenId = topToken.getId();
@@ -174,14 +173,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setSymbol(topToken.getSymbol());
             Optional<TopTokenChainVO> topTokenChainVOOptional = this.queryTokenByTokenIdAndChainId(tokenId, topChain.getChainId());
             if (!topTokenChainVOOptional.isPresent()) {
-                return AjaxResult.error("tokenChain not exist");
+                throw new ServiceException("tokenChain not exist");
             }
             String erc20AddressConfig = topTokenChainVOOptional.get().getErc20Address();
             String erc20Address = transaction.getTo();
             // 如果该币种不是对应的这个erc20的地址.则该笔充值为伪造的充值.
             if (!erc20AddressConfig.equalsIgnoreCase(erc20Address)) {
                 log.error("erc20 address error! erc20AddressConfig is:{},erc20Address is:{}", erc20AddressConfig, erc20Address);
-                return AjaxResult.error("recharge chain erc20 address not match error");
+                throw new ServiceException("recharge chain erc20 address not match error");
             }
 //            String jsonString = JSONObject.toJSONString(transaction);
             log.info("transaction is:{}", transaction);
@@ -197,7 +196,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.info("address is transfer address???:{}", address.getValue());
             // TODO 检查项目方的地址
             if (!receiveAddress.equalsIgnoreCase(address.getValue())) {
-                return AjaxResult.error("the address is not the project wallet address");
+                throw new ServiceException("the address is not the project wallet address");
             }
             Uint256 amount = (Uint256) refMethod.invoke(null, value, 0, Uint256.class);
             BigInteger decimalOfContract = getDecimalOfContract(web3j, erc20AddressConfig, address.getValue());
@@ -223,18 +222,17 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.error("system error", e);
             throw new ServiceException("recharge error!");
         }
-        return ajax;
     }
     @Transactional
-    public AjaxResult rechargeTRX(RechargeBody rechargeBody) throws Exception {
+    public void rechargeTRX(RechargeBody rechargeBody) throws Exception {
+        log.info("recharge in,hash is:{}",rechargeBody.getHash());
         try {
-
             TopTransaction topTransaction = new TopTransaction();
             Long chainId = rechargeBody.getChainId();
             topTransaction.setChainId(chainId);
             Optional<TopChain> topChainOpt = topChainService.getOptByChainId(chainId);
             if (!topChainOpt.isPresent()) {
-                return AjaxResult.error("chain not exist!");
+                throw new ServiceException("chain not exist!");
             }
             // chainId is -1;
             TopChain topChain = topChainOpt.get();
@@ -279,7 +277,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             // 获取币种信息
             Optional<TopToken> topTokenOpt = this.queryTokenBySymbol(rechargeBody.getTokenSymbol());
             if (!topTokenOpt.isPresent()) {
-                return AjaxResult.error("token not exist");
+                throw new ServiceException("token not exist");
             }
             TopToken topToken = topTokenOpt.get();
             Integer tokenId = topToken.getId();
@@ -287,18 +285,18 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setSymbol(topToken.getSymbol());
             Optional<TopTokenChainVO> topTokenChainVOOptional = this.queryTokenByTokenIdAndChainId(tokenId, topChain.getChainId());
             if (!topTokenChainVOOptional.isPresent()) {
-                return AjaxResult.error("tokenChain not exist");
+                throw new ServiceException("tokenChain not exist");
             }
             String erc20AddressConfig = topTokenChainVOOptional.get().getErc20Address();
 
             // 如果该币种不是对应的这个erc20的地址.则该笔充值为伪造的充值.
             if (!("0x"+erc20AddressConfig).equalsIgnoreCase(erc20Address)) {
                 log.error("erc20 address error! erc20AddressConfig is:{},erc20Address is:{}", erc20AddressConfig, erc20Address);
-                return AjaxResult.error("recharge chain erc20 address not match error");
+                throw new ServiceException("recharge chain erc20 address not match error");
             }
             // TODO 检查项目方的地址
             if (!usdtReceivedWallet.equalsIgnoreCase(to)) {
-                return AjaxResult.error("the address is not the project wallet address");
+                throw new ServiceException("the address is not the project wallet address");
             }
             BigInteger decimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, erc20AddressConfig, from);
             // TODO 修改此处的小数位为合约的小数位.
@@ -318,12 +316,11 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setBlockConfirm(topChain.getBlockConfirm());
             topTransaction.setType(TransactionType.TronRecharge);
             topTransactionService.save(topTransaction);
-
+            log.info("recharge end,hash is:{}",rechargeBody.getHash());
         } catch (Exception e) {
             log.error("system error", e);
-            throw e;
+            throw new ServiceException("tron recharge error!");
         }
-        return AjaxResult.success();
     }
 
     private BigInteger getDecimalOfContract(Web3j web3j, String contractAddress, String from) throws IOException {
