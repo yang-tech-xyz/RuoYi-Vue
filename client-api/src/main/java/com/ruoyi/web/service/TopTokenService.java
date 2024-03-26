@@ -132,6 +132,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Transactional
     public AjaxResult recharge(RechargeBody rechargeBody) throws Exception {
+        log.info("recharge in,hash is:{}",rechargeBody.getHash());
         AjaxResult ajax = AjaxResult.success();
         String hash = rechargeBody.getHash();
         try {
@@ -217,9 +218,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setBlockConfirm(topChain.getBlockConfirm());
             topTransaction.setType(TransactionType.Recharge);
             topTransactionService.save(topTransaction);
+            log.info("recharge end,hash is:{}",rechargeBody.getHash());
         } catch (Exception e) {
             log.error("system error", e);
-            throw e;
+            throw new ServiceException("recharge error!");
         }
         return ajax;
     }
