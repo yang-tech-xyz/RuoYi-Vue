@@ -165,6 +165,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     public void tronWithdrawAuditPass(TopTransaction topTransaction) {
+        ApiWrapper wrapper = null;
         try {
             String contractAddress = topTransaction.getErc20Address();
 //        String rpcEndpoint = topTransaction.getRpcEndpoint();
@@ -178,7 +179,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             String tronCurve = topPowerConfig.getTronCurve();
             KeyPair keyPair = new KeyPair(tronCurve);
             String from = keyPair.toHexAddress();
-            ApiWrapper wrapper = null;
+
             if ("dev".equalsIgnoreCase(env)) {
                 // 随便给一个私钥即可
                 wrapper = ApiWrapper.ofNile(tronCurve);
@@ -208,6 +209,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         } catch (Exception e) {
             log.error("withdraw tron usdt failed", e);
             throw new ServiceException("withdraw tron usdt failed");
+        }finally {
+            if(wrapper!=null){
+                wrapper.close();
+            }
         }
     }
 
@@ -304,6 +309,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Transactional(rollbackFor = Exception.class)
     public boolean confirmTronWithdrawToken(String hash) {
+        ApiWrapper wrapper = null;
         try {
             Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(hash);
             if (!topTransactionOptional.isPresent()) {
@@ -317,7 +323,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             String rpcEndpoint = topTransaction.getRpcEndpoint();
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
 
-            ApiWrapper wrapper = null;
+
             if ("dev".equalsIgnoreCase(env)) {
                 wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
             } else {
@@ -342,6 +348,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.error("confirmRechargeToken error:", e);
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(hash), 10000));
             throw new ServiceException(e);
+        }finally {
+            if(wrapper!=null){
+                wrapper.close();
+            }
         }
     }
 
