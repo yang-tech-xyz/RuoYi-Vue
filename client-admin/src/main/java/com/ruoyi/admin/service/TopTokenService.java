@@ -151,7 +151,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
         // 检查提现账户是否有足够的金额
         boolean amountCheckResult = topTokenService.checkTransferValueEnough(curve, web3j, contractAddress, tokenAmount);
-        if(!amountCheckResult){
+        if (!amountCheckResult) {
             throw new ServiceException("amountCheckResult failed");
         }
 
@@ -205,8 +205,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransactionService.updateById(topTransactionEntity);
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(transactionHash), 10000));
 
-        }catch (Exception e){
-            log.error("withdraw tron usdt failed",e);
+        } catch (Exception e) {
+            log.error("withdraw tron usdt failed", e);
             throw new ServiceException("withdraw tron usdt failed");
         }
     }
@@ -244,23 +244,23 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
 
-    private boolean validateTronTransactionReceipt(String hash, ApiWrapper wrap,Long chainId) throws Exception {
+    private boolean validateTronTransactionReceipt(String hash, ApiWrapper wrap, Long chainId) throws Exception {
         Response.TransactionInfo transactionReceiptOptional = wrap.getTransactionInfoById(hash);
         log.info("transactionReceiptOptional is:{}", transactionReceiptOptional);
         // 获取用户信息
         Response.TransactionInfo.code result = transactionReceiptOptional.getResult();
         // FAILED is failed
-        if("FAILED".equalsIgnoreCase(result.toString())){
+        if ("FAILED".equalsIgnoreCase(result.toString())) {
             topTransactionService.updateFailed(hash);
         }
-        if(!"SUCESS".equalsIgnoreCase(result.toString())){
+        if (!"SUCESS".equalsIgnoreCase(result.toString())) {
             return false;
         }
         long transactionBlockNumber = transactionReceiptOptional.getBlockNumber();
         long currentBlockNumber = wrap.getNowBlock().getBlockHeader().getRawData().getNumber();
         TopChain topChain = topChainService.getOptByChainId(chainId).get();
         Long blockConfirm = topChain.getBlockConfirm();
-        if(currentBlockNumber-transactionBlockNumber<blockConfirm){
+        if (currentBlockNumber - transactionBlockNumber < blockConfirm) {
             return false;
         }
         return true;
@@ -318,14 +318,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             Web3j web3j = Web3j.build(new HttpService(rpcEndpoint));
 
             ApiWrapper wrapper = null;
-            if("dev".equalsIgnoreCase(env)){
+            if ("dev".equalsIgnoreCase(env)) {
                 wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
-            }else{
-                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351","13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+            } else {
+                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
             }
 
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
-            if (validateTronTransactionReceipt(hash, wrapper,topTransaction.getChainId())) {
+            if (validateTronTransactionReceipt(hash, wrapper, topTransaction.getChainId())) {
                 TopTransaction topTransactionEntity = new TopTransaction();
                 topTransactionEntity.setId(topTransaction.getId());
                 topTransactionEntity.setIsConfirm(CommonStatus.IS_CONFIRM);
@@ -395,7 +395,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException("transfer error");
         }
     }
-    public String transferTronToken(ApiWrapper wrapper, String contractAddress, KeyPair keyPair, String to, Long amount,Integer power) throws ServiceException {
+
+    public String transferTronToken(ApiWrapper wrapper, String contractAddress, KeyPair keyPair, String to, Long amount, Integer power) throws ServiceException {
         try {
             Contract contract = wrapper.getContract(contractAddress);
             Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
@@ -421,7 +422,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topAccountService.refund(topTransaction.getTransNo());
     }
 
-    public boolean checkTransferValueEnough(String privateKey, Web3j web3j, String contractAddress,BigInteger transferAmount) {
+    public boolean checkTransferValueEnough(String privateKey, Web3j web3j, String contractAddress, BigInteger transferAmount) {
         try {
             BigInteger bigInteger = new BigInteger(privateKey, 16);
             ECKeyPair ecKeyPair = ECKeyPair.create(bigInteger);
@@ -447,20 +448,26 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             List<Type> balanceOf = FunctionReturnDecoder.decode(
                     response.getValue(), function.getOutputParameters());
             BigInteger balance = (BigInteger) balanceOf.getFirst().getValue();
-            return balance.compareTo(transferAmount)>0;
+            return balance.compareTo(transferAmount) > 0;
         } catch (Exception e) {
             log.error("check balance of amount error!", e);
             throw new ServiceException(e.getMessage());
         }
     }
-    public boolean checkTronTransferValueEnough(ApiWrapper wrapper, String contractAddress,BigInteger withdrawAmount,String from) {
+
+    public boolean checkTronTransferValueEnough(ApiWrapper wrapper, String contractAddress, BigInteger withdrawAmount, String from) {
         try {
             BigInteger tronBalanceOfContract = topTRONService.getTronBalanceOfContract(wrapper, contractAddress, from);
-            return tronBalanceOfContract.compareTo(withdrawAmount)>0;
+            return tronBalanceOfContract.compareTo(withdrawAmount) > 0;
         } catch (Exception e) {
             log.error("check balance of amount error!", e);
             throw new ServiceException(e.getMessage());
         }
+    }
+
+    public static void main(String[] args) {
+        BigInteger bigInteger = new BigInteger("0x58eef556f93ba37d103e48867fd69e4b477f19e6df2d485d89aee0e0d3c3cbec", 16);
+        System.out.println(bigInteger);
     }
 
 }

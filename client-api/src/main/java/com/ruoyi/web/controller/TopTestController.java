@@ -51,6 +51,7 @@ public class TopTestController {
         // Nile test net, using a node from Nile official website
         ApiWrapper wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
         topTRONService.queryTransactionInfoByHash(wrapper,hash);
+        wrapper.close();
         return AjaxResult.success();
     }
 
