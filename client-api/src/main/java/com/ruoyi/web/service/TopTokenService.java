@@ -54,7 +54,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @Service
@@ -149,9 +148,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setHash(hash);
             //通过hash获取交易
             Optional<Transaction> transactionOptional = web3j.ethGetTransactionByHash(hash).send().getTransaction();
-            if(1==1){
-                throw new TimeoutException();
-            }
             if (!transactionOptional.isPresent()) {
                 throw new ServiceException("get transaction error!");
             }
