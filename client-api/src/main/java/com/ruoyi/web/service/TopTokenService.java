@@ -130,7 +130,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Transactional
     public void recharge(RechargeBody rechargeBody) throws Exception {
-        log.info("recharge in,hash is:{}",rechargeBody.getHash());
+        log.info("recharge in,rechargeBody is:{}",rechargeBody);
         String hash = rechargeBody.getHash();
         try {
             TopTransaction topTransaction = new TopTransaction();
@@ -1227,24 +1227,34 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     public static void main(String[] args) {
-        {
-            ApiWrapper wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
-            try {
-                Chain.Block nowBlock = wrapper.getNowBlock();
-                System.out.println(nowBlock.getBlockHeader().getRawData().getNumber());
-            } catch (IllegalException e) {
-                throw new RuntimeException(e);
+        try {
+            Web3j web3j = Web3j.build(new HttpService("https://bsc-dataseed3.ninicoin.io"));
+            Optional<Transaction> transactionOptional = web3j.ethGetTransactionByHash("0xcf83c42425062c691ffed7280045b916470b9ea96a5c1aed5fd42eafec50f5a9").send().getTransaction();
+            if (!transactionOptional.isPresent()) {
+                throw new ServiceException("get transaction error!");
             }
+            System.out.println(transactionOptional.isPresent());
+        }catch (Exception e){
+            System.out.println(e);
         }
-        {
-            ApiWrapper wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
-            try {
-                Chain.Block nowBlock = wrapper.getNowBlock();
-                System.out.println(nowBlock.getBlockHeader().getRawData().getNumber());
-                wrapper.close();
-            } catch (IllegalException e) {
-                throw new RuntimeException(e);
-            }
-        }
+//        {
+//            ApiWrapper wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+//            try {
+//                Chain.Block nowBlock = wrapper.getNowBlock();
+//                System.out.println(nowBlock.getBlockHeader().getRawData().getNumber());
+//            } catch (IllegalException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        {
+//            ApiWrapper wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+//            try {
+//                Chain.Block nowBlock = wrapper.getNowBlock();
+//                System.out.println(nowBlock.getBlockHeader().getRawData().getNumber());
+//                wrapper.close();
+//            } catch (IllegalException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
     }
 }
