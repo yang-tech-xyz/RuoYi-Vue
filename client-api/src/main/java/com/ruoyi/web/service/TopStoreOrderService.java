@@ -65,6 +65,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
      */
     @Transactional(rollbackFor = Exception.class)
     public Boolean order(String walletAddress, StoreOrderDTO dto) {
+        if (dto.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ServiceException("金额错误", 500);
+        }
         TopStore store = storeMapper.selectById(dto.getStoreId());
         if (store.getStatus() != 1) {
             throw new ServiceException("状态错误", 500);
