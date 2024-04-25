@@ -13,6 +13,7 @@ import com.ruoyi.web.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -60,7 +61,7 @@ public class TopTokenController {
      */
     @Operation(summary = "充值到账,兼容波场USDT")
     @PostMapping("/recharge")
-    public AjaxResult recharge(@RequestBody RechargeBody rechargeBody) throws Exception {
+    public AjaxResult recharge(@Valid @RequestBody RechargeBody rechargeBody) throws Exception {
         Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(rechargeBody.getHash());
         if (topTransactionOptional.isPresent()) {
             return AjaxResult.error("transaction has exist!");
@@ -92,7 +93,7 @@ public class TopTokenController {
      */
     @Operation(summary = "提币")
     @PostMapping("/withdraw")
-    public AjaxResult claim(@RequestBody WithdrawBody withdrawBody) throws Exception {
+    public AjaxResult claim(@Valid @RequestBody WithdrawBody withdrawBody) throws Exception {
         try {
             boolean validateResult = UnsignMessageUtils.validate(withdrawBody.getSignMsg(), withdrawBody.getContent(), withdrawBody.getWallet());
             if (!validateResult) {
@@ -119,7 +120,7 @@ public class TopTokenController {
 
     @Operation(summary = "内部转账")
     @PostMapping("internalTransfer")
-    public AjaxResult internalTransfer(@RequestBody InternalTransferBody internalTransferBody) {
+    public AjaxResult internalTransfer(@Valid @RequestBody InternalTransferBody internalTransferBody) {
         try {
             boolean validateResult = UnsignMessageUtils.validate(internalTransferBody.getSignMsg(), internalTransferBody.getContent(), internalTransferBody.getWallet());
         } catch (SignatureException e) {
@@ -132,7 +133,7 @@ public class TopTokenController {
 
     @Operation(summary = "BTC市价兑换USDT")
     @PostMapping("exchangeBTC2USDT")
-    public AjaxResult exchangeBTC2USDT(@RequestBody ExchangeBody exchangeBody) {
+    public AjaxResult exchangeBTC2USDT(@Valid @RequestBody ExchangeBody exchangeBody) {
         try {
             boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(), exchangeBody.getContent(), exchangeBody.getWallet());
         } catch (SignatureException e) {
@@ -145,7 +146,7 @@ public class TopTokenController {
 
     @Operation(summary = "USDT兑换BTCF")
     @PostMapping("exchangeUsdt2BTCF")
-    public AjaxResult exchangeUsdt2BTCF(@RequestBody ExchangeBody exchangeBody){
+    public AjaxResult exchangeUsdt2BTCF(@Valid @RequestBody ExchangeBody exchangeBody){
         try {
             boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(), exchangeBody.getContent(), exchangeBody.getWallet());
         } catch (SignatureException e) {

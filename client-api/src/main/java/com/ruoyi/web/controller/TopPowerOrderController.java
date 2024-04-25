@@ -12,6 +12,7 @@ import com.ruoyi.web.vo.PowerOrderInfoVO;
 import com.ruoyi.web.vo.TopPowerOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
@@ -44,7 +45,7 @@ public class TopPowerOrderController
 
     @Operation(summary = "购买算力,需要用户签名")
     @PostMapping("buyOrder")
-    public AjaxResult<String> buyOrder(@RequestBody BuyPowerBody buyPowerBody){
+    public AjaxResult<String> buyOrder(@Valid @RequestBody BuyPowerBody buyPowerBody){
         try {
             boolean validateResult = UnsignMessageUtils.validate(buyPowerBody.getSignMsg(),buyPowerBody.getContent(),buyPowerBody.getWallet());
             if(!validateResult){
