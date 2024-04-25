@@ -54,9 +54,9 @@ public class TopPowerOrderController
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
-//        if(buyPowerBody.getNumber()<=0){
-//            return AjaxResult.error("the mount is not position");
-//        }
+        if(buyPowerBody.getNumber()<=0){
+            return AjaxResult.error("the mount is not position");
+        }
         topPowerOrderService.buyOrder(buyPowerBody);
         return AjaxResult.success("success");
     }
