@@ -9,7 +9,6 @@ import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.BuyPowerBody;
 import com.ruoyi.web.vo.PowerOrderInfoVO;
-import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.TopPowerOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,7 +44,7 @@ public class TopPowerOrderController
 
     @Operation(summary = "购买算力,需要用户签名")
     @PostMapping("buyOrder")
-    public AjaxResult buyOrder(@RequestBody BuyPowerBody buyPowerBody){
+    public AjaxResult<String> buyOrder(@RequestBody BuyPowerBody buyPowerBody){
         try {
             boolean validateResult = UnsignMessageUtils.validate(buyPowerBody.getSignMsg(),buyPowerBody.getContent(),buyPowerBody.getWallet());
             if(!validateResult){
@@ -54,6 +53,9 @@ public class TopPowerOrderController
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
+//        if(buyPowerBody.getNumber()<=0){
+//            return AjaxResult.error("the mount is not position");
+//        }
         topPowerOrderService.buyOrder(buyPowerBody);
         return AjaxResult.success("success");
     }

@@ -23,7 +23,7 @@ public class RechargeBody
     /**
      * 链id,TRON定义为0号链
      */
-    @Schema(description="链id", example= "-1")
+    @Schema(description="链id", example= "56")
     @NotNull
     private Long chainId;
 

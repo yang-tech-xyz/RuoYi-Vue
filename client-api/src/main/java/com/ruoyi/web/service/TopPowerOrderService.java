@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -48,17 +49,17 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
     public void buyOrder(BuyPowerBody buyPowerBody) {
         TopPowerOrder topPowerOrder = new TopPowerOrder();
         List<TopPowerConfig> powerConfigs = topPowerConfigService.list();
-        if (powerConfigs == null || powerConfigs.size() == 0) {
+        if (powerConfigs == null || powerConfigs.isEmpty()) {
             throw new ServiceException("powerConfig is error!");
         }
-        TopPowerConfig topPowerConfig = powerConfigs.get(0);
+        TopPowerConfig topPowerConfig = powerConfigs.getFirst();
         //通过购买数量,计算需要的金额.
         BigDecimal price = topPowerConfig.getPrice();
-        BigDecimal buyNumbers = buyPowerBody.getNumber();
+        Integer buyNumbers = buyPowerBody.getNumber();
         topPowerOrder.setSymbol(buyPowerBody.getSymbol());
-        topPowerOrder.setNumber(buyNumbers.intValue());
+        topPowerOrder.setNumber(buyNumbers);
         // 购买矿机需要的U的数量
-        BigDecimal buyPowerNeedPayUsdt = buyNumbers.multiply(price);
+        BigDecimal buyPowerNeedPayUsdt = BigDecimal.valueOf(buyNumbers).multiply(price);
         topPowerOrder.setAmount(buyPowerNeedPayUsdt);
         topPowerOrder.setOutputSymbol(topPowerConfig.getOutputSymbol());
         topPowerOrder.setPeriod(topPowerConfig.getPeriod());
@@ -72,10 +73,10 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         // 查询symbol的价格.
         BigDecimal tokenPrice = topTokenService.getPrice(symbol);
         // 计算用户需要的token的数量
-        BigDecimal payTokenAmount = buyPowerNeedPayUsdt.divide(tokenPrice, 10, 2);
+        BigDecimal payTokenAmount = buyPowerNeedPayUsdt.divide(tokenPrice, 10, RoundingMode.UP);
         String wallet = buyPowerBody.getWallet().toLowerCase();
         TopUser topUserEntity = topUserService.getByWallet(wallet);
-        TopAccount account = topAccountService.getAccount(topUserEntity.getId().longValue(), symbol);
+        TopAccount account = topAccountService.getAccount(topUserEntity.getId(), symbol);
         if (account.getAvailableBalance().compareTo(payTokenAmount) < 0) {
             log.warn("account have no enough money,account info:{}", account);
         }

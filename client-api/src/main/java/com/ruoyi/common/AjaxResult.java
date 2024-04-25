@@ -166,7 +166,7 @@ public class AjaxResult<T> implements Serializable {
      * @param data 数据对象
      * @return 错误消息
      */
-    public static <T> AjaxResult error(String msg, T data) {
+    public static <T> AjaxResult<T> error(String msg, T data) {
         return new AjaxResult(HttpStatus.ERROR, msg, data);
     }
 
