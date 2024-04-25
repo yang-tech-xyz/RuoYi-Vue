@@ -48,7 +48,7 @@ public class TopStoreOrderController {
 
     @Operation(summary = "订单复投")
     @PostMapping("/cpOrder")
-    public AjaxResult cpOrder(@RequestBody StoreCpOrderDTO dto) {
+    public AjaxResult cpOrder(@Valid @RequestBody StoreCpOrderDTO dto) {
         try {
             boolean validateResult = UnsignMessageUtils.validate(dto.getSignMsg(), dto.getContent(), dto.getWallet());
             if (!validateResult) {
