@@ -177,9 +177,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 throw new ServiceException("power config is not exist");
             }
             String tronCurve = topPowerConfig.getTronCurve();
+            log.info("tronCurve is:{}",tronCurve);
             KeyPair keyPair = new KeyPair(tronCurve);
             String from = keyPair.toHexAddress();
-
+            log.info("env is:{}",env);
             if ("dev".equalsIgnoreCase(env)) {
                 // 随便给一个私钥即可
                 wrapper = ApiWrapper.ofNile(tronCurve);
@@ -408,6 +409,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     public String transferTronToken(ApiWrapper wrapper, String contractAddress, KeyPair keyPair, String to, Long amount, Integer power) throws ServiceException {
         try {
+            log.info("contractAddress is:{}",contractAddress);
+            log.info("to is:{}",to);
+            log.info("amount is:{}",amount);
+            log.info("power is:{}",power);
             Contract contract = wrapper.getContract(contractAddress);
             Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
             String hash = token.transfer(to, amount, power, "memo", 100000000L);
@@ -476,8 +481,26 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     public static void main(String[] args) {
-        BigInteger bigInteger = new BigInteger("0x58eef556f93ba37d103e48867fd69e4b477f19e6df2d485d89aee0e0d3c3cbec", 16);
-        System.out.println(bigInteger);
+//        BigInteger bigInteger = new BigInteger("0x58eef556f93ba37d103e48867fd69e4b477f19e6df2d485d89aee0e0d3c3cbec", 16);
+//        System.out.println(bigInteger);
+
+        String tronCurve = "84f481672cea847d18d4bce4c159efa2da374403bc2033ecf00cda7831173e98";
+        ApiWrapper wrapper = ApiWrapper.ofMainnet(tronCurve, "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+        KeyPair keyPair = new KeyPair(tronCurve);
+        String from = keyPair.toHexAddress();
+
+        try {
+            Contract contract = wrapper.getContract("41a614f803b6fd780986a42c78ec9c7f77e6ded13c");
+            Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
+            String hash = token.transfer("TUAaiz5WQCRwwQiHV1G6ZheAXETtBMcZQF", 1, 6, "memo", 100000000L);
+            System.out.println("hash is:"+hash);
+        } catch (Exception e) {
+            log.error("transfer error!", e);
+            throw new ServiceException("transfer error");
+        }
+
+
+
     }
 
 }
