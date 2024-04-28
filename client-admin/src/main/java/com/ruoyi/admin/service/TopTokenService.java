@@ -1,5 +1,6 @@
 package com.ruoyi.admin.service;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.cron.timingwheel.SystemTimer;
 import cn.hutool.cron.timingwheel.TimerTask;
 import cn.hutool.crypto.Mode;
@@ -54,6 +55,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -413,10 +415,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.info("to is:{}",to);
             log.info("amount is:{}",amount);
             log.info("power is:{}",power);
+            long random = RandomUtil.randomLong(System.currentTimeMillis());
             Contract contract = wrapper.getContract(contractAddress);
             Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
-            String hash = token.transfer(to, amount, power, "memo", 100000000L);
-            return hash;
+            return token.transfer(to, amount, power, Long.toString(random), 100000000L);
         } catch (Exception e) {
             log.error("transfer error!", e);
             throw new ServiceException("transfer error");
@@ -492,7 +494,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         try {
             Contract contract = wrapper.getContract("41a614f803b6fd780986a42c78ec9c7f77e6ded13c");
             Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
-            String hash = token.transfer("TUAaiz5WQCRwwQiHV1G6ZheAXETtBMcZQF", 1, 6, "memo", 100000000L);
+            long random = RandomUtil.randomLong(System.currentTimeMillis());
+            String hash = token.transfer("TUAaiz5WQCRwwQiHV1G6ZheAXETtBMcZQF", 1, 6, Long.toString(random), 100000000L);
             System.out.println("hash is:"+hash);
         } catch (Exception e) {
             log.error("transfer error!", e);
