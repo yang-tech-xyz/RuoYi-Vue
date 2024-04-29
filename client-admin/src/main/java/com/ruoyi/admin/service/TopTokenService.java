@@ -178,15 +178,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 throw new ServiceException("power config is not exist");
             }
             String tronCurve = topPowerConfig.getTronCurve();
-            log.info("tronCurve is:{}", tronCurve);
             KeyPair keyPair = new KeyPair(tronCurve);
             String from = keyPair.toHexAddress();
-            log.info("env is:{}", env);
             if ("dev".equalsIgnoreCase(env)) {
                 // 随便给一个私钥即可
                 wrapper = ApiWrapper.ofNile(tronCurve);
             } else {
-                wrapper = ApiWrapper.ofMainnet(tronCurve, "0067cd94-efec-4389-8955-1157d97270f7");
+                wrapper = ApiWrapper.ofMainnet(tronCurve, "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
             }
 
 
@@ -330,7 +328,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             if ("dev".equalsIgnoreCase(env)) {
                 wrapper = ApiWrapper.ofNile("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351");
             } else {
-                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "0067cd94-efec-4389-8955-1157d97270f7");
+                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
             }
 
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
@@ -483,79 +481,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     public static void main(String[] args) {
-//        BigInteger bigInteger = new BigInteger("0x58eef556f93ba37d103e48867fd69e4b477f19e6df2d485d89aee0e0d3c3cbec", 16);
-//        System.out.println(bigInteger);
-        {
-            String tronCurve = "84f481672cea847d18d4bce4c159efa2da374403bc2033ecf00cda7831173e98";
-            ApiWrapper wrapper = ApiWrapper.ofMainnet(tronCurve, "0067cd94-efec-4389-8955-1157d97270f7");
-            KeyPair keyPair = new KeyPair(tronCurve);
-            String from = keyPair.toHexAddress();
-
-            try {
-                Contract contract = wrapper.getContract("41a614f803b6fd780986a42c78ec9c7f77e6ded13c");
-                Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
-                long random = RandomUtil.randomLong(System.currentTimeMillis());
-                String hash = token.transfer("TUAaiz5WQCRwwQiHV1G6ZheAXETtBMcZQF", 1, 6, Long.toString(random), 100000000L);
-                System.out.println("hash is:" + hash);
-            } catch (Exception e) {
-                log.error("transfer error!", e);
-                throw new ServiceException("transfer error");
-            } finally {
-                if (wrapper != null) {
-                    wrapper.close();
-                }
-            }
-
-        }
-
-//        {
-//            ApiWrapper wrapper = null;
-//            try {
-//
-//
-//                wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "0067cd94-efec-4389-8955-1157d97270f7");
-//
-//                //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
-//                String hash = "75866f9f53d21cf44465169508d4c7d159aec1b5243f94877821a675ca30596e";
-//
-//                Response.TransactionInfo transactionReceiptOptional = wrapper.getTransactionInfoById(hash);
-//                log.info("transactionReceiptOptional is:{}", transactionReceiptOptional);
-//                // 获取用户信息
-//                Response.TransactionInfo.code result = transactionReceiptOptional.getResult();
-//                // FAILED is failed
-//                long transactionBlockNumber = transactionReceiptOptional.getBlockNumber();
-//                long currentBlockNumber = wrapper.getNowBlock().getBlockHeader().getRawData().getNumber();
-//
-//            } catch (Exception e) {
-//                log.error("confirmRechargeToken error:", e);
-//                throw new ServiceException(e);
-//            }finally {
-//                if(wrapper!=null){
-//                    wrapper.close();
-//                }
-//            }
-//        }
-//
-//
-//        {
-//            String tronCurve = "84f481672cea847d18d4bce4c159efa2da374403bc2033ecf00cda7831173e98";
-//            ApiWrapper wrapper = ApiWrapper.ofMainnet(tronCurve, "0067cd94-efec-4389-8955-1157d97270f7");
-//            KeyPair keyPair = new KeyPair(tronCurve);
-//            String from = keyPair.toHexAddress();
-//
-//            try {
-//                Contract contract = wrapper.getContract("41a614f803b6fd780986a42c78ec9c7f77e6ded13c");
-//                Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
-//                long random = RandomUtil.randomLong(System.currentTimeMillis());
-//                String hash = token.transfer("TUAaiz5WQCRwwQiHV1G6ZheAXETtBMcZQF", 1, 6, Long.toString(random), 100000000L);
-//                System.out.println("hash is:"+hash);
-//            } catch (Exception e) {
-//                log.error("transfer error!", e);
-//                throw new ServiceException("transfer error");
-//            }finally {
-//                wrapper.close();
-//            }
-//        }
+        BigInteger bigInteger = new BigInteger("0x58eef556f93ba37d103e48867fd69e4b477f19e6df2d485d89aee0e0d3c3cbec", 16);
+        System.out.println(bigInteger);
 
 
     }
