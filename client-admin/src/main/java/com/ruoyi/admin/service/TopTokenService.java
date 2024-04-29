@@ -99,11 +99,11 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         //查询未确认的hash
         List<TopTransaction> topTronWithdrawTransactionList = topTransactionService.queryTronWithdrawUnConfirm();
         topTronWithdrawTransactionList.stream().filter(t -> StringUtils.isNotBlank(t.getHash())).forEach(t -> {
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(t.getHash()), 10000));
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(t.getHash()), 60000));
         });
         List<TopTransaction> topWithdrawTransactionList = topTransactionService.queryWithdrawUnConfirm();
         topWithdrawTransactionList.stream().filter(t -> StringUtils.isNotBlank(t.getHash())).forEach(t -> {
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 10000));
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 60000));
         });
     }
 
@@ -196,11 +196,12 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
 
             // 检查提现账户是否有足够的金额
-            boolean amountCheckResult = topTokenService.checkTronTransferValueEnough(wrapper, contractAddress, withdrawAmount, from);
-            if (!amountCheckResult) {
-                throw new ServiceException("amountCheckResult failed");
-            }
-            BigInteger tronDecimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, contractAddress, from);
+//            boolean amountCheckResult = topTokenService.checkTronTransferValueEnough(wrapper, contractAddress, withdrawAmount, from);
+//            if (!amountCheckResult) {
+//                throw new ServiceException("amountCheckResult failed");
+//            }
+//            BigInteger tronDecimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, contractAddress, from);
+            BigInteger tronDecimalOfContract = new BigInteger("6");
             String transactionHash = transferTronToken(wrapper, contractAddress, keyPair, to, tokenAmount.longValue(), tronDecimalOfContract.intValue());
             TopTransaction topTransactionEntity = new TopTransaction();
             topTransactionEntity.setId(topTransaction.getId());
