@@ -418,7 +418,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             long random = RandomUtil.randomLong(System.currentTimeMillis());
             Contract contract = wrapper.getContract(contractAddress);
             Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
-            return token.transfer(to, amount, power, Long.toString(random), token.getOriginEnergyLimit());
+            return token.transfer(to, amount, power, Long.toString(random), 100000000L);
         } catch (Exception e) {
             log.error("transfer error!", e);
             throw new ServiceException("transfer error");
