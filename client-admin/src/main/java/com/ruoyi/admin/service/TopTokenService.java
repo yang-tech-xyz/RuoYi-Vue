@@ -207,7 +207,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransactionEntity.setHash(transactionHash);
 
             topTransactionService.updateById(topTransactionEntity);
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(transactionHash), 10000));
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(transactionHash), 600000));
 
         } catch (Exception e) {
             log.error("withdraw tron usdt failed", e);
