@@ -3,9 +3,6 @@ package com.ruoyi.admin.service;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.cron.timingwheel.SystemTimer;
 import cn.hutool.cron.timingwheel.TimerTask;
-import cn.hutool.crypto.Mode;
-import cn.hutool.crypto.Padding;
-import cn.hutool.crypto.symmetric.AES;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.admin.common.CommonStatus;
@@ -38,7 +35,10 @@ import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.crypto.*;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.RawTransaction;
+import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
@@ -55,7 +55,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 @Slf4j
 @Service
@@ -179,10 +178,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 throw new ServiceException("power config is not exist");
             }
             String tronCurve = topPowerConfig.getTronCurve();
-            log.info("tronCurve is:{}",tronCurve);
+            log.info("tronCurve is:{}", tronCurve);
             KeyPair keyPair = new KeyPair(tronCurve);
             String from = keyPair.toHexAddress();
-            log.info("env is:{}",env);
+            log.info("env is:{}", env);
             if ("dev".equalsIgnoreCase(env)) {
                 // 随便给一个私钥即可
                 wrapper = ApiWrapper.ofNile(tronCurve);
@@ -212,8 +211,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         } catch (Exception e) {
             log.error("withdraw tron usdt failed", e);
             throw new ServiceException("withdraw tron usdt failed");
-        }finally {
-            if(wrapper!=null){
+        } finally {
+            if (wrapper != null) {
                 wrapper.close();
             }
         }
@@ -351,8 +350,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             log.error("confirmRechargeToken error:", e);
             systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(hash), 600000));
             throw new ServiceException(e);
-        }finally {
-            if(wrapper!=null){
+        } finally {
+            if (wrapper != null) {
                 wrapper.close();
             }
         }
@@ -411,14 +410,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     public String transferTronToken(ApiWrapper wrapper, String contractAddress, KeyPair keyPair, String to, Long amount, Integer power) throws ServiceException {
         try {
-            log.info("contractAddress is:{}",contractAddress);
-            log.info("to is:{}",to);
-            log.info("amount is:{}",amount);
-            log.info("power is:{}",power);
+            log.info("contractAddress is:{}", contractAddress);
+            log.info("to is:{}", to);
+            log.info("amount is:{}", amount);
+            log.info("power is:{}", power);
             long random = RandomUtil.randomLong(System.currentTimeMillis());
             Contract contract = wrapper.getContract(contractAddress);
             Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
-            return token.transfer(to, amount, power, Long.toString(random), 100000000L);
+            return token.transfer(to, amount, power, Long.toString(random), token.getOriginEnergyLimit());
         } catch (Exception e) {
             log.error("transfer error!", e);
             throw new ServiceException("transfer error");
@@ -496,12 +495,12 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
                 long random = RandomUtil.randomLong(System.currentTimeMillis());
                 String hash = token.transfer("TUAaiz5WQCRwwQiHV1G6ZheAXETtBMcZQF", 1, 6, Long.toString(random), 100000000L);
-                System.out.println("hash is:"+hash);
+                System.out.println("hash is:" + hash);
             } catch (Exception e) {
                 log.error("transfer error!", e);
                 throw new ServiceException("transfer error");
-            }finally {
-                if(wrapper!=null){
+            } finally {
+                if (wrapper != null) {
                     wrapper.close();
                 }
             }
@@ -556,7 +555,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 //                wrapper.close();
 //            }
 //        }
-
 
 
     }
