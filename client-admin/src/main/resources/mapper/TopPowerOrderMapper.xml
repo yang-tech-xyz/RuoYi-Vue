@@ -11,7 +11,7 @@
                  inner join top_power_order tpo on tu.id = tpo.user_id
         <where>
             <if test="dto.userId != null">
-                and tu.user_id = #{dto.userId}
+                and tu.id = #{dto.userId}
             </if>
             <if test="dto.wallet != null and dto.wallet != ''">
                 and tu.wallet = #{dto.wallet}

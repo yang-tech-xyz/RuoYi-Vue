@@ -32,7 +32,7 @@
                 and tu.created_date between #{dto.startDateTime} and #{dto.endDateTime}
             </if>
             <if test="dto.userId != null">
-                and tu.user_id = #{dto.userId}
+                and tat.user_id = #{dto.userId}
             </if>
             <if test="dto.wallet != null and dto.wallet != ''">
                 and tu.wallet = #{dto.wallet}

@@ -15,7 +15,7 @@
         from top_account ta inner join top_user tu on ta.user_id = tu.id
         <where>
             <if test="dto.userId != null">
-                and tu.user_id = #{dto.userId}
+                and ta.user_id = #{dto.userId}
             </if>
             <if test="dto.wallet != null and dto.wallet != ''">
                 and tu.wallet = #{dto.wallet}
