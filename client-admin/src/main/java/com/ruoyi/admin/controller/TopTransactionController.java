@@ -3,6 +3,7 @@ package com.ruoyi.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.dto.TopTransactionDTO;
+import com.ruoyi.admin.dto.UnAuditTopTransactionDTO;
 import com.ruoyi.admin.entity.TopPowerConfig;
 import com.ruoyi.admin.entity.TopTransaction;
 import com.ruoyi.admin.exception.ServiceException;
@@ -24,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.SignatureException;
+import java.util.List;
 
 /**
  * 充值
@@ -35,7 +37,10 @@ import java.security.SignatureException;
 @Tag(description = "TopTransactionController", name = "事务信息")
 @RestController
 @AllArgsConstructor
-public class TopTransactionController {
+public class
+
+
+TopTransactionController {
 
 
     @Autowired
@@ -47,11 +52,20 @@ public class TopTransactionController {
     @Autowired
     private TopTokenService topTokenService;
 
+
     @Operation(summary = "查询当前所有币种")
     @GetMapping("/")
     public AjaxResult<IPage<TopTransaction>> getTransaction(@ParameterObject TopTransactionDTO topTransaction) {
         return AjaxResult.success(topTransactionService.getTransaction(topTransaction));
     }
+
+    @Operation(summary = "查询当前未审核的事物")
+    @GetMapping("/unAudit")
+    public AjaxResult<List<TopTransaction>> unAudit(@ParameterObject UnAuditTopTransactionDTO unAuditTopTransactionDTO) {
+        return AjaxResult.success(topTransactionService.getUnAuditTransaction(unAuditTopTransactionDTO));
+    }
+
+
 
     @Operation(summary = "提现审批")
     @PostMapping("/withdrawAudit")
@@ -75,7 +89,7 @@ public class TopTransactionController {
                 throw new ServiceException("签名错误");
             }
             if(StringUtils.isNotEmpty(topTransaction.getHash())){
-                log.error("transaction had been audit,hash is:"+topTransaction.getHash());
+                log.error("transaction had been audit,hash is:{}",topTransaction.getHash());
                 throw new ServiceException("transaction had been audit");
             }
             if(-1 == topTransaction.getChainId()){

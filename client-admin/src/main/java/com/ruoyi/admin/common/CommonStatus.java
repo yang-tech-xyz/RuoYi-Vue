@@ -2,8 +2,11 @@ package com.ruoyi.admin.common;
 
 public class CommonStatus {
 
+    // 审核拒绝
     public static String STATES_REJECT = "0x2";
+    // 审批通过
     public static String STATES_SUCCESS = "0x1";
+    // 未审核
     public static String STATES_COMMIT = "0x0";
 
     /**
