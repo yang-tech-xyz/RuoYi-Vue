@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -81,6 +82,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Autowired
     private TopAccountService accountService;
+
+    @Autowired
+    private TopAccountTxService accountTxService;
 
     @Autowired
     private TopUserService topUserService;
@@ -1078,7 +1082,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
         BigDecimal btcPrice = getPrice(exchangeSymbol);
         BigDecimal exchangeAmount = amount.divide(btcPrice, 10, 2);
-
+        //检查当日兑换的BTCF是否超过100万个。
+        // 检查当日的兑换量，是否达到了100w
+        LocalDate now = LocalDate.now();
+        BigDecimal btcfSumExchangeAmount = accountTxService.sumExchangeAmount(exchangeSymbol, now,now.plusDays(1));
+        if(btcfSumExchangeAmount.compareTo(new BigDecimal("1000000")) > 0){
+            throw new ServiceException("Over restrict amount");
+        }
 
         // 扣除USDT资金
         UUID uuid = UUID.fastUUID();
@@ -1127,8 +1137,12 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         BigDecimal btcPrice = getPrice(originSymbol);
         BigDecimal btcfPrice = getPrice(exchangeSymbol);
         BigDecimal exchangeAmount = amount.multiply(btcPrice).divide(btcfPrice, 10, 2);
-
-
+        // 检查当日的兑换量，是否达到了100w
+        LocalDate now = LocalDate.now();
+        BigDecimal btcfSumExchangeAmount = accountTxService.sumExchangeAmount(exchangeSymbol, now,now.plusDays(1));
+        if(btcfSumExchangeAmount.compareTo(new BigDecimal("1000000")) > 0){
+            throw new ServiceException("Over restrict amount");
+        }
         // 扣除USDT资金
         UUID uuid = UUID.fastUUID();
         accountService.processAccount(
