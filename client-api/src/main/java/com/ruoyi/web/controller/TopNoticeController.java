@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(description = "资产流水", name = "资产流水")
+@Tag(description = "系统公告", name = "系统公告")
 @RestController
 @RequestMapping("topNotice")
 public class TopNoticeController {
