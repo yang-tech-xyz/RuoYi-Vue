@@ -1,6 +1,11 @@
 package com.ruoyi.admin.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ruoyi.admin.dto.SettleDepositWithdrawPageDTO;
 import com.ruoyi.admin.mapper.TopSettleMapper;
+import com.ruoyi.admin.vo.PageVO;
+import com.ruoyi.admin.vo.SettleDepositWithdrawPageVO;
 import com.ruoyi.admin.vo.SettleDepositWithdrawVO;
 import com.ruoyi.admin.vo.SettleMemberCountVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,4 +42,14 @@ public class TopSettleService {
     }
 
 
+    public PageVO<SettleDepositWithdrawPageVO> getDepositWithdrawPage(SettleDepositWithdrawPageDTO dto) {
+        IPage<SettleDepositWithdrawPageVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+        iPage = settleMapper.selectPageVO(iPage, dto);
+        PageVO<SettleDepositWithdrawPageVO> pageVO = new PageVO<>();
+        pageVO.setPageNum(dto.getPageNum());
+        pageVO.setPageSize(dto.getPageSize());
+        pageVO.setTotal(iPage.getTotal());
+        pageVO.setList(iPage.getRecords());
+        return pageVO;
+    }
 }

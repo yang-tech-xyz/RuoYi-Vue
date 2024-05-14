@@ -3,11 +3,11 @@
 <mapper namespace="com.ruoyi.admin.mapper.TopSettleMapper">
 
     <select id="selectMemberCount" resultType="com.ruoyi.admin.vo.SettleMemberCountVO">
-        SELECT
-            (select count(_tu.id) from top_user _tu where _tu.create_time BETWEEN #{start} and #{end}) as todayCount,
-            (select count(_tu.id) from top_user _tu where _tu.create_time BETWEEN #{yesterdayStart} and #{yesterdayEnd}) as yesterdayCount
-        FROM
-            DUAL
+        SELECT (select count(_tu.id) from top_user _tu where _tu.create_time BETWEEN #{start} and #{end}) as todayCount,
+               (select count(_tu.id)
+                from top_user _tu
+                where _tu.create_time BETWEEN #{yesterdayStart} and #{yesterdayEnd})                      as yesterdayCount
+        FROM DUAL
     </select>
 
     <select id="selectDepositWithdrawList" resultType="com.ruoyi.admin.vo.SettleDepositWithdrawVO">
@@ -18,6 +18,25 @@
         WHERE tt.is_confirm = 1
           AND tt.create_time BETWEEN #{start} AND #{end}
         GROUP BY tt.symbol
+    </select>
+
+    <select id="selectPageVO" resultType="com.ruoyi.admin.vo.SettleDepositWithdrawPageVO">
+        SELECT
+        tt.user_id,
+        tt.symbol,
+        (select _tu.wallet from top_user _tu where _tu.id = tt.user_id) as wallet,
+        IFNULL(sum(IF(tt.type = 'Recharge', tt.token_amount, 0)), 0) as deposit,
+        IFNULL(sum(IF(tt.type = 'Withdraw', tt.token_amount, 0)), 0) as withdraw
+        FROM top_transaction tt
+        WHERE tt.is_confirm = 1
+        <if test="dto.startDateTime != null and dto.endDateTime != null">
+            AND tt.create_time BETWEEN #{dto.startDateTime} and #{dto.endDateTime}
+        </if>
+        <if test="dto.userId != null">
+            AND tt.user_id = #{dto.userId}
+        </if>
+        GROUP BY tt.user_id,tt.symbol
+        ORDER BY tt.user_id
     </select>
 
 </mapper>
