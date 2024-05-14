@@ -31,7 +31,7 @@ public class TopSettleService {
         LocalDateTime _yesterday_start = LocalDateTime.of(yesterday, LocalTime.MIN);
         LocalDateTime _yesterday_end = LocalDateTime.of(yesterday, LocalTime.MAX);
 
-        return settleMapper.selectMemberCount(_start, _end, _yesterday_start, _yesterday_end;
+        return settleMapper.selectMemberCount(_start, _end, _yesterday_start, _yesterday_end);
     }
 
     public List<SettleDepositWithdrawVO> getDepositWithdrawList() {
