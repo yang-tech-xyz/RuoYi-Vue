@@ -1,6 +1,8 @@
 package com.ruoyi.admin.controller;
 
 import com.ruoyi.admin.service.TopSettleService;
+import com.ruoyi.admin.vo.SettleDepositWithdrawVO;
+import com.ruoyi.admin.vo.SettleMemberCountVO;
 import com.ruoyi.admin.vo.SettleStatisticsVO;
 import com.ruoyi.common.AjaxResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,17 +24,17 @@ public class TopSettleController {
     @Autowired
     private TopSettleService service;
 
-    @Operation(summary = "结算统计")
-    @GetMapping("/getStatistics")
-    public AjaxResult<List<SettleStatisticsVO>> getStatistics(@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end) {
-        return AjaxResult.success(service.getStatistics(start, end));
+    @Operation(summary = "合计统计：今日新增用户数")
+    @GetMapping("/getMemberCount")
+    public AjaxResult<SettleMemberCountVO> getMemberCount() {
+        return AjaxResult.success(service.getMemberCount());
     }
 
-    /*@Operation(summary = "出入金详情")
-    @GetMapping("/getDepositAndWithdraw")
-    public AjaxResult<List<SettleStatisticsVO>> getDepositAndWithdraw(@ModelAttribute SettleDepositWithdrawDTO dto) {
-        return AjaxResult.success(service.getDepositAndWithdraw(start, end));
-    }*/
+    @Operation(summary = "合计统计：今日出入金")
+    @GetMapping("/getDepositWithdrawList")
+    public AjaxResult<List<SettleDepositWithdrawVO>> getDepositWithdrawList() {
+        return AjaxResult.success(service.getDepositWithdrawList());
+    }
+
 
 }

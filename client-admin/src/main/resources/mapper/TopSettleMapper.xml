@@ -2,7 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.ruoyi.admin.mapper.TopSettleMapper">
 
-    <select id="selectStatistics" resultType="com.ruoyi.admin.vo.SettleStatisticsVO">
+    <select id="selectMemberCount" resultType="com.ruoyi.admin.vo.SettleMemberCountVO">
+        SELECT
+            (select count(_tu.id) from top_user _tu where _tu.create_time BETWEEN #{start} and #{end}) as todayCount,
+            (select count(_tu.id) from top_user _tu where _tu.create_time BETWEEN #{yesterdayStart} and #{yesterdayEnd}) as yesterdayCount
+        FROM
+            DUAL
+    </select>
+
+    <select id="selectDepositWithdrawList" resultType="com.ruoyi.admin.vo.SettleDepositWithdrawVO">
         SELECT tt.symbol,
                IFNULL(sum(IF(tt.type = 'Recharge', tt.token_amount, 0)), 0) as deposit,
                IFNULL(sum(IF(tt.type = 'Withdraw', tt.token_amount, 0)), 0) as withdraw
