@@ -1,11 +1,9 @@
 package com.ruoyi.admin.controller;
 
 import com.ruoyi.admin.dto.SettleDepositWithdrawPageDTO;
+import com.ruoyi.admin.dto.SettleMemberInvitePageDTO;
 import com.ruoyi.admin.service.TopSettleService;
-import com.ruoyi.admin.vo.PageVO;
-import com.ruoyi.admin.vo.SettleDepositWithdrawPageVO;
-import com.ruoyi.admin.vo.SettleDepositWithdrawVO;
-import com.ruoyi.admin.vo.SettleMemberCountVO;
+import com.ruoyi.admin.vo.*;
 import com.ruoyi.common.AjaxResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,5 +41,10 @@ public class TopSettleController {
         return AjaxResult.success(service.getDepositWithdrawPage(dto));
     }
 
+    @Operation(summary = "用户邀请统计")
+    @GetMapping("/getMemberInvitePage")
+    public AjaxResult<PageVO<SettleMemberInvitePageVO>> getMemberInvitePage(@ModelAttribute SettleMemberInvitePageDTO dto) {
+        return AjaxResult.success(service.getMemberInvitePage(dto));
+    }
 
 }

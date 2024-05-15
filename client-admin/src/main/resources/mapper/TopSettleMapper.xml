@@ -20,7 +20,7 @@
         GROUP BY tt.symbol
     </select>
 
-    <select id="selectPageVO" resultType="com.ruoyi.admin.vo.SettleDepositWithdrawPageVO">
+    <select id="selectDepositWithdrawPageVO" resultType="com.ruoyi.admin.vo.SettleDepositWithdrawPageVO">
         SELECT
         tt.user_id,
         tt.symbol,
@@ -37,6 +37,35 @@
         </if>
         GROUP BY tt.user_id,tt.symbol
         ORDER BY tt.user_id
+    </select>
+
+    <select id="selectMemberInvitePageVO" resultType="com.ruoyi.admin.vo.SettleMemberInvitePageVO">
+        SELECT
+            tu.id AS userId,
+            tu.wallet,
+            tu.invited_user_id,
+            ( SELECT _tu.wallet FROM top_user _tu WHERE _tu.id = tu.invited_user_id ) AS invitedUserWallet,
+            ( SELECT count( _tui.id ) FROM top_user_invite _tui WHERE _tui.user_id = tu.id ) AS inviteMemberCount,
+            (
+                SELECT
+                    IFNULL(sum( _tpo.number ),0)
+                FROM
+                    top_user_invite _tui
+                        INNER JOIN top_power_order _tpo ON _tui.invite_user_id = _tpo.user_id
+                WHERE
+                    _tui.user_id = tu.id
+            ) AS inviteMemberPowerNumber
+        FROM
+            top_user tu
+        <where>
+            <if test="dto.userId != null">
+                AND tu.user_id = #{dto.userId}
+            </if>
+            <if test="dto.wallet != null and dto.wallet != ''">
+                AND tu.wallet = #{dto.wallet}
+            </if>
+        </where>
+        ORDER BY tu.user_id
     </select>
 
 </mapper>
