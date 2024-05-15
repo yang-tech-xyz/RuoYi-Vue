@@ -1,5 +1,5 @@
 # Use the official OpenJDK 21 image as the base image
-FROM openjdk:21-jdk-alpine
+FROM karluto/jdk21-apline3.18
 
 # Set the working directory in the container
 WORKDIR /app
