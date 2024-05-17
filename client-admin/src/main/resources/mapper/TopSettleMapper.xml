@@ -65,7 +65,7 @@
                 AND tu.wallet = #{dto.wallet}
             </if>
         </where>
-        ORDER BY tu.user_id
+        ORDER BY tu.id
     </select>
 
 </mapper>
