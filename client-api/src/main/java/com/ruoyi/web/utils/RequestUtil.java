@@ -8,6 +8,8 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.util.Locale;
+
 
 @Slf4j
 public class RequestUtil {
@@ -28,8 +30,25 @@ public class RequestUtil {
             }
             return walletAddress.toLowerCase();
         } catch (Exception ex) {
-            log.error("get user wallet address error!",ex);
+            log.error("get user wallet address error!", ex);
             throw ex;
+        }
+    }
+
+    public static String getLang() {
+        try {
+            RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+            HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+            if (null == request.getHeader("Accept-Language")) {
+                return "zh";
+            }
+            String lang = String.valueOf(request.getHeader("Accept-Language"));
+            if (StringUtils.isBlank(lang)) {
+                return "zh";
+            }
+            return Locale.forLanguageTag(lang).getLanguage();
+        } catch (Exception ex) {
+            return "zh";
         }
     }
 }
