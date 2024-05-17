@@ -29,7 +29,7 @@ public class TopTransaction extends BaseEntity
     @Schema(description = "链hash")
     private String hash;
 
-    /** rpc 节点url */
+    /** 链id */
     @Schema(description = "节点id")
     private Long chainId;
 

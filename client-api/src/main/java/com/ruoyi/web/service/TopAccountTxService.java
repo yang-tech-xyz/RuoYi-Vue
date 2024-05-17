@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -104,5 +105,9 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
      */
     public Long checkUniqueId(String uniqueId) {
         return baseMapper.selectCount(new LambdaQueryWrapper<TopAccountTx>().eq(TopAccountTx::getUniqueId, uniqueId));
+    }
+
+    public BigDecimal sumExchangeAmount(String exchangeSymbol, LocalDate startDate, LocalDate endDate) {
+        return baseMapper.sumExchangeAmount(exchangeSymbol,startDate,endDate);
     }
 }

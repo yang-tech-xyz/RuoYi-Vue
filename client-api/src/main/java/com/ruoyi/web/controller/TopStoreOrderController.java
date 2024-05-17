@@ -7,11 +7,12 @@ import com.ruoyi.web.dto.StoreOrderPageDTO;
 import com.ruoyi.web.service.TopStoreOrderService;
 import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
-import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.PageVO;
+import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.StoreOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,7 @@ public class TopStoreOrderController {
 
     @Operation(summary = "存单")
     @PostMapping("/order")
-    public AjaxResult order(@RequestBody StoreOrderDTO dto) {
+    public AjaxResult order(@Valid @RequestBody StoreOrderDTO dto) {
         try {
             boolean validateResult = UnsignMessageUtils.validate(dto.getSignMsg(), dto.getContent(), dto.getWallet());
             if (!validateResult) {
@@ -47,7 +48,7 @@ public class TopStoreOrderController {
 
     @Operation(summary = "订单复投")
     @PostMapping("/cpOrder")
-    public AjaxResult cpOrder(@RequestBody StoreCpOrderDTO dto) {
+    public AjaxResult cpOrder(@Valid @RequestBody StoreCpOrderDTO dto) {
         try {
             boolean validateResult = UnsignMessageUtils.validate(dto.getSignMsg(), dto.getContent(), dto.getWallet());
             if (!validateResult) {

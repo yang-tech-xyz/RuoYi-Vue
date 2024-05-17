@@ -2,6 +2,7 @@ package com.ruoyi.web.vo;
 
 import com.ruoyi.common.SignBaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ public class WithdrawBody extends SignBaseEntity
      * 用户钱包地址
      */
     @Schema(description="提现数量",example = "100")
+    @Positive
     private BigDecimal amount;
 
     /**

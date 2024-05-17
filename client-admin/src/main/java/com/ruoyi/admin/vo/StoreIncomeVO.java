@@ -9,6 +9,9 @@ import java.time.LocalDateTime;
 @Data
 public class StoreIncomeVO {
 
+    @Schema(description = "会员ID")
+    private Long userId;
+
     private String wallet;
 
     @Schema(description = "代币")

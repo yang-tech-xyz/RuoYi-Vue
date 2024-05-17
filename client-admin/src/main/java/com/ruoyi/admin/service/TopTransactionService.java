@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.admin.dto.TopTransactionDTO;
+import com.ruoyi.admin.dto.UnAuditTopTransactionDTO;
 import com.ruoyi.admin.entity.TopTransaction;
 import com.ruoyi.admin.enums.TransactionType;
 import com.ruoyi.admin.exception.ServiceException;
@@ -75,5 +76,15 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
                 .eq((topTransaction.getType() != null), TopTransaction::getType, topTransaction.getType())
                 .orderByDesc(TopTransaction::getCreateTime);
         return this.getBaseMapper().selectPage(page, wrapper);
+    }
+
+    public List<TopTransaction> getUnAuditTransaction(UnAuditTopTransactionDTO unAuditTopTransactionDTO) {
+        LambdaQueryWrapper<TopTransaction> wrapper = new LambdaQueryWrapper<>();
+        wrapper.isNull( TopTransaction::getHash)
+                .eq(TopTransaction::getStatus, CommonStatus.STATES_COMMIT)
+                .eq( TopTransaction::getType, TransactionType.Withdraw)
+                .eq((unAuditTopTransactionDTO.getChainId() != null), TopTransaction::getChainId, unAuditTopTransactionDTO.getChainId())
+                .orderByDesc(TopTransaction::getCreateTime);
+        return this.getBaseMapper().selectList(wrapper);
     }
 }

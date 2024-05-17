@@ -18,6 +18,8 @@ public class StoreIncomePageDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endDateTime;
 
+    private Long userId;
+
     private String wallet;
 
     private String refNo;

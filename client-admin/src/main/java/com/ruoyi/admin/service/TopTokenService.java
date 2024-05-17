@@ -1,10 +1,8 @@
 package com.ruoyi.admin.service;
 
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.cron.timingwheel.SystemTimer;
 import cn.hutool.cron.timingwheel.TimerTask;
-import cn.hutool.crypto.Mode;
-import cn.hutool.crypto.Padding;
-import cn.hutool.crypto.symmetric.AES;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.admin.common.CommonStatus;
@@ -37,7 +35,10 @@ import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
 import org.web3j.abi.datatypes.generated.Uint256;
-import org.web3j.crypto.*;
+import org.web3j.crypto.Credentials;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.RawTransaction;
+import org.web3j.crypto.TransactionEncoder;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.methods.request.Transaction;
@@ -97,11 +98,11 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         //查询未确认的hash
         List<TopTransaction> topTronWithdrawTransactionList = topTransactionService.queryTronWithdrawUnConfirm();
         topTronWithdrawTransactionList.stream().filter(t -> StringUtils.isNotBlank(t.getHash())).forEach(t -> {
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(t.getHash()), 10000));
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(t.getHash()), 60000));
         });
         List<TopTransaction> topWithdrawTransactionList = topTransactionService.queryWithdrawUnConfirm();
         topWithdrawTransactionList.stream().filter(t -> StringUtils.isNotBlank(t.getHash())).forEach(t -> {
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 10000));
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(t.getHash()), 60000));
         });
     }
 
@@ -179,7 +180,6 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             String tronCurve = topPowerConfig.getTronCurve();
             KeyPair keyPair = new KeyPair(tronCurve);
             String from = keyPair.toHexAddress();
-
             if ("dev".equalsIgnoreCase(env)) {
                 // 随便给一个私钥即可
                 wrapper = ApiWrapper.ofNile(tronCurve);
@@ -193,24 +193,25 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
 
             // 检查提现账户是否有足够的金额
-            boolean amountCheckResult = topTokenService.checkTronTransferValueEnough(wrapper, contractAddress, withdrawAmount, from);
-            if (!amountCheckResult) {
-                throw new ServiceException("amountCheckResult failed");
-            }
-            BigInteger tronDecimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, contractAddress, from);
+//            boolean amountCheckResult = topTokenService.checkTronTransferValueEnough(wrapper, contractAddress, withdrawAmount, from);
+//            if (!amountCheckResult) {
+//                throw new ServiceException("amountCheckResult failed");
+//            }
+//            BigInteger tronDecimalOfContract = topTRONService.getTronDecimalOfContract(wrapper, contractAddress, from);
+            BigInteger tronDecimalOfContract = new BigInteger("6");
             String transactionHash = transferTronToken(wrapper, contractAddress, keyPair, to, tokenAmount.longValue(), tronDecimalOfContract.intValue());
             TopTransaction topTransactionEntity = new TopTransaction();
             topTransactionEntity.setId(topTransaction.getId());
             topTransactionEntity.setHash(transactionHash);
 
             topTransactionService.updateById(topTransactionEntity);
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(transactionHash), 10000));
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(transactionHash), 600000));
 
         } catch (Exception e) {
             log.error("withdraw tron usdt failed", e);
             throw new ServiceException("withdraw tron usdt failed");
-        }finally {
-            if(wrapper!=null){
+        } finally {
+            if (wrapper != null) {
                 wrapper.close();
             }
         }
@@ -341,15 +342,15 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 //                topTransactionService.updateConfirm(topTransaction);
             } else {
                 //获取当前的区块高度
-                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(hash), 10000));
+                systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(hash), 600000));
             }
             return true;
         } catch (Exception e) {
             log.error("confirmRechargeToken error:", e);
-            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(hash), 10000));
+            systemTimer.addTask(new TimerTask(() -> topTokenService.confirmTronWithdrawToken(hash), 600000));
             throw new ServiceException(e);
-        }finally {
-            if(wrapper!=null){
+        } finally {
+            if (wrapper != null) {
                 wrapper.close();
             }
         }
@@ -408,10 +409,14 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     public String transferTronToken(ApiWrapper wrapper, String contractAddress, KeyPair keyPair, String to, Long amount, Integer power) throws ServiceException {
         try {
+            log.info("contractAddress is:{}", contractAddress);
+            log.info("to is:{}", to);
+            log.info("amount is:{}", amount);
+            log.info("power is:{}", power);
+            long random = RandomUtil.randomLong(System.currentTimeMillis());
             Contract contract = wrapper.getContract(contractAddress);
             Trc20Contract token = new Trc20Contract(contract, keyPair.toHexAddress(), wrapper);
-            String hash = token.transfer(to, amount, power, "memo", 100000000L);
-            return hash;
+            return token.transfer(to, amount, power, Long.toString(random), 100000000L);
         } catch (Exception e) {
             log.error("transfer error!", e);
             throw new ServiceException("transfer error");
@@ -478,6 +483,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     public static void main(String[] args) {
         BigInteger bigInteger = new BigInteger("0x58eef556f93ba37d103e48867fd69e4b477f19e6df2d485d89aee0e0d3c3cbec", 16);
         System.out.println(bigInteger);
+
+
     }
 
 }

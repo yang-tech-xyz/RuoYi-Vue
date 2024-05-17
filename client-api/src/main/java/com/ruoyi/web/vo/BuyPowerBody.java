@@ -2,9 +2,8 @@ package com.ruoyi.web.vo;
 
 import com.ruoyi.common.SignBaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
-
-import java.math.BigDecimal;
 
 /**
  *
@@ -25,6 +24,7 @@ public class BuyPowerBody extends SignBaseEntity
      * 用户签名后信息
      */
     @Schema(description="购买的数量",example = "2")
-    private BigDecimal number;
+    @Positive
+    private Integer number;
 
 }

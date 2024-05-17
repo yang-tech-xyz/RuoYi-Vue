@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -81,6 +82,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Autowired
     private TopAccountService accountService;
+
+    @Autowired
+    private TopAccountTxService accountTxService;
 
     @Autowired
     private TopUserService topUserService;
@@ -130,7 +134,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
     @Transactional
     public void recharge(RechargeBody rechargeBody) throws Exception {
-        log.info("recharge in,hash is:{}",rechargeBody.getHash());
+        log.info("recharge in,rechargeBody is:{}",rechargeBody);
         String hash = rechargeBody.getHash();
         try {
             TopTransaction topTransaction = new TopTransaction();
@@ -1078,7 +1082,13 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
         BigDecimal btcPrice = getPrice(exchangeSymbol);
         BigDecimal exchangeAmount = amount.divide(btcPrice, 10, 2);
-
+        //检查当日兑换的BTCF是否超过100万个。
+        // 检查当日的兑换量，是否达到了100w
+        LocalDate now = LocalDate.now();
+        BigDecimal btcfSumExchangeAmount = accountTxService.sumExchangeAmount(exchangeSymbol, now,now.plusDays(1));
+        if(btcfSumExchangeAmount.compareTo(new BigDecimal("1000000")) > 0){
+            throw new ServiceException("Over restrict amount");
+        }
 
         // 扣除USDT资金
         UUID uuid = UUID.fastUUID();
@@ -1127,8 +1137,12 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         BigDecimal btcPrice = getPrice(originSymbol);
         BigDecimal btcfPrice = getPrice(exchangeSymbol);
         BigDecimal exchangeAmount = amount.multiply(btcPrice).divide(btcfPrice, 10, 2);
-
-
+        // 检查当日的兑换量，是否达到了100w
+        LocalDate now = LocalDate.now();
+        BigDecimal btcfSumExchangeAmount = accountTxService.sumExchangeAmount(exchangeSymbol, now,now.plusDays(1));
+        if(btcfSumExchangeAmount.compareTo(new BigDecimal("1000000")) > 0){
+            throw new ServiceException("Over restrict amount");
+        }
         // 扣除USDT资金
         UUID uuid = UUID.fastUUID();
         accountService.processAccount(
@@ -1227,24 +1241,34 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     public static void main(String[] args) {
-        {
-            ApiWrapper wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
-            try {
-                Chain.Block nowBlock = wrapper.getNowBlock();
-                System.out.println(nowBlock.getBlockHeader().getRawData().getNumber());
-            } catch (IllegalException e) {
-                throw new RuntimeException(e);
+        try {
+            Web3j web3j = Web3j.build(new HttpService("https://bsc-dataseed3.ninicoin.io"));
+            Optional<Transaction> transactionOptional = web3j.ethGetTransactionByHash("0xcf83c42425062c691ffed7280045b916470b9ea96a5c1aed5fd42eafec50f5a9").send().getTransaction();
+            if (!transactionOptional.isPresent()) {
+                throw new ServiceException("get transaction error!");
             }
+            System.out.println(transactionOptional.isPresent());
+        }catch (Exception e){
+            System.out.println(e);
         }
-        {
-            ApiWrapper wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
-            try {
-                Chain.Block nowBlock = wrapper.getNowBlock();
-                System.out.println(nowBlock.getBlockHeader().getRawData().getNumber());
-                wrapper.close();
-            } catch (IllegalException e) {
-                throw new RuntimeException(e);
-            }
-        }
+//        {
+//            ApiWrapper wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+//            try {
+//                Chain.Block nowBlock = wrapper.getNowBlock();
+//                System.out.println(nowBlock.getBlockHeader().getRawData().getNumber());
+//            } catch (IllegalException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        {
+//            ApiWrapper wrapper = ApiWrapper.ofMainnet("2b34557b528df6d1a0d824c47590e814bcb8269492776634d57902600eb72351", "13cba328-e4df-4c14-b5fd-77d9f92df2f7");
+//            try {
+//                Chain.Block nowBlock = wrapper.getNowBlock();
+//                System.out.println(nowBlock.getBlockHeader().getRawData().getNumber());
+//                wrapper.close();
+//            } catch (IllegalException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
     }
 }

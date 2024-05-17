@@ -86,7 +86,6 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
 
     /**
      * 算力推广
-     * 1:限制十层用户
      */
     public PowerInviteInfoVO getPowerInviteInfo(String wallet) {
         return baseMapper.selectPowerInviteInfo(wallet);
@@ -94,7 +93,6 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
 
     /**
      * 算力推广
-     * 1:限制十层用户
      */
     public PageVO<PowerInviteVO> getPowerInvitePage(String wallet, InvitePageDTO dto) {
         TopUser user = baseMapper.selectByWallet(wallet);

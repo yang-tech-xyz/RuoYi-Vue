@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruoyi.admin.mapper.TopSettleMapper">
+
+    <select id="selectMemberCount" resultType="com.ruoyi.admin.vo.SettleMemberCountVO">
+        SELECT (select count(_tu.id) from top_user _tu where _tu.create_time BETWEEN #{start} and #{end}) as todayCount,
+               (select count(_tu.id)
+                from top_user _tu
+                where _tu.create_time BETWEEN #{yesterdayStart} and #{yesterdayEnd})                      as yesterdayCount
+        FROM DUAL
+    </select>
+
+    <select id="selectDepositWithdrawList" resultType="com.ruoyi.admin.vo.SettleDepositWithdrawVO">
+        SELECT tt.symbol,
+               IFNULL(sum(IF(tt.type = 'Recharge', tt.token_amount, 0)), 0) as deposit,
+               IFNULL(sum(IF(tt.type = 'Withdraw', tt.token_amount, 0)), 0) as withdraw
+        FROM top_transaction tt
+        WHERE tt.is_confirm = 1
+          AND tt.create_time BETWEEN #{start} AND #{end}
+        GROUP BY tt.symbol
+    </select>
+
+    <select id="selectDepositWithdrawPageVO" resultType="com.ruoyi.admin.vo.SettleDepositWithdrawPageVO">
+        SELECT
+        tt.user_id,
+        tt.symbol,
+        (select _tu.wallet from top_user _tu where _tu.id = tt.user_id) as wallet,
+        IFNULL(sum(IF(tt.type = 'Recharge', tt.token_amount, 0)), 0) as deposit,
+        IFNULL(sum(IF(tt.type = 'Withdraw', tt.token_amount, 0)), 0) as withdraw
+        FROM top_transaction tt
+        WHERE tt.is_confirm = 1
+        <if test="dto.startDateTime != null and dto.endDateTime != null">
+            AND tt.create_time BETWEEN #{dto.startDateTime} and #{dto.endDateTime}
+        </if>
+        <if test="dto.userId != null">
+            AND tt.user_id = #{dto.userId}
+        </if>
+        GROUP BY tt.user_id,tt.symbol
+        ORDER BY tt.user_id
+    </select>
+
+    <select id="selectMemberInvitePageVO" resultType="com.ruoyi.admin.vo.SettleMemberInvitePageVO">
+        SELECT
+            tu.id AS userId,
+            tu.wallet,
+            tu.invited_user_id,
+            ( SELECT _tu.wallet FROM top_user _tu WHERE _tu.id = tu.invited_user_id ) AS invitedUserWallet,
+            ( SELECT count( _tui.id ) FROM top_user_invite _tui WHERE _tui.user_id = tu.id ) AS inviteMemberCount,
+            (
+                SELECT
+                    IFNULL(sum( _tpo.number ),0)
+                FROM
+                    top_user_invite _tui
+                        INNER JOIN top_power_order _tpo ON _tui.invite_user_id = _tpo.user_id
+                WHERE
+                    _tui.user_id = tu.id
+            ) AS inviteMemberPowerNumber
+        FROM
+            top_user tu
+        <where>
+            <if test="dto.userId != null">
+                AND tu.user_id = #{dto.userId}
+            </if>
+            <if test="dto.wallet != null and dto.wallet != ''">
+                AND tu.wallet = #{dto.wallet}
+            </if>
+        </where>
+        ORDER BY tu.user_id
+    </select>
+
+</mapper>

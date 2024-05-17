@@ -18,6 +18,8 @@ public class PowerOrderIncomePageDTO {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
+    private Long userId;
+
     private String wallet;
 
     private String orderNo;
