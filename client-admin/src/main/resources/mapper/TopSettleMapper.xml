@@ -59,7 +59,7 @@
             top_user tu
         <where>
             <if test="dto.userId != null">
-                AND tu.user_id = #{dto.userId}
+                AND tu.id = #{dto.userId}
             </if>
             <if test="dto.wallet != null and dto.wallet != ''">
                 AND tu.wallet = #{dto.wallet}
