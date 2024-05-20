@@ -20,4 +20,6 @@ public class SettleDepositWithdrawPageDTO {
 
     private Long userId;
 
+    private String wallet;
+
 }
