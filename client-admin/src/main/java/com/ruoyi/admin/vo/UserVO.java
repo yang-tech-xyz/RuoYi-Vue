@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data
 public class UserVO {
 
+    private Long id;
 
     @Schema(description = "钱包地址")
     private String wallet;
