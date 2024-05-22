@@ -35,6 +35,15 @@
             tu.invited_code,
             (select _tu.wallet from top_user _tu where _tu.id = tu.invited_user_id) as invitedUserWallet,
             (select count(_tui.id) from top_user_invite _tui where _tui.user_id = tu.id) as totalInviteUser,
+            (
+                SELECT
+                    IFNULL(sum( _tpo.number ),0)
+                FROM
+                    top_user_invite _tui
+                        INNER JOIN top_power_order _tpo ON _tui.invite_user_id = _tpo.user_id
+                WHERE
+                    _tui.user_id = tu.id
+            ) AS totalInvitePowerNumber,
             (select ifnull(sum(_tpsi.income),0) from top_power_sharing_income _tpsi where _tpsi.user_id = tu.id) as totalPowerIncome
         from top_user tu
         where tu.wallet = #{wallet}

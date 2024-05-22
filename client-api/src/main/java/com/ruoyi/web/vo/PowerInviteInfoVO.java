@@ -20,6 +20,9 @@ public class PowerInviteInfoVO {
     @Schema(description = "全部推广人数")
     private Integer totalInviteUser;
 
+    @Schema(description = "全部推广人数矿机")
+    private Integer totalInvitePowerNumber;
+
     @Schema(description = "全部推广收益（BTC）")
     private BigDecimal totalPowerIncome = BigDecimal.ZERO;
 

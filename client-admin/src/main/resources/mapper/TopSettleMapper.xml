@@ -27,13 +27,16 @@
         (select _tu.wallet from top_user _tu where _tu.id = tt.user_id) as wallet,
         IFNULL(sum(IF(tt.type = 'Recharge', tt.token_amount, 0)), 0) as deposit,
         IFNULL(sum(IF(tt.type = 'Withdraw', tt.token_amount, 0)), 0) as withdraw
-        FROM top_transaction tt
+        FROM top_transaction tt inner join top_user tu on tt.user_id = tu.id
         WHERE tt.is_confirm = 1
         <if test="dto.startDateTime != null and dto.endDateTime != null">
             AND tt.create_time BETWEEN #{dto.startDateTime} and #{dto.endDateTime}
         </if>
         <if test="dto.userId != null">
             AND tt.user_id = #{dto.userId}
+        </if>
+        <if test="dto.wallet != null and dto.wallet != ''">
+            AND tu.wallet = #{dto.wallet}
         </if>
         GROUP BY tt.user_id,tt.symbol
         ORDER BY tt.user_id
@@ -59,13 +62,13 @@
             top_user tu
         <where>
             <if test="dto.userId != null">
-                AND tu.user_id = #{dto.userId}
+                AND tu.id = #{dto.userId}
             </if>
             <if test="dto.wallet != null and dto.wallet != ''">
                 AND tu.wallet = #{dto.wallet}
             </if>
         </where>
-        ORDER BY tu.user_id
+        ORDER BY tu.id
     </select>
 
 </mapper>

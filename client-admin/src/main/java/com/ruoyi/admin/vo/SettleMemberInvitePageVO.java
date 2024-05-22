@@ -16,7 +16,7 @@ public class SettleMemberInvitePageVO {
     @Schema(description = "邀请人的地址")
     private String invitedUserWallet;
 
-    @Schema(description = "被邀请人")
+    @Schema(description = "被邀请人数量")
     private Long inviteMemberCount;
 
     @Schema(description = "被邀请人矿机台数")

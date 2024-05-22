@@ -30,6 +30,10 @@ public class TopNotice implements Serializable {
     @TableField(value = "contents")
     private String contents;
 
+    @Schema(description = "语言")
+    @TableField(value = "lang")
+    private String lang;
+
     @Schema(description = "排序：倒序")
     @TableField(value = "seq")
     private Integer seq;
