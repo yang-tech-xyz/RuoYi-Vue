@@ -25,7 +25,7 @@ public class TopTransaction extends BaseEntity
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    /** 链类型 */
+    /** 链hash */
     @Schema(description = "链hash")
     private String hash;
 
@@ -33,7 +33,6 @@ public class TopTransaction extends BaseEntity
     @Schema(description = "节点id")
     private Long chainId;
 
-    /** 在多少个区块确认之后 才确认充值成功 */
     @Schema(description = "币种id")
     private Integer tokenId;
 
@@ -67,7 +66,6 @@ public class TopTransaction extends BaseEntity
 
     @Schema(description = "事务号")
     private String transNo;
-
 
     @Schema(description = "erc20地址")
     private String erc20Address;
