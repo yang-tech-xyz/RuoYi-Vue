@@ -12,8 +12,8 @@
 
     <select id="selectDepositWithdrawList" resultType="com.ruoyi.admin.vo.SettleDepositWithdrawVO">
         SELECT tt.symbol,
-               IFNULL(sum(IF(tt.type = 'Recharge', tt.token_amount, 0)), 0) as deposit,
-               IFNULL(sum(IF(tt.type = 'Withdraw', tt.token_amount, 0)), 0) as withdraw
+               IFNULL(sum(IF(tt.type in ('Recharge','TronRecharge'), tt.token_amount, 0)), 0) as deposit,
+               IFNULL(sum(IF(tt.type in ('Withdraw','Tron_Withdraw','Withdraw_BTC'), tt.token_amount, 0)), 0) as withdraw
         FROM top_transaction tt
         WHERE tt.is_confirm = 1
           AND tt.create_time BETWEEN #{start} AND #{end}
@@ -25,8 +25,8 @@
         tt.user_id,
         tt.symbol,
         (select _tu.wallet from top_user _tu where _tu.id = tt.user_id) as wallet,
-        IFNULL(sum(IF(tt.type = 'Recharge', tt.token_amount, 0)), 0) as deposit,
-        IFNULL(sum(IF(tt.type = 'Withdraw', tt.token_amount, 0)), 0) as withdraw
+        IFNULL(sum(IF(tt.type in ('Recharge','TronRecharge'), tt.token_amount, 0)), 0) as deposit,
+        IFNULL(sum(IF(tt.type in ('Withdraw','Tron_Withdraw','Withdraw_BTC'), tt.token_amount, 0)), 0) as withdraw
         FROM top_transaction tt inner join top_user tu on tt.user_id = tu.id
         WHERE tt.is_confirm = 1
         <if test="dto.startDateTime != null and dto.endDateTime != null">
