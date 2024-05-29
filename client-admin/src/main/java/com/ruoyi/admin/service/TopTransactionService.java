@@ -74,6 +74,7 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
         wrapper.eq(StringUtils.isNotEmpty(topTransaction.getHash()), TopTransaction::getHash, topTransaction.getHash())
                 .eq(StringUtils.isNotEmpty(topTransaction.getStatus()), TopTransaction::getStatus, topTransaction.getStatus())
                 .eq((topTransaction.getType() != null), TopTransaction::getType, topTransaction.getType())
+                .eq((topTransaction.getUserId() != null), TopTransaction::getUserId, topTransaction.getUserId())
                 .orderByDesc(TopTransaction::getCreateTime);
         return this.getBaseMapper().selectPage(page, wrapper);
     }

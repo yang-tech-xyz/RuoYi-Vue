@@ -14,4 +14,7 @@ public class StoreInviteInfoVO {
     @Schema(description = "全部推广收益（USD）")
     private BigDecimal totalStoreIncome = BigDecimal.ZERO;
 
+    @Schema(description = "团队总质押数（USD）")
+    private BigDecimal totalStoreAmount = BigDecimal.ZERO;
+
 }

@@ -5,9 +5,12 @@ import com.ruoyi.common.AjaxResult;
 import com.ruoyi.common.CommonSymbols;
 import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.entity.TopTransaction;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.exception.ServiceException;
+import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.service.TopTokenService;
 import com.ruoyi.web.service.TopTransactionService;
+import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +41,9 @@ public class TopTokenController {
 
     @Autowired
     private TopTransactionService topTransactionService;
+
+    @Autowired
+    private TopUserMapper userMapper;
 
     @Operation(summary = "查询当前所有币种")
     @GetMapping("/getList")
@@ -90,6 +96,7 @@ public class TopTokenController {
 
     /**
      * 提币申请.
+     * 1:新增提币用户限制
      */
     @Operation(summary = "提币")
     @PostMapping("/withdraw")
@@ -102,6 +109,11 @@ public class TopTokenController {
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
+        }
+        String wallet = RequestUtil.getWallet();
+        TopUser user= userMapper.selectByWallet(wallet);
+        if (user.getBlockEnabled()){
+            return AjaxResult.error("withdraw block");
         }
         String symbol = withdrawBody.getSymbol();
         Long chainId = withdrawBody.getChainId();

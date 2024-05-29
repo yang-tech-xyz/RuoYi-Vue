@@ -3,10 +3,10 @@ package com.ruoyi.admin.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.admin.dto.UserBlockDTO;
 import com.ruoyi.admin.dto.UserPageDTO;
 import com.ruoyi.admin.entity.TopUser;
 import com.ruoyi.admin.mapper.TopUserMapper;
-import com.ruoyi.admin.vo.AccountTxVO;
 import com.ruoyi.admin.vo.PageVO;
 import com.ruoyi.admin.vo.UserVO;
 import lombok.extern.slf4j.Slf4j;
@@ -25,5 +25,12 @@ public class TopUserService extends ServiceImpl<TopUserMapper, TopUser> {
         pageVO.setTotal(iPage.getTotal());
         pageVO.setList(iPage.getRecords());
         return pageVO;
+    }
+
+    public Boolean blockEnabled(UserBlockDTO dto) {
+        TopUser user = baseMapper.selectById(dto.getUserId());
+        user.setBlockEnabled(dto.getBlockEnabled());
+        baseMapper.updateById(user);
+        return true;
     }
 }

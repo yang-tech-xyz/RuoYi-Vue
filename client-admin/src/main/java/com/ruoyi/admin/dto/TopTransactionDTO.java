@@ -20,6 +20,7 @@ import java.math.BigInteger;
 @Data
 public class TopTransactionDTO extends BaseDTO
 {
+    private Long userId;
 
     /** 链类型 */
     @Schema(description = "链hash")

@@ -3,10 +3,7 @@ package com.ruoyi.admin.mapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ruoyi.admin.dto.SettleDepositWithdrawPageDTO;
 import com.ruoyi.admin.dto.SettleMemberInvitePageDTO;
-import com.ruoyi.admin.vo.SettleDepositWithdrawPageVO;
-import com.ruoyi.admin.vo.SettleDepositWithdrawVO;
-import com.ruoyi.admin.vo.SettleMemberCountVO;
-import com.ruoyi.admin.vo.SettleMemberInvitePageVO;
+import com.ruoyi.admin.vo.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -24,4 +21,7 @@ public interface TopSettleMapper {
     IPage<SettleDepositWithdrawPageVO> selectDepositWithdrawPageVO(@Param("iPage") IPage<SettleDepositWithdrawPageVO> iPage, @Param("dto") SettleDepositWithdrawPageDTO dto);
 
     IPage<SettleMemberInvitePageVO> selectMemberInvitePageVO(@Param("iPage") IPage<SettleMemberInvitePageVO> iPage, @Param("dto") SettleMemberInvitePageDTO dto);
+
+    List<SettleDirectVO> selectDirectByUserId(@Param("userId") Long userId);
+
 }

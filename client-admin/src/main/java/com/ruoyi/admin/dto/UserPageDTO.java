@@ -9,6 +9,8 @@ public class UserPageDTO {
 
     private Integer pageSize = 10;
 
+    private Long userId;
+
     private String wallet;
     
 }

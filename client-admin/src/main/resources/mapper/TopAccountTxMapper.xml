@@ -9,7 +9,7 @@
         from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
         <where>
             <if test="dto.userId != null">
-                and tu.user_id = #{dto.userId}
+                and tu.id = #{dto.userId}
             </if>
             <if test="dto.wallet != null and dto.wallet != ''">
                 and tu.wallet = #{dto.wallet}
