@@ -76,6 +76,9 @@ public class TopSettleService {
         }
         if (StringUtils.isNotBlank(wallet)) {
             TopUser user = userMapper.selectOne(new LambdaQueryWrapper<TopUser>().eq(TopUser::getWallet, wallet));
+            if (user == null) {
+                return new ArrayList<>();
+            }
             userId = user.getId();
         }
         return settleMapper.selectDirectByUserId(userId);
