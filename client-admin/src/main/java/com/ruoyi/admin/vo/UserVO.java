@@ -39,4 +39,6 @@ public class UserVO {
     @Schema(description = "btc转账地址")
     private String btcTransferAddress;
 
+    @Schema(description = "禁止")
+    private Boolean blockEnabled;
 }

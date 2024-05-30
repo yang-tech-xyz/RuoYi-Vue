@@ -266,6 +266,12 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.telegram</groupId>
+            <artifactId>telegrambots</artifactId>
+            <version>6.1.0</version>
+        </dependency>
+
 
         <!--mybatis plus-->
         <!--		<dependency>-->

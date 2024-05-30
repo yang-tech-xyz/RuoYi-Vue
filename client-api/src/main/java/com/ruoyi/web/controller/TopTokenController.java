@@ -3,6 +3,7 @@ package com.ruoyi.web.controller;
 import cn.hutool.cron.timingwheel.TimerTask;
 import com.ruoyi.common.AjaxResult;
 import com.ruoyi.common.CommonSymbols;
+import com.ruoyi.web.bot.ExecBot;
 import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.entity.TopTransaction;
 import com.ruoyi.web.entity.TopUser;
@@ -19,7 +20,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.tron.trident.core.ApiWrapper;
 
 import java.security.SignatureException;
 import java.util.List;
@@ -41,6 +44,9 @@ public class TopTokenController {
 
     @Autowired
     private TopTransactionService topTransactionService;
+
+    @Value("${spring.profiles.active}")
+    private String env;
 
     @Autowired
     private TopUserMapper userMapper;
@@ -119,15 +125,23 @@ public class TopTokenController {
         Long chainId = withdrawBody.getChainId();
         if(chainId==-1){
             topTokenService.withdrawTron(withdrawBody);
-            return AjaxResult.success();
         }
         if (symbol.equalsIgnoreCase(CommonSymbols.BTC_SYMBOL)) {
             topTokenService.withdrawBTC(withdrawBody);
-            return AjaxResult.success();
         } else {
             topTokenService.withdraw(withdrawBody);
-            return AjaxResult.success();
         }
+        //添加提币提醒
+        String msg = "user:"+withdrawBody.getWallet()+" withdraw symbol:"+withdrawBody.getSymbol()+" amount:"+withdrawBody.getAmount()+" on chain id:"+withdrawBody.getChainId();
+        ExecBot bot = null;
+        if("dev".equalsIgnoreCase(env)){
+            // 随便给一个私钥即可
+            bot = ExecBot.genExecBotByProxy();
+        }else{
+            bot = ExecBot.genExecBot();
+        }
+        bot.sendRechargeMessage(msg);
+        return AjaxResult.success();
     }
 
     @Operation(summary = "内部转账")
