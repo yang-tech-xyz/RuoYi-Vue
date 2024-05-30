@@ -1,5 +1,6 @@
 package com.ruoyi.admin.vo;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -34,5 +35,8 @@ public class UserVO {
 
     @Schema(description = "btc转账地址")
     private String btcTransferAddress;
+
+    @Schema(description = "禁止")
+    private Boolean blockEnabled;
 
 }
