@@ -5,15 +5,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.dto.TopTransactionDTO;
 import com.ruoyi.admin.dto.UnAuditTopTransactionDTO;
 import com.ruoyi.admin.entity.TopTransaction;
 import com.ruoyi.admin.enums.TransactionType;
 import com.ruoyi.admin.exception.ServiceException;
 import com.ruoyi.admin.mapper.TopTransactionMapper;
-import com.ruoyi.admin.common.CommonStatus;
+import com.ruoyi.admin.vo.TopTransactionVO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -68,22 +68,16 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
         return this.list(query);
     }
 
-    public IPage<TopTransaction> getTransaction(TopTransactionDTO topTransaction) {
-        IPage<TopTransaction> page = new Page<>(topTransaction.getPageNum(), topTransaction.getPageSize());
-        LambdaQueryWrapper<TopTransaction> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(StringUtils.isNotEmpty(topTransaction.getHash()), TopTransaction::getHash, topTransaction.getHash())
-                .eq(StringUtils.isNotEmpty(topTransaction.getStatus()), TopTransaction::getStatus, topTransaction.getStatus())
-                .eq((topTransaction.getType() != null), TopTransaction::getType, topTransaction.getType())
-                .eq((topTransaction.getUserId() != null), TopTransaction::getUserId, topTransaction.getUserId())
-                .orderByDesc(TopTransaction::getCreateTime);
-        return this.getBaseMapper().selectPage(page, wrapper);
+    public IPage<TopTransactionVO> getTransaction(TopTransactionDTO dto) {
+        IPage<TopTransactionVO> page = new Page<>(dto.getPageNum(), dto.getPageSize());
+        return baseMapper.selectPageVOByDTO(page, dto);
     }
 
     public List<TopTransaction> getUnAuditTransaction(UnAuditTopTransactionDTO unAuditTopTransactionDTO) {
         LambdaQueryWrapper<TopTransaction> wrapper = new LambdaQueryWrapper<>();
-        wrapper.isNull( TopTransaction::getHash)
+        wrapper.isNull(TopTransaction::getHash)
                 .eq(TopTransaction::getStatus, CommonStatus.STATES_COMMIT)
-                .eq( TopTransaction::getType, TransactionType.Withdraw)
+                .eq(TopTransaction::getType, TransactionType.Withdraw)
                 .eq((unAuditTopTransactionDTO.getChainId() != null), TopTransaction::getChainId, unAuditTopTransactionDTO.getChainId())
                 .orderByDesc(TopTransaction::getCreateTime);
         return this.getBaseMapper().selectList(wrapper);

@@ -11,6 +11,7 @@ import com.ruoyi.admin.service.TopPowerConfigService;
 import com.ruoyi.admin.service.TopTokenService;
 import com.ruoyi.admin.service.TopTransactionService;
 import com.ruoyi.admin.utils.UnsignMessageUtils;
+import com.ruoyi.admin.vo.TopTransactionVO;
 import com.ruoyi.admin.vo.WithdrawAuditBody;
 import com.ruoyi.admin.vo.WithdrawBTCAuditBody;
 import com.ruoyi.common.AjaxResult;
@@ -55,7 +56,7 @@ TopTransactionController {
 
     @Operation(summary = "查询当前所有币种")
     @GetMapping("/")
-    public AjaxResult<IPage<TopTransaction>> getTransaction(@ParameterObject TopTransactionDTO topTransaction) {
+    public AjaxResult<IPage<TopTransactionVO>> getTransaction(@ParameterObject TopTransactionDTO topTransaction) {
         return AjaxResult.success(topTransactionService.getTransaction(topTransaction));
     }
 
