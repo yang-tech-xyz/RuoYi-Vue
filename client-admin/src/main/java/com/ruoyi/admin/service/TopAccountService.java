@@ -50,38 +50,29 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
     @Transactional
     public void refund(String transNo) {
         //查询对应的流水
-        TopAccountTx topAccountTx = topAccountTxService.getByRefNo(transNo);
-        Long userId = topAccountTx.getUserId();
-        String symbol = topAccountTx.getSymbol();
-        BigDecimal amount = topAccountTx.getAmount().negate();
-        BigDecimal fee = topAccountTx.getFee().negate();
-        //退回用户的资金
-        topAccountService.processAccount(
-                Arrays.asList(
-                        AccountRequest.builder()
-                                .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_REJECT.typeCode))
-                                .userId(userId)
-                                .token(symbol)
-                                .balanceChanged(amount)
-                                .fee(BigDecimal.ZERO)
-                                .balanceTxType(Account.Balance.AVAILABLE)
-                                .txType(Account.TxType.WITHDRAW_REJECT)
-                                .refNo(transNo)
-                                .remark("提现返回")
-                                .build(),
-                        AccountRequest.builder()
-                                .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_REJECT.typeCode))
-                                .userId(userId)
-                                .token(symbol)
-                                .balanceChanged(fee)
-                                .fee(BigDecimal.ZERO)
-                                .balanceTxType(Account.Balance.AVAILABLE)
-                                .txType(Account.TxType.WITHDRAW_REJECT)
-                                .refNo(transNo)
-                                .remark("提现返回")
-                                .build()
-                )
-        );
+        List<TopAccountTx> topAccountTxList = topAccountTxService.getByRefNo(transNo);
+        topAccountTxList.forEach(topAccountTx -> {
+            Long userId = topAccountTx.getUserId();
+            String symbol = topAccountTx.getSymbol();
+            BigDecimal amount = topAccountTx.getAmount().negate();
+            //退回用户的资金
+            topAccountService.processAccount(
+                    Arrays.asList(
+                            AccountRequest.builder()
+                                    .uniqueId(UUID.fastUUID().toString().concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_REJECT.typeCode))
+                                    .userId(userId)
+                                    .token(symbol)
+                                    .balanceChanged(amount)
+                                    .fee(BigDecimal.ZERO)
+                                    .balanceTxType(Account.Balance.AVAILABLE)
+                                    .txType(Account.TxType.WITHDRAW_REJECT)
+                                    .refNo(transNo)
+                                    .remark(Account.TxType.WITHDRAW_REJECT.typeName)
+                                    .build()
+                    )
+            );
+        });
+
     }
 
     public void processAccount(List<AccountRequest> requests) {
