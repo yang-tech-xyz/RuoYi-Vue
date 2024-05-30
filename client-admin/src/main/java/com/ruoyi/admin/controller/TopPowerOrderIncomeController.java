@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Tag(description = "算力收益明细", name = "算力收益明细")
 @RestController
 @RequestMapping("topPowerOrderIncome")
@@ -24,7 +26,7 @@ public class TopPowerOrderIncomeController {
 
     @Operation(summary = "汇总")
     @GetMapping("/getStatistics")
-    public AjaxResult<PowerOrderIncomeStatisticsVO> getStatistics(@ModelAttribute PowerOrderIncomePageDTO dto) {
+    public AjaxResult<List<PowerOrderIncomeStatisticsVO>> getStatistics(@ModelAttribute PowerOrderIncomePageDTO dto) {
         return AjaxResult.success(service.getStatistics(dto));
     }
 

@@ -9,10 +9,12 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import com.ruoyi.admin.entity.TopPowerOrderIncome;
 
+import java.util.List;
+
 @Repository
 public interface TopPowerOrderIncomeMapper extends BaseMapper<TopPowerOrderIncome>{
 
-    PowerOrderIncomeStatisticsVO selectStatistics(@Param("dto") PowerOrderIncomePageDTO dto);
+    List<PowerOrderIncomeStatisticsVO> selectStatistics(@Param("dto") PowerOrderIncomePageDTO dto);
 
     IPage<PowerOrderIncomeVO> selectPageVO(@Param("iPage") IPage<PowerOrderIncomeVO> iPage, @Param("dto") PowerOrderIncomePageDTO dto);
 }
