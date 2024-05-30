@@ -57,7 +57,16 @@
                         INNER JOIN top_power_order _tpo ON _tui.invite_user_id = _tpo.user_id
                 WHERE
                     _tui.user_id = tu.id
-            ) AS inviteMemberPowerNumber
+            ) AS inviteMemberPowerNumber,
+            (
+                SELECT
+                    IFNULL(sum( _tpo.invest_amount ),0)
+                FROM
+                    top_user_invite _tui
+                    INNER JOIN top_store_order _tpo ON _tui.invite_user_id = _tpo.user_id
+                WHERE
+                    _tui.user_id = tu.id
+            ) AS totalStoreAmount
         FROM
             top_user tu
         <where>
