@@ -1,8 +1,11 @@
 package com.ruoyi.admin.controller;
 
+import com.ruoyi.admin.dto.PowerOrderIncomePageDTO;
 import com.ruoyi.admin.dto.PowerOrderSharingIncomePageDTO;
 import com.ruoyi.admin.service.TopPowerSharingIncomeService;
 import com.ruoyi.admin.vo.PageVO;
+import com.ruoyi.admin.vo.PowerOrderIncomeStatisticsVO;
+import com.ruoyi.admin.vo.PowerOrderSharingIncomeStatisticsVO;
 import com.ruoyi.admin.vo.PowerOrderSharingIncomeVO;
 import com.ruoyi.common.AjaxResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +23,12 @@ public class TopPowerSharingIncomeController {
 
     @Autowired
     private TopPowerSharingIncomeService service;
+
+    @Operation(summary = "汇总")
+    @GetMapping("/getStatistics")
+    public AjaxResult<PowerOrderSharingIncomeStatisticsVO> getStatistics(@ModelAttribute PowerOrderSharingIncomePageDTO dto) {
+        return AjaxResult.success(service.getStatistics(dto));
+    }
 
     @Operation(summary = "查询记录")
     @GetMapping("/getPage")

@@ -1,11 +1,10 @@
 package com.ruoyi.admin.controller;
 
 import com.ruoyi.admin.dto.PowerOrderIncomePageDTO;
-import com.ruoyi.admin.dto.PowerOrderPageDTO;
 import com.ruoyi.admin.service.TopPowerOrderIncomeService;
 import com.ruoyi.admin.vo.PageVO;
+import com.ruoyi.admin.vo.PowerOrderIncomeStatisticsVO;
 import com.ruoyi.admin.vo.PowerOrderIncomeVO;
-import com.ruoyi.admin.vo.PowerOrderVO;
 import com.ruoyi.common.AjaxResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +21,12 @@ public class TopPowerOrderIncomeController {
 
     @Autowired
     private TopPowerOrderIncomeService service;
+
+    @Operation(summary = "汇总")
+    @GetMapping("/getStatistics")
+    public AjaxResult<PowerOrderIncomeStatisticsVO> getStatistics(@ModelAttribute PowerOrderIncomePageDTO dto) {
+        return AjaxResult.success(service.getStatistics(dto));
+    }
 
     @Operation(summary = "查询记录")
     @GetMapping("/getPage")

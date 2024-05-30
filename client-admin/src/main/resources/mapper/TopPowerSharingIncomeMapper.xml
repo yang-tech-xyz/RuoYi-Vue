@@ -2,6 +2,29 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.admin.mapper.TopPowerSharingIncomeMapper">
 
+    <select id="selectStatistics" resultType="com.ruoyi.admin.vo.PowerOrderSharingIncomeStatisticsVO">
+        select
+            tpsi.symbol,
+            sum( tpsi.income ) as income
+        from top_user tu
+        inner join top_power_sharing_income tpsi on tu.id = tpsi.user_id
+        <where>
+            <if test="dto.userId != null">
+                and tu.id = #{dto.userId}
+            </if>
+            <if test="dto.wallet != null and dto.wallet != ''">
+                and tu.wallet = #{dto.wallet}
+            </if>
+            <if test="dto.startDate != null">
+                and tpsi.process_date between #{dto.startDate} and #{dto.endDate}
+            </if>
+            <if test="dto.orderNo != null and dto.orderNo != ''">
+                and tpsi.provider_order_no = #{dto.orderNo}
+            </if>
+        </where>
+        GROUP BY tpsi.symbol
+    </select>
+
     <select id="selectPageVO" resultType="com.ruoyi.admin.vo.PowerOrderSharingIncomeVO">
         select
         tu.wallet,

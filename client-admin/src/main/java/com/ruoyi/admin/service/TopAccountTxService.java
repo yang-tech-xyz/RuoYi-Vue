@@ -18,6 +18,7 @@ import com.ruoyi.admin.mapper.TopAccountMapper;
 import com.ruoyi.admin.mapper.TopAccountTxMapper;
 import com.ruoyi.admin.vo.AccountTxVO;
 import com.ruoyi.admin.vo.PageVO;
+import com.ruoyi.admin.vo.StoreIncomeStatisticsVO;
 import com.ruoyi.admin.vo.StoreIncomeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -121,6 +122,10 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
         if (Arrays.stream(balance).anyMatch(e -> e.compareTo(BigDecimal.ZERO) < 0)) {
             throw new ServiceException("余额不足", 500);
         }
+    }
+
+    public StoreIncomeStatisticsVO getStoreStatistics(StoreIncomePageDTO dto) {
+        return baseMapper.selectStoreStatistics(dto);
     }
 
     public PageVO<StoreIncomeVO> getStoreIncomePage(StoreIncomePageDTO dto) {
