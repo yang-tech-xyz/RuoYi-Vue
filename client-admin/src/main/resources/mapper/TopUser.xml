@@ -8,6 +8,9 @@
             (select _tu.wallet from top_user _tu where _tu.id = tu.invited_user_id) as invitedUserWallet
         from top_user tu
         <where>
+            <if test="dto.userId != null">
+                and tu.id = #{dto.userId}
+            </if>
             <if test="dto.wallet != '' and dto.wallet != null">
                 and tu.wallet = #{dto.wallet}
             </if>

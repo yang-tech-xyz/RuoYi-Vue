@@ -3,6 +3,8 @@ package com.ruoyi.admin.vo;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class SettleMemberInvitePageVO {
 
@@ -21,5 +23,8 @@ public class SettleMemberInvitePageVO {
 
     @Schema(description = "被邀请人矿机台数")
     private Long inviteMemberPowerNumber;
+
+    @Schema(description = "伞下总质押数（USD）")
+    private BigDecimal totalStoreAmount = BigDecimal.ZERO;
     
 }

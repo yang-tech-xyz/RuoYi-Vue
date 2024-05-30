@@ -3,9 +3,7 @@ package com.ruoyi.admin.controller;
 import com.ruoyi.admin.dto.AccountTxPageDTO;
 import com.ruoyi.admin.dto.StoreIncomePageDTO;
 import com.ruoyi.admin.service.TopAccountTxService;
-import com.ruoyi.admin.vo.AccountTxVO;
-import com.ruoyi.admin.vo.PageVO;
-import com.ruoyi.admin.vo.StoreIncomeVO;
+import com.ruoyi.admin.vo.*;
 import com.ruoyi.common.AjaxResult;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +25,12 @@ public class TopAccountTxController {
     @GetMapping("/getPage")
     public AjaxResult<PageVO<AccountTxVO>> getPage(@ModelAttribute AccountTxPageDTO dto) {
         return AjaxResult.success(service.getPage(dto));
+    }
+
+    @Operation(summary = "理财收益汇总")
+    @GetMapping("/getStoreStatistics")
+    public AjaxResult<StoreIncomeStatisticsVO> getStoreStatistics(@ModelAttribute StoreIncomePageDTO dto) {
+        return AjaxResult.success(service.getStoreStatistics(dto));
     }
 
     @Operation(summary = "理财收益明细")

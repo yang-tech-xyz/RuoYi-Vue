@@ -1,30 +1,18 @@
-package com.ruoyi.admin.entity;
+package com.ruoyi.admin.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.ruoyi.admin.enums.TransactionType;
-import com.ruoyi.common.BaseEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 
-/**
- * 【请填写功能名称】对象 top_chain
- *
- * @author ruoyi
- * @date 2024-02-03
- */
 @Data
-public class TopTransaction extends BaseEntity {
-    private static final long serialVersionUID = 1L;
+public class TopTransactionVO {
 
     /**
      * 链信息配置表
      */
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -88,9 +76,4 @@ public class TopTransaction extends BaseEntity {
 
     @Schema(description = "已经处理次数,仍然未能确认该笔交易")
     private int retryCounts;
-
-    private LocalDateTime createTime;
-
-    private LocalDateTime updateTime;
-
 }

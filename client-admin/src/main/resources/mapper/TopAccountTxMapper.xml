@@ -9,7 +9,7 @@
         from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
         <where>
             <if test="dto.userId != null">
-                and tu.user_id = #{dto.userId}
+                and tu.id = #{dto.userId}
             </if>
             <if test="dto.wallet != null and dto.wallet != ''">
                 and tu.wallet = #{dto.wallet}
@@ -19,6 +19,29 @@
             </if>
         </where>
         order by tat.id desc
+    </select>
+
+    <select id="selectStoreStatistics" resultType="com.ruoyi.admin.vo.StoreIncomeStatisticsVO">
+        select
+            tat.symbol,
+            sum(tat.amount) as amount
+        from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
+        <where>
+            tat.tx_type in ('STORE_INTEREST', 'STORE_INTEREST_INVITE')
+            <if test="dto.startDateTime != null">
+                and tu.created_date between #{dto.startDateTime} and #{dto.endDateTime}
+            </if>
+            <if test="dto.userId != null">
+                and tat.user_id = #{dto.userId}
+            </if>
+            <if test="dto.wallet != null and dto.wallet != ''">
+                and tu.wallet = #{dto.wallet}
+            </if>
+            <if test="dto.refNo != null and dto.refNo != ''">
+                and tat.ref_no = #{dto.refNo}
+            </if>
+        </where>
+        group by tat.symbol
     </select>
 
     <select id="selectStoreIncomePageVO" resultType="com.ruoyi.admin.vo.StoreIncomeVO">

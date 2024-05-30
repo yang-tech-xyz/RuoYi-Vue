@@ -64,7 +64,16 @@
     <select id="selectStoreInviteInfo" resultType="com.ruoyi.web.vo.StoreInviteInfoVO">
         select
             (select count(_tui.id) from top_user_invite _tui where _tui.user_id = tu.id and _tui.level = 1) as totalInviteUser,
-            (select ifnull(sum(_tat.amount),0) from top_account_tx _tat where _tat.tx_type = 'STORE_INTEREST_INVITE' and _tat.user_id = tu.id) as totalStoreIncome
+            (select ifnull(sum(_tat.amount),0) from top_account_tx _tat where _tat.tx_type = 'STORE_INTEREST_INVITE' and _tat.user_id = tu.id) as totalStoreIncome,
+            (
+                SELECT
+                    IFNULL(sum( _tpo.invest_amount ),0)
+                FROM
+                    top_user_invite _tui
+                        INNER JOIN top_store_order _tpo ON _tui.invite_user_id = _tpo.user_id
+                WHERE
+                    _tui.user_id = tu.id
+            ) AS totalStoreAmount
         from top_user tu
         where tu.wallet = #{wallet}
     </select>

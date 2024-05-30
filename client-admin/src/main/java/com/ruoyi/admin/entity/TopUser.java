@@ -40,6 +40,10 @@ public class TopUser {
     @TableField(value = "invited_user_id")
     private Long invitedUserId;
 
+    @Schema(description = "禁止")
+    @TableField(value = "block_enabled")
+    private Boolean blockEnabled;
+
     @Schema(description = "邀请人的邀请码")
     @TableField(value = "invited_user_code")
     private String invitedUserCode;

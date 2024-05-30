@@ -1,17 +1,22 @@
 package com.ruoyi.admin.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.admin.dto.SettleDepositWithdrawPageDTO;
 import com.ruoyi.admin.dto.SettleMemberInvitePageDTO;
+import com.ruoyi.admin.entity.TopUser;
 import com.ruoyi.admin.mapper.TopSettleMapper;
+import com.ruoyi.admin.mapper.TopUserMapper;
 import com.ruoyi.admin.vo.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,6 +24,9 @@ public class TopSettleService {
 
     @Autowired
     private TopSettleMapper settleMapper;
+
+    @Autowired
+    private TopUserMapper userMapper;
 
     public SettleMemberCountVO getMemberCount() {
         LocalDate today = LocalDate.now();
@@ -60,5 +68,16 @@ public class TopSettleService {
         pageVO.setTotal(iPage.getTotal());
         pageVO.setList(iPage.getRecords());
         return pageVO;
+    }
+
+    public List<SettleDirectVO> getDirect(Long userId, String wallet) {
+        if (userId == null && StringUtils.isBlank(wallet)) {
+            return new ArrayList<>();
+        }
+        if (StringUtils.isNotBlank(wallet)) {
+            TopUser user = userMapper.selectOne(new LambdaQueryWrapper<TopUser>().eq(TopUser::getWallet, wallet));
+            userId = user.getId();
+        }
+        return settleMapper.selectDirectByUserId(userId);
     }
 }

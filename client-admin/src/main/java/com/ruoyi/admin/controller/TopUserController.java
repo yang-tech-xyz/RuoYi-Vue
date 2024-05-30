@@ -1,5 +1,6 @@
 package com.ruoyi.admin.controller;
 
+import com.ruoyi.admin.dto.UserBlockDTO;
 import com.ruoyi.admin.dto.UserPageDTO;
 import com.ruoyi.admin.service.TopUserService;
 import com.ruoyi.admin.vo.PageVO;
@@ -9,10 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  *
@@ -30,6 +28,12 @@ public class TopUserController {
     @GetMapping("/getPage")
     public AjaxResult<PageVO<UserVO>> getPage(@ModelAttribute UserPageDTO dto) {
         return AjaxResult.success(service.getPage(dto));
+    }
+
+    @Operation(summary = "禁止开关")
+    @PostMapping("/blockEnabled")
+    public AjaxResult<Boolean> blockEnabled(@RequestBody UserBlockDTO dto) {
+        return AjaxResult.success(service.blockEnabled(dto));
     }
 
 }

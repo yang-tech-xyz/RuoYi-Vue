@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.ruoyi.common.AjaxResult;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.dto.StoreCpOrderDTO;
 import com.ruoyi.web.dto.StoreOrderDTO;
@@ -22,6 +23,7 @@ import com.ruoyi.web.exception.ServiceException;
 import com.ruoyi.web.mapper.TopStoreMapper;
 import com.ruoyi.web.mapper.TopStoreOrderMapper;
 import com.ruoyi.web.mapper.TopUserMapper;
+import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.vo.PageVO;
 import com.ruoyi.web.vo.StoreOrderInfoVO;
 import com.ruoyi.web.vo.StoreOrderVO;
@@ -84,6 +86,9 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
             throw new ServiceException("未达到最低投资额", 500);
         }
         TopUser user = userMapper.selectByWallet(walletAddress);
+        if (user.getBlockEnabled()){
+            throw new ServiceException("user block", 500);
+        }
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
         TopStoreOrder order = new TopStoreOrder();
         order.setStoreId(store.getId());

@@ -48,6 +48,10 @@ public class TopUser {
     @TableField(value = "invited_user_code")
     private String invitedUserCode;
 
+    @Schema(description = "禁止")
+    @TableField(value = "block_enabled")
+    private Boolean blockEnabled;
+
     @Schema(description = "${column.comment}")
     @TableField(value = "create_time")
     private LocalDateTime createTime;

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ruoyi.admin.mapper.TopTransactionMapper">
+
+    <select id="selectPageVOByDTO" resultType="com.ruoyi.admin.vo.TopTransactionVO">
+        select tu.wallet,
+        tt.*
+        from top_transaction tt
+        inner join top_user tu on tt.user_id = tu.id
+        <where>
+            <if test="dto.startDateTime != null and dto.endDateTime != null">
+                and tt.create_time between #{dto.startDateTime} and #{dto.endDateTime}
+            </if>
+            <if test="dto.userId != null">
+                and tu.id = #{dto.userId}
+            </if>
+            <if test="dto.wallet != null and dto.wallet != ''">
+                and tu.wallet = #{dto.wallet}
+            </if>
+            <if test="dto.symbol != null and dto.symbol != ''">
+                and tt.symbol = #{dto.symbol}
+            </if>
+            <if test="dto.chainId != null">
+                and tt.chain_id = #{dto.chainId}
+            </if>
+            <if test="dto.hash != null and dto.hash != ''">
+                and tt.hash = #{dto.hash}
+            </if>
+            <if test="dto.status != null and dto.status != ''">
+                and tt.status = #{dto.status}
+            </if>
+            <if test="dto.type != null and dto.type != ''">
+                and tt.type = #{dto.type}
+            </if>
+        </where>
+        order by tt.create_time desc
+    </select>
+
+</mapper>

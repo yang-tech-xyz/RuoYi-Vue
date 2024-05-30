@@ -6,9 +6,12 @@ import com.ruoyi.common.CommonSymbols;
 import com.ruoyi.web.bot.ExecBot;
 import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.entity.TopTransaction;
+import com.ruoyi.web.entity.TopUser;
 import com.ruoyi.web.exception.ServiceException;
+import com.ruoyi.web.mapper.TopUserMapper;
 import com.ruoyi.web.service.TopTokenService;
 import com.ruoyi.web.service.TopTransactionService;
+import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,6 +47,9 @@ public class TopTokenController {
 
     @Value("${spring.profiles.active}")
     private String env;
+
+    @Autowired
+    private TopUserMapper userMapper;
 
     @Operation(summary = "查询当前所有币种")
     @GetMapping("/getList")
@@ -96,6 +102,7 @@ public class TopTokenController {
 
     /**
      * 提币申请.
+     * 1:新增提币用户限制
      */
     @Operation(summary = "提币")
     @PostMapping("/withdraw")
@@ -108,6 +115,11 @@ public class TopTokenController {
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
+        }
+        String wallet = RequestUtil.getWallet();
+        TopUser user= userMapper.selectByWallet(wallet);
+        if (user.getBlockEnabled()){
+            return AjaxResult.error("user block");
         }
         String symbol = withdrawBody.getSymbol();
         Long chainId = withdrawBody.getChainId();
@@ -141,6 +153,11 @@ public class TopTokenController {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
+        String wallet = RequestUtil.getWallet();
+        TopUser user= userMapper.selectByWallet(wallet);
+        if (user.getBlockEnabled()){
+            return AjaxResult.error("user block");
+        }
         topTokenService.internalTransferBody(internalTransferBody);
         return AjaxResult.success("Success");
     }
@@ -153,6 +170,11 @@ public class TopTokenController {
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
+        }
+        String wallet = RequestUtil.getWallet();
+        TopUser user= userMapper.selectByWallet(wallet);
+        if (user.getBlockEnabled()){
+            return AjaxResult.error("user block");
         }
         topTokenService.exchangeBTC2USDT(exchangeBody);
         return AjaxResult.success("Success");
@@ -167,6 +189,11 @@ public class TopTokenController {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
+        String wallet = RequestUtil.getWallet();
+        TopUser user= userMapper.selectByWallet(wallet);
+        if (user.getBlockEnabled()){
+            return AjaxResult.error("user block");
+        }
         topTokenService.exchangeUsdt2BTCF(exchangeBody);
         return AjaxResult.success("Success");
     }
@@ -179,6 +206,11 @@ public class TopTokenController {
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
+        }
+        String wallet = RequestUtil.getWallet();
+        TopUser user= userMapper.selectByWallet(wallet);
+        if (user.getBlockEnabled()){
+            return AjaxResult.error("user block");
         }
         topTokenService.exchangeBTC2BTCF(exchangeBody);
         return AjaxResult.success("Success");

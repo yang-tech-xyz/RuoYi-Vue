@@ -9,6 +9,8 @@ import java.time.LocalDate;
 @Data
 public class PowerOrderSharingIncomeVO {
 
+    private Long userId;
+
     @Schema(description = "地址")
     private String wallet;
 

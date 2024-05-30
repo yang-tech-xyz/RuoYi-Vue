@@ -7,6 +7,7 @@ import com.ruoyi.admin.dto.PowerOrderIncomePageDTO;
 import com.ruoyi.admin.entity.TopPowerOrderIncome;
 import com.ruoyi.admin.mapper.TopPowerOrderIncomeMapper;
 import com.ruoyi.admin.vo.PageVO;
+import com.ruoyi.admin.vo.PowerOrderIncomeStatisticsVO;
 import com.ruoyi.admin.vo.PowerOrderIncomeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class TopPowerOrderIncomeService extends ServiceImpl<TopPowerOrderIncomeMapper, TopPowerOrderIncome> {
+
+    public PowerOrderIncomeStatisticsVO getStatistics(PowerOrderIncomePageDTO dto) {
+        return baseMapper.selectStatistics(dto);
+    }
 
     public PageVO<PowerOrderIncomeVO> getPage(PowerOrderIncomePageDTO dto) {
         IPage<PowerOrderIncomeVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
