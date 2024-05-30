@@ -4,9 +4,9 @@
 
     <select id="selectPageVOByDTO" resultType="com.ruoyi.admin.vo.TopTransactionVO">
         select tu.wallet,
-               tt.*
+        tt.*
         from top_transaction tt
-                 inner join top_user tu on tt.user_id = tu.id
+        inner join top_user tu on tt.user_id = tu.id
         <where>
             <if test="dto.startDateTime != null and dto.endDateTime != null">
                 and tt.create_time between #{dto.startDateTime} and #{dto.endDateTime}
@@ -18,7 +18,10 @@
                 and tu.wallet = #{dto.wallet}
             </if>
             <if test="dto.symbol != null and dto.symbol != ''">
-               and tt.symbol = #{dto.symbol}
+                and tt.symbol = #{dto.symbol}
+            </if>
+            <if test="dto.chainId != null">
+                and tt.chain_id = #{dto.chainId}
             </if>
             <if test="dto.hash != null and dto.hash != ''">
                 and tt.hash = #{dto.hash}

@@ -29,6 +29,9 @@ public class TopTransactionDTO extends BaseDTO {
 
     private String symbol;
 
+    @Schema(description = "节点id")
+    private Long chainId;
+
     @Schema(description = "hash")
     private String hash;
 
