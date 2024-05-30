@@ -37,6 +37,7 @@ public interface Account {
         RECHARGE_IN("RECHARGE_IN", "充值"),
         TRON_RECHARGE_IN("TRON_RECHARGE_IN", "TRON充值"),
         WITHDRAW("WITHDRAW", "提现"),
+        WITHDRAW_FEE("WITHDRAW_FEE", "提现手续费"),
         TRON_WITHDRAW("TRON_WITHDRAW", "波场提现"),
         WITHDRAW_REJECT("WITHDRAW_REJECT", "提现拒绝"),
         WITHDRAW_BTC("WITHDRAW_BTC", "提现BTC"),

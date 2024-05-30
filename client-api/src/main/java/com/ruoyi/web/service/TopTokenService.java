@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.protobuf.ByteString;
+import com.ruoyi.common.CommonSymbols;
 import com.ruoyi.web.common.CommonStatus;
 import com.ruoyi.web.dto.AccountRequest;
 import com.ruoyi.web.entity.*;
@@ -52,6 +53,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -659,9 +661,19 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException("fee ratio is null");
         }
         BigDecimal fee = withdrawAmount.multiply(feeRatio);
+        // 修改需求,手续费使用等值的BTCF进行支付.如果需要支付的BTCF手续费不足,则提现失败,用户需要购买BTCF后重新发起提现.
+        //1.获取BTCF的价格.并计算需要支付的BTCF手续费个数
+        BigDecimal priceOfBTCF = getPrice(CommonSymbols.BTCF_SYMBOL);
+        BigDecimal priceOfSymbol = getPrice(symbol);
+        BigDecimal feeAmountOfBTCF = fee.multiply(priceOfSymbol).divide(priceOfBTCF,6, RoundingMode.UP);
+        //检查手续费是否足够,如果不足够,报错.如果足够,则冻结该手续费.
+        TopAccount accountBTCF = accountService.getAccount(userId, CommonSymbols.BTCF_SYMBOL);
+        if(accountBTCF.getAvailableBalance().compareTo(feeAmountOfBTCF)<0){
+            throw new ServiceException("BTCF fee not enough,need BTCF amount:"+feeAmountOfBTCF);
+        }
+
         // 实际到账金额应该减去手续费
-//        BigDecimal transferAmount = withdrawAmount.subtract(fee);
-        BigDecimal transferAmount = withdrawAmount.subtract(fee);
+        BigDecimal transferAmount = withdrawAmount;
 
 
         BigInteger tokenAmount = transferAmount.multiply(new BigDecimal("10").pow(decimalOfContract.intValue())).toBigInteger();
@@ -679,7 +691,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW.typeCode))
                                 .userId(userId)
                                 .token(symbol)
-                                .fee(fee.negate())
+                                .fee(BigDecimal.ZERO)
                                 .balanceChanged(transferAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.WITHDRAW)
@@ -688,6 +700,25 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .build()
                 )
         );
+
+
+        // 扣除用户手续费.
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_FEE.typeCode))
+                                .userId(userId)
+                                .token(CommonSymbols.BTCF_SYMBOL)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(feeAmountOfBTCF.negate())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.WITHDRAW_FEE)
+                                .refNo(uuid)
+                                .remark(Account.TxType.WITHDRAW_FEE.typeName)
+                                .build()
+                )
+        );
+
 //        topTransaction.setHash(transactionHash);
         topTransaction.setWithdrawReceiveAddress(to);
         topTransaction.setErc20Address(contractAddress);
@@ -786,9 +817,21 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                 throw new ServiceException("fee ratio is null");
             }
             BigDecimal fee = withdrawAmount.multiply(feeRatio);
+
+            // 修改需求,手续费使用等值的BTCF进行支付.如果需要支付的BTCF手续费不足,则提现失败,用户需要购买BTCF后重新发起提现.
+            //1.获取BTCF的价格.并计算需要支付的BTCF手续费个数
+            BigDecimal priceOfBTCF = getPrice(CommonSymbols.BTCF_SYMBOL);
+            BigDecimal priceOfSymbol = getPrice(symbol);
+            BigDecimal feeAmountOfBTCF = fee.multiply(priceOfSymbol).divide(priceOfBTCF,6, RoundingMode.UP);
+            //检查手续费是否足够,如果不足够,报错.如果足够,则冻结该手续费.
+            TopAccount accountBTCF = accountService.getAccount(userId, CommonSymbols.BTCF_SYMBOL);
+            if(accountBTCF.getAvailableBalance().compareTo(feeAmountOfBTCF)<0){
+                throw new ServiceException("BTCF fee not enough,need BTCF amount:"+feeAmountOfBTCF);
+            }
+
+
             // 实际到账金额应该减去手续费
-//        BigDecimal transferAmount = withdrawAmount.subtract(fee);
-            BigDecimal transferAmount = withdrawAmount.subtract(fee);
+            BigDecimal transferAmount = withdrawAmount;
 
 
             BigInteger tokenAmount = transferAmount.multiply(new BigDecimal("10").pow(tronDecimalOfContract.intValue())).toBigInteger();
@@ -810,7 +853,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                     .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.TRON_WITHDRAW.typeCode))
                                     .userId(userId)
                                     .token(symbol)
-                                    .fee(fee.negate())
+                                    .fee(BigDecimal.ZERO)
                                     .balanceChanged(transferAmount.negate())
                                     .balanceTxType(Account.Balance.AVAILABLE)
                                     .txType(Account.TxType.TRON_WITHDRAW)
@@ -819,6 +862,27 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                     .build()
                     )
             );
+
+
+
+            // 扣除用户手续费.
+            accountService.processAccount(
+                    Arrays.asList(
+                            AccountRequest.builder()
+                                    .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_FEE.typeCode))
+                                    .userId(userId)
+                                    .token(CommonSymbols.BTCF_SYMBOL)
+                                    .fee(BigDecimal.ZERO)
+                                    .balanceChanged(feeAmountOfBTCF.negate())
+                                    .balanceTxType(Account.Balance.AVAILABLE)
+                                    .txType(Account.TxType.WITHDRAW_FEE)
+                                    .refNo(uuid)
+                                    .remark(Account.TxType.WITHDRAW_FEE.typeName)
+                                    .build()
+                    )
+            );
+
+
 //        topTransaction.setHash(transactionHash);
             topTransaction.setWithdrawReceiveAddress(to);
             topTransaction.setErc20Address(contractAddress);
@@ -894,9 +958,22 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             throw new ServiceException("fee ratio is null");
         }
         BigDecimal fee = withdrawAmount.multiply(feeRatio);
+
+
+        // 修改需求,手续费使用等值的BTCF进行支付.如果需要支付的BTCF手续费不足,则提现失败,用户需要购买BTCF后重新发起提现.
+        //1.获取BTCF的价格.并计算需要支付的BTCF手续费个数
+        BigDecimal priceOfBTCF = getPrice(CommonSymbols.BTCF_SYMBOL);
+        BigDecimal priceOfSymbol = getPrice(symbol);
+        BigDecimal feeAmountOfBTCF = fee.multiply(priceOfSymbol).divide(priceOfBTCF,6, RoundingMode.UP);
+        //检查手续费是否足够,如果不足够,报错.如果足够,则冻结该手续费.
+        TopAccount accountBTCF = accountService.getAccount(userId, CommonSymbols.BTCF_SYMBOL);
+        if(accountBTCF.getAvailableBalance().compareTo(feeAmountOfBTCF)<0){
+            throw new ServiceException("BTCF fee not enough,need BTCF amount:"+feeAmountOfBTCF);
+        }
+
+
         // 实际到账金额应该减去手续费
-//        BigDecimal transferAmount = withdrawAmount.subtract(fee);
-        BigDecimal transferAmount = withdrawAmount.subtract(fee);
+        BigDecimal transferAmount = withdrawAmount;
         // 检查账户中的资金是否充足
         if (account.getAvailableBalance().compareTo(withdrawAmount) < 0) {
             log.error("account exceed balance,account balance is:{},symbol is:{}", account.getAvailableBalance(), withdrawAmount);
@@ -911,7 +988,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_BTC.typeCode))
                                 .userId(userId)
                                 .token(symbol)
-                                .fee(fee.negate())
+                                .fee(BigDecimal.ZERO)
                                 .balanceChanged(transferAmount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.WITHDRAW_BTC)
@@ -920,6 +997,24 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .build()
                 )
         );
+
+        // 扣除用户手续费.
+        accountService.processAccount(
+                Arrays.asList(
+                        AccountRequest.builder()
+                                .uniqueId(uuid.concat("_" + userId).concat("_" + Account.TxType.WITHDRAW_FEE.typeCode))
+                                .userId(userId)
+                                .token(CommonSymbols.BTCF_SYMBOL)
+                                .fee(BigDecimal.ZERO)
+                                .balanceChanged(feeAmountOfBTCF.negate())
+                                .balanceTxType(Account.Balance.AVAILABLE)
+                                .txType(Account.TxType.WITHDRAW_FEE)
+                                .refNo(uuid)
+                                .remark(Account.TxType.WITHDRAW_FEE.typeName)
+                                .build()
+                )
+        );
+
 //        topTransaction.setHash(transactionHash);
         topTransaction.setWithdrawReceiveAddress(btcTransferAddress);
         topTransaction.setTransNo(uuid);
