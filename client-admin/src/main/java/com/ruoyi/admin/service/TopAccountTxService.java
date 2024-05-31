@@ -52,15 +52,18 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
         return pageVO;
     }
 
-    public TopAccountTx getByRefNo(String transNo) {
+    public List<TopAccountTx> getByRefNo(String transNo) {
         LambdaQueryWrapper<TopAccountTx> query = Wrappers.lambdaQuery();
         query.eq(TopAccountTx::getRefNo, transNo);
-        Optional<TopAccountTx> topAccountTxOptional = this.getOneOpt(query);
-        if (topAccountTxOptional.isEmpty()) {
-            log.error("account tx is not exist,refer no is:" + transNo);
-            throw new ServiceException("account tx is not exist");
-        }
-        return topAccountTxOptional.get();
+
+        return this.list(query);
+
+//        Optional<TopAccountTx> topAccountTxOptional = this.getOneOpt(query);
+//        if (topAccountTxOptional.isEmpty()) {
+//            log.error("account tx is not exist,refer no is:" + transNo);
+//            throw new ServiceException("account tx is not exist");
+//        }
+//        return topAccountTxOptional.get();
     }
 
     /**
