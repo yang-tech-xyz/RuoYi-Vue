@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDateTime;
 
 @Data
 public class TopTransactionVO {
@@ -76,4 +77,8 @@ public class TopTransactionVO {
 
     @Schema(description = "已经处理次数,仍然未能确认该笔交易")
     private int retryCounts;
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
 }
