@@ -76,9 +76,6 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
         BigDecimal payTokenAmount = buyPowerNeedPayUsdt.divide(tokenPrice, 10, RoundingMode.UP);
         String wallet = buyPowerBody.getWallet().toLowerCase();
         TopUser topUserEntity = topUserService.getByWallet(wallet);
-        if (topUserEntity.getBlockEnabled()){
-            throw new ServiceException("user block", 500);
-        }
         TopAccount account = topAccountService.getAccount(topUserEntity.getId(), symbol);
         if (account.getAvailableBalance().compareTo(payTokenAmount) < 0) {
             log.warn("account have no enough money,account info:{}", account);
