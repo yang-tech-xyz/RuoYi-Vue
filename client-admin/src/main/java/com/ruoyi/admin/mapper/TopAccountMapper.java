@@ -10,13 +10,15 @@ import com.ruoyi.admin.vo.AccountVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TopAccountMapper extends BaseMapper<TopAccount> {
 
 
     TopAccount lockById(@Param("id") Long id);
 
-    AccountTxStatisticsVO selectStatistics(@Param("dto") AccountTxPageDTO dto);
+    List<AccountTxStatisticsVO> selectStatistics(@Param("dto") AccountTxPageDTO dto);
 
     IPage<AccountVO> selectPageVO(@Param("iPage") IPage<AccountVO> iPage, @Param("dto") AccountPageDTO dto);
 }

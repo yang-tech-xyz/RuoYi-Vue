@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @Tag(description = "资产流水", name = "资产流水")
 @RestController
 @RequestMapping("topAccountTx")
@@ -23,7 +25,7 @@ public class TopAccountTxController {
 
     @Operation(summary = "流水汇总")
     @GetMapping("/getStatistics")
-    public AjaxResult<AccountTxStatisticsVO> getStatistics(@ModelAttribute AccountTxPageDTO dto) {
+    public AjaxResult<List<AccountTxStatisticsVO>> getStatistics(@ModelAttribute AccountTxPageDTO dto) {
         return AjaxResult.success(service.getStatistics(dto));
     }
 
@@ -35,7 +37,7 @@ public class TopAccountTxController {
 
     @Operation(summary = "理财收益汇总")
     @GetMapping("/getStoreStatistics")
-    public AjaxResult<StoreIncomeStatisticsVO> getStoreStatistics(@ModelAttribute StoreIncomePageDTO dto) {
+    public AjaxResult<List<StoreIncomeStatisticsVO>> getStoreStatistics(@ModelAttribute StoreIncomePageDTO dto) {
         return AjaxResult.success(service.getStoreStatistics(dto));
     }
 

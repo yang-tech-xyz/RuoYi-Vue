@@ -11,12 +11,14 @@ import com.ruoyi.admin.vo.StoreIncomeVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface TopAccountTxMapper extends BaseMapper<TopAccountTx> {
 
     IPage<AccountTxVO> selectPageVO(@Param("iPage") IPage<AccountTxVO> iPage, @Param("dto") AccountTxPageDTO dto);
 
-    StoreIncomeStatisticsVO selectStoreStatistics(@Param("dto") StoreIncomePageDTO dto);
+    List<StoreIncomeStatisticsVO> selectStoreStatistics(@Param("dto") StoreIncomePageDTO dto);
 
     IPage<StoreIncomeVO> selectStoreIncomePageVO(@Param("iPage") IPage<StoreIncomeVO> iPage, @Param("dto") StoreIncomePageDTO dto);
 }

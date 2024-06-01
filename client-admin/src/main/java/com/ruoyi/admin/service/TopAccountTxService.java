@@ -38,7 +38,7 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
     private TopAccountMapper accountMapper;
 
 
-    public AccountTxStatisticsVO getStatistics(AccountTxPageDTO dto) {
+    public List<AccountTxStatisticsVO> getStatistics(AccountTxPageDTO dto) {
         return accountMapper.selectStatistics(dto);
     }
 
@@ -128,7 +128,7 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
         }
     }
 
-    public StoreIncomeStatisticsVO getStoreStatistics(StoreIncomePageDTO dto) {
+    public List<StoreIncomeStatisticsVO> getStoreStatistics(StoreIncomePageDTO dto) {
         return baseMapper.selectStoreStatistics(dto);
     }
 
