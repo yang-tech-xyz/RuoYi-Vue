@@ -21,6 +21,12 @@ public class TopAccountTxController {
     @Autowired
     private TopAccountTxService service;
 
+    @Operation(summary = "流水汇总")
+    @GetMapping("/getStatistics")
+    public AjaxResult<AccountTxStatisticsVO> getStatistics(@ModelAttribute AccountTxPageDTO dto) {
+        return AjaxResult.success(service.getStatistics(dto));
+    }
+
     @Operation(summary = "查询记录")
     @GetMapping("/getPage")
     public AjaxResult<PageVO<AccountTxVO>> getPage(@ModelAttribute AccountTxPageDTO dto) {
