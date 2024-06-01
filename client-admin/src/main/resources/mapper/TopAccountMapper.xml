@@ -24,7 +24,7 @@
                 and ta.symbol = #{dto.symbol}
             </if>
         </where>
-        order by ta.update_time desc
+        order by ta.updated_date desc
     </select>
 
 </mapper>
