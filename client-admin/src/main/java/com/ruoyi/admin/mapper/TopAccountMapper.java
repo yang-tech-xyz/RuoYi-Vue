@@ -18,8 +18,6 @@ public interface TopAccountMapper extends BaseMapper<TopAccount> {
 
     TopAccount lockById(@Param("id") Long id);
 
-    List<AccountTxStatisticsVO> selectStatistics(@Param("dto") AccountTxPageDTO dto);
-
     IPage<AccountVO> selectPageVO(@Param("iPage") IPage<AccountVO> iPage, @Param("dto") AccountPageDTO dto);
 }
 

@@ -39,7 +39,7 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
 
 
     public List<AccountTxStatisticsVO> getStatistics(AccountTxPageDTO dto) {
-        return accountMapper.selectStatistics(dto);
+        return baseMapper.selectStatistics(dto);
     }
 
     public PageVO<AccountTxVO> getPage(AccountTxPageDTO dto) {

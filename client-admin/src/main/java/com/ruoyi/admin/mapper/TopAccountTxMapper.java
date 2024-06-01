@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ruoyi.admin.dto.AccountTxPageDTO;
 import com.ruoyi.admin.dto.StoreIncomePageDTO;
 import com.ruoyi.admin.entity.TopAccountTx;
+import com.ruoyi.admin.vo.AccountTxStatisticsVO;
 import com.ruoyi.admin.vo.AccountTxVO;
 import com.ruoyi.admin.vo.StoreIncomeStatisticsVO;
 import com.ruoyi.admin.vo.StoreIncomeVO;
@@ -15,6 +16,8 @@ import java.util.List;
 
 @Repository
 public interface TopAccountTxMapper extends BaseMapper<TopAccountTx> {
+
+    List<AccountTxStatisticsVO> selectStatistics(@Param("dto") AccountTxPageDTO dto);
 
     IPage<AccountTxVO> selectPageVO(@Param("iPage") IPage<AccountTxVO> iPage, @Param("dto") AccountTxPageDTO dto);
 

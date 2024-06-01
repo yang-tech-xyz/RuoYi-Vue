@@ -8,25 +8,6 @@
         where id = #{id} for update
     </select>
 
-    <select id="selectStatistics" resultType="com.ruoyi.admin.vo.AccountTxStatisticsVO">
-        select
-            ta.symbol,
-            sum(ta.amount) as amount
-        from top_account ta inner join top_user tu on ta.user_id = tu.id
-        <where>
-            <if test="dto.userId != null">
-                and ta.user_id = #{dto.userId}
-            </if>
-            <if test="dto.wallet != null and dto.wallet != ''">
-                and tu.wallet = #{dto.wallet}
-            </if>
-            <if test="dto.symbol != null and dto.symbol != ''">
-                and ta.symbol = #{dto.symbol}
-            </if>
-        </where>
-        group by ta.symbol
-    </select>
-
     <select id="selectPageVO" resultType="com.ruoyi.admin.vo.AccountVO">
         select
         tu.wallet,
