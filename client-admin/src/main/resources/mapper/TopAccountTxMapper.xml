@@ -5,7 +5,7 @@
     <select id="selectStatistics" resultType="com.ruoyi.admin.vo.AccountTxStatisticsVO">
         select
         tat.symbol,
-        sum(tat.amount) as amount
+        sum(tat.amount+tat.fee) as amount
         from top_user tu inner join top_account_tx tat on tu.id = tat.user_id
         <where>
             <if test="dto.startDateTime != null">
