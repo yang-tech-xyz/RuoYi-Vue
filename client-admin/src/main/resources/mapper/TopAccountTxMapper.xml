@@ -21,7 +21,7 @@
                 and tat.symbol = #{dto.symbol}
             </if>
         </where>
-        group by tat.symbol desc
+        group by tat.symbol
     </select>
 
     <select id="selectPageVO" resultType="com.ruoyi.admin.vo.AccountTxVO">
