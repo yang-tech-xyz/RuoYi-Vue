@@ -105,7 +105,7 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
                                 .remark("支付")
                                 .build()
                 )
-                // TODO 是否需要記錄用戶系統賬戶入賬?
+                // TODO 是否需要記錄用戶系統賬戶入賬? 没有系统账户
         );
 
         //生成算力訂單

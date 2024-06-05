@@ -1077,6 +1077,11 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         String symbol = internalTransferBody.getSymbol();
         BigDecimal amount = internalTransferBody.getAmount();
 
+        BigDecimal fee = BigDecimal.ZERO;
+        if(CommonSymbols.BTCF_SYMBOL.equalsIgnoreCase(symbol)){
+            fee = amount.divide(new BigDecimal("100"),6,RoundingMode.UP);
+            amount = amount.subtract(fee);
+        }
         // 从发出用户转出资金
         UUID uuid = UUID.fastUUID();
         accountService.processAccount(
