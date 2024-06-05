@@ -85,6 +85,7 @@
             tu.id as userId,
             tu.wallet,
             tu.grade,
+            tu.create_time,
             (select count(_tui.id) from top_user_invite _tui where _tui.user_id = tu.id) as totalInviteUser,
             (
                 SELECT

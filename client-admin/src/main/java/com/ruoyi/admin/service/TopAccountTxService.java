@@ -16,10 +16,7 @@ import com.ruoyi.admin.enums.Account;
 import com.ruoyi.admin.exception.ServiceException;
 import com.ruoyi.admin.mapper.TopAccountMapper;
 import com.ruoyi.admin.mapper.TopAccountTxMapper;
-import com.ruoyi.admin.vo.AccountTxVO;
-import com.ruoyi.admin.vo.PageVO;
-import com.ruoyi.admin.vo.StoreIncomeStatisticsVO;
-import com.ruoyi.admin.vo.StoreIncomeVO;
+import com.ruoyi.admin.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,6 +36,11 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
 
     @Autowired
     private TopAccountMapper accountMapper;
+
+
+    public List<AccountTxStatisticsVO> getStatistics(AccountTxPageDTO dto) {
+        return baseMapper.selectStatistics(dto);
+    }
 
     public PageVO<AccountTxVO> getPage(AccountTxPageDTO dto) {
         IPage<AccountTxVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
@@ -127,7 +128,7 @@ public class TopAccountTxService extends ServiceImpl<TopAccountTxMapper, TopAcco
         }
     }
 
-    public StoreIncomeStatisticsVO getStoreStatistics(StoreIncomePageDTO dto) {
+    public List<StoreIncomeStatisticsVO> getStoreStatistics(StoreIncomePageDTO dto) {
         return baseMapper.selectStoreStatistics(dto);
     }
 

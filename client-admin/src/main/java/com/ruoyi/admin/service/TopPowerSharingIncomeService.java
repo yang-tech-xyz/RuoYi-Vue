@@ -12,11 +12,13 @@ import com.ruoyi.admin.vo.PowerOrderSharingIncomeVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 public class TopPowerSharingIncomeService extends ServiceImpl<TopPowerSharingIncomeMapper, TopPowerSharingIncome> {
 
-    public PowerOrderSharingIncomeStatisticsVO getStatistics(PowerOrderSharingIncomePageDTO dto) {
+    public List<PowerOrderSharingIncomeStatisticsVO> getStatistics(PowerOrderSharingIncomePageDTO dto) {
         return baseMapper.selectStatistics(dto);
     }
 

@@ -171,11 +171,6 @@ public class TopTokenController {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
-        String wallet = RequestUtil.getWallet();
-        TopUser user= userMapper.selectByWallet(wallet);
-        if (user.getBlockEnabled()){
-            return AjaxResult.error("user block");
-        }
         topTokenService.exchangeBTC2USDT(exchangeBody);
         return AjaxResult.success("Success");
     }
@@ -189,11 +184,6 @@ public class TopTokenController {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
         }
-        String wallet = RequestUtil.getWallet();
-        TopUser user= userMapper.selectByWallet(wallet);
-        if (user.getBlockEnabled()){
-            return AjaxResult.error("user block");
-        }
         topTokenService.exchangeUsdt2BTCF(exchangeBody);
         return AjaxResult.success("Success");
     }
@@ -206,11 +196,6 @@ public class TopTokenController {
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
-        }
-        String wallet = RequestUtil.getWallet();
-        TopUser user= userMapper.selectByWallet(wallet);
-        if (user.getBlockEnabled()){
-            return AjaxResult.error("user block");
         }
         topTokenService.exchangeBTC2BTCF(exchangeBody);
         return AjaxResult.success("Success");

@@ -1,6 +1,9 @@
 package com.ruoyi.admin.dto;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 @Data
 public class AccountTxPageDTO {
@@ -14,5 +17,11 @@ public class AccountTxPageDTO {
     private String wallet;
 
     private String symbol;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime startDateTime;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime endDateTime;
 
 }

@@ -86,9 +86,6 @@ public class TopStoreOrderService extends ServiceImpl<TopStoreOrderMapper, TopSt
             throw new ServiceException("未达到最低投资额", 500);
         }
         TopUser user = userMapper.selectByWallet(walletAddress);
-        if (user.getBlockEnabled()){
-            throw new ServiceException("user block", 500);
-        }
         String orderNo = TopNo.STORE_NO._code + IdUtil.getSnowflake(TopNo.STORE_NO._workId).nextIdStr();
         TopStoreOrder order = new TopStoreOrder();
         order.setStoreId(store.getId());
