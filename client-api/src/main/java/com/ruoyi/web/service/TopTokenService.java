@@ -1090,7 +1090,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .uniqueId(uuid.toString().concat("_" + sendUserId).concat("_" + Account.TxType.INTERNAL_TRANSFER.typeCode))
                                 .userId(sendUserId)
                                 .token(symbol)
-                                .fee(BigDecimal.ZERO)
+                                .fee(fee)
                                 .balanceChanged(amount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.INTERNAL_TRANSFER)
