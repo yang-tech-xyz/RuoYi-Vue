@@ -151,4 +151,23 @@ public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPo
     public PowerOrderInfoVO getOderInfo(String wallet) {
         return baseMapper.selectInfo(wallet);
     }
+
+    public BigDecimal evaluateBuyMinterAmount(String symbol, String walletAddress) {
+        List<TopPowerConfig> powerConfigs = topPowerConfigService.list();
+        if (powerConfigs == null || powerConfigs.isEmpty()) {
+            throw new ServiceException("powerConfig is error!");
+        }
+        TopPowerConfig topPowerConfig = powerConfigs.getFirst();
+        //通过购买数量,计算需要的金额.
+        BigDecimal topPowerConfigPrice = topPowerConfig.getPrice();
+        // 查询symbol的价格.
+        BigDecimal tokenPrice = topTokenService.getPrice(symbol);
+        // 计算用户需要的token的数量
+        String wallet = walletAddress.toLowerCase();
+        TopUser topUserEntity = topUserService.getByWallet(wallet);
+        TopAccount account = topAccountService.getAccount(topUserEntity.getId(), symbol);
+        BigDecimal availableBalance = account.getAvailableBalance();
+        BigDecimal evaluateAmount = availableBalance.multiply(tokenPrice).divide(topPowerConfigPrice, 2, RoundingMode.DOWN);
+        return evaluateAmount;
+    }
 }
