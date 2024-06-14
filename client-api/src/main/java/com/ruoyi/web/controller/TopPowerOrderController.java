@@ -8,6 +8,7 @@ import com.ruoyi.web.service.TopUserService;
 import com.ruoyi.web.utils.RequestUtil;
 import com.ruoyi.web.utils.UnsignMessageUtils;
 import com.ruoyi.web.vo.BuyPowerBody;
+import com.ruoyi.web.vo.EvaluateBuyPowerBody;
 import com.ruoyi.web.vo.PowerOrderInfoVO;
 import com.ruoyi.web.vo.TopPowerOrderVO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.security.SignatureException;
 
 /**
@@ -41,6 +43,14 @@ public class TopPowerOrderController
     @GetMapping("/orderInfo")
     public AjaxResult<PowerOrderInfoVO> orderInfo() {
         return AjaxResult.success(topPowerOrderService.getOderInfo(RequestUtil.getWallet()));
+    }
+
+    @Operation(summary = "评估当前资产可以购买的矿机台数")
+    @GetMapping("evaluateBuyMinterAmount")
+    public AjaxResult<BigDecimal> evaluateBuyMinterAmount(@ParameterObject @Valid EvaluateBuyPowerBody body){
+        String wallet = RequestUtil.getWallet();
+        BigDecimal evaluateAmount = topPowerOrderService.evaluateBuyMinterAmount(body.getSymbol(),wallet);
+        return AjaxResult.success(evaluateAmount);
     }
 
     @Operation(summary = "购买算力,需要用户签名")
