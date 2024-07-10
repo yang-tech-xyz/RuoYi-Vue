@@ -38,7 +38,7 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         txRequest.setTxNo(UUID.fastUUID().toString(true));
         requests.stream()
                 .filter(e -> e.getBalanceChanged().compareTo(BigDecimal.ZERO) != 0)
-                .filter(e -> checkUniqueId(e.getUniqueId()) == 0)
+//                .filter(e -> checkUniqueId(e.getUniqueId()) == 0)
                 .forEach(e -> {
                     txRequest.addDetail(AccountTxRequestDetail.builder()
                             .uniqueId(e.getUniqueId())
