@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.admin.mapper.TopTokenBurningMapper">
+
+    <select id="selectBySymbol" resultType="com.ruoyi.admin.vo.TokenBurningVO">
+        select *
+        from top_token_burning
+        where symbol = #{symbol}
+    </select>
+
+    <select id="lockBySymbol" resultType="com.ruoyi.admin.entity.TopTokenBurning">
+        select *
+        from top_token_burning
+        where symbol = #{symbol} for update
+    </select>
+
+</mapper>
+
