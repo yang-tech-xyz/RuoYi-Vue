@@ -149,6 +149,9 @@ public class TopTokenController {
     public AjaxResult internalTransfer(@Valid @RequestBody InternalTransferBody internalTransferBody) {
         try {
             boolean validateResult = UnsignMessageUtils.validate(internalTransferBody.getSignMsg(), internalTransferBody.getContent(), internalTransferBody.getWallet());
+            if(!validateResult){
+                return AjaxResult.error("validate sign error!");
+            }
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
@@ -167,6 +170,9 @@ public class TopTokenController {
     public AjaxResult exchangeBTC2USDT(@Valid @RequestBody ExchangeBody exchangeBody) {
         try {
             boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(), exchangeBody.getContent(), exchangeBody.getWallet());
+            if(!validateResult){
+                return AjaxResult.error("validate sign error!");
+            }
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
@@ -180,6 +186,9 @@ public class TopTokenController {
     public AjaxResult exchangeUsdt2BTCF(@Valid @RequestBody ExchangeBody exchangeBody){
         try {
             boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(), exchangeBody.getContent(), exchangeBody.getWallet());
+            if(!validateResult){
+                return AjaxResult.error("validate sign error!");
+            }
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
@@ -193,6 +202,9 @@ public class TopTokenController {
     public AjaxResult exchangeBTC2BTCF(@RequestBody ExchangeBody exchangeBody){
         try {
             boolean validateResult = UnsignMessageUtils.validate(exchangeBody.getSignMsg(), exchangeBody.getContent(), exchangeBody.getWallet());
+            if(!validateResult){
+                return AjaxResult.error("validate sign error!");
+            }
         } catch (SignatureException e) {
             log.error("签名错误", e);
             throw new ServiceException("签名错误");
