@@ -32,7 +32,7 @@ public class InternalTransferBody extends SignBaseEntity
     /**
      * 币种标记
      */
-    @Schema(description="币种标记", example= "SUI")
+    @Schema(description="币种标记", example= "BTCF")
     private String symbol;
 
 

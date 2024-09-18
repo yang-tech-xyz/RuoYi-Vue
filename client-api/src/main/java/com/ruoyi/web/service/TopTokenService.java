@@ -1080,7 +1080,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         BigDecimal fee = BigDecimal.ZERO;
         if(CommonSymbols.BTCF_SYMBOL.equalsIgnoreCase(symbol)){
             fee = amount.divide(new BigDecimal("100"),6,RoundingMode.UP);
-            amount = amount.subtract(fee);
+//            amount = amount.subtract(fee);
         }
         // 从发出用户转出资金
         UUID uuid = UUID.fastUUID();
@@ -1090,7 +1090,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
                                 .uniqueId(uuid.toString().concat("_" + sendUserId).concat("_" + Account.TxType.INTERNAL_TRANSFER.typeCode))
                                 .userId(sendUserId)
                                 .token(symbol)
-                                .fee(fee)
+                                .fee(fee.negate())
                                 .balanceChanged(amount.negate())
                                 .balanceTxType(Account.Balance.AVAILABLE)
                                 .txType(Account.TxType.INTERNAL_TRANSFER)
