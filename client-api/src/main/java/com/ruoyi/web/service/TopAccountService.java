@@ -89,9 +89,9 @@ public class TopAccountService extends ServiceImpl<TopAccountMapper, TopAccount>
         List<TopAccount> accounts = baseMapper.selectList(new LambdaQueryWrapper<TopAccount>()
                 .eq(TopAccount::getUserId, user.getId())
                 .and(
-                        con->con.ne(TopAccount::getAvailableBalance, BigDecimal.ZERO)
-                        .ne(TopAccount::getLockupBalance, BigDecimal.ZERO)
-                        .ne(TopAccount::getFrozenBalance,BigDecimal.ZERO)
+                        con -> con.ne(TopAccount::getAvailableBalance, BigDecimal.ZERO)
+                                .or().ne(TopAccount::getLockupBalance, BigDecimal.ZERO)
+                                .or().ne(TopAccount::getFrozenBalance, BigDecimal.ZERO)
                 )
                 .eq(StringUtils.isNotBlank(symbol), TopAccount::getSymbol, symbol));
         if (StringUtils.isNotBlank(symbol) && accounts.isEmpty()) {
