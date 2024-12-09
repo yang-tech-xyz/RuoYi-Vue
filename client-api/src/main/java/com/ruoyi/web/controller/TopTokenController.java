@@ -74,12 +74,17 @@ public class TopTokenController {
     @Operation(summary = "充值到账,兼容波场USDT")
     @PostMapping("/recharge")
     public AjaxResult recharge(@Valid @RequestBody RechargeBody rechargeBody) throws Exception {
+//        if(1==1){
+//            throw new Exception("test exception");
+//        }
+        // 记录充值信息.
+        log.info("recharge body is:{}",rechargeBody);
         Optional<TopTransaction> topTransactionOptional = topTransactionService.getTransactionByHash(rechargeBody.getHash());
         if (topTransactionOptional.isPresent()) {
             return AjaxResult.error("transaction has exist!");
         }
         Long chainId = rechargeBody.getChainId();
-        if(chainId== CommonStatus.TRON_CHAIN_ID){
+        if(chainId == CommonStatus.TRON_CHAIN_ID){
             //波场链充值
             topTokenService.rechargeTRX(rechargeBody);
             try{
@@ -125,11 +130,12 @@ public class TopTokenController {
         Long chainId = withdrawBody.getChainId();
         if(chainId==-1){
             topTokenService.withdrawTron(withdrawBody);
-        }
-        if (symbol.equalsIgnoreCase(CommonSymbols.BTC_SYMBOL)) {
-            topTokenService.withdrawBTC(withdrawBody);
-        } else {
-            topTokenService.withdraw(withdrawBody);
+        }else{
+            if (symbol.equalsIgnoreCase(CommonSymbols.BTC_SYMBOL)) {
+                topTokenService.withdrawBTC(withdrawBody);
+            } else {
+                topTokenService.withdraw(withdrawBody);
+            }
         }
         //添加提币提醒
         String msg = "user:"+withdrawBody.getWallet()+" withdraw symbol:"+withdrawBody.getSymbol()+" amount:"+withdrawBody.getAmount()+" on chain id:"+withdrawBody.getChainId();
