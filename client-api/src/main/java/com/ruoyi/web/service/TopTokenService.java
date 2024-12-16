@@ -475,7 +475,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
             if (validateTransactionReceipt(hash, web3j)) {
                 topTransaction.setIsConfirm(1);
-                topTransaction.setStatus("0x1");
+                topTransaction.setStatus(CommonStatus.STATES_SUCCESS);
                 Long userId = topTransaction.getUserId().longValue();
                 accountService.processAccount(
                         Arrays.asList(
@@ -537,7 +537,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
             if (validateTronTransactionReceipt(hash, wrapper,topTransaction.getChainId())) {
                 topTransaction.setIsConfirm(1);
-                topTransaction.setStatus("0x1");
+                topTransaction.setStatus(CommonStatus.STATES_SUCCESS);
                 Long userId = topTransaction.getUserId().longValue();
                 accountService.processAccount(
                         Arrays.asList(
@@ -590,7 +590,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             //已经超过确认的区块高度.确认用户充值到账成功.写入用户的账户.
             if (validateTransactionReceipt(hash, web3j)) {
                 topTransaction.setIsConfirm(1);
-                topTransaction.setStatus("0x1");
+                topTransaction.setStatus(CommonStatus.STATES_SUCCESS);
                 Long userId = topTransaction.getUserId().longValue();
 
                 topTransactionService.updateConfirm(topTransaction);
@@ -720,6 +720,7 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         );
 
 //        topTransaction.setHash(transactionHash);
+        LocalDate now = LocalDate.now();
         topTransaction.setWithdrawReceiveAddress(to);
         topTransaction.setErc20Address(contractAddress);
         topTransaction.setTransNo(uuid);
@@ -741,6 +742,8 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         topTransaction.setUpdateBy(userId.toString());
         topTransaction.setBlockConfirm(topChain.getBlockConfirm());
         topTransaction.setType(TransactionType.Withdraw);
+        topTransaction.setCreatedDate(now);
+        topTransaction.setUpdatedDate(now);
         topTransactionService.save(topTransaction);
 //        systemTimer.addTask(new TimerTask(() -> topTokenService.confirmWithdrawToken(transactionHash), 10000));
     }

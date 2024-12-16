@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.LocalDate;
 
 /**
  * 【请填写功能名称】对象 top_chain
@@ -82,5 +83,11 @@ public class TopTransaction extends BaseEntity
 
     @Schema(description = "已经处理次数,仍然未能确认该笔交易")
     private int retryCounts;
+
+    @Schema(description = "创建日期")
+    private LocalDate createdDate;
+
+    @Schema(description = "修改日期")
+    private LocalDate updatedDate;
 
 }

@@ -19,7 +19,7 @@ public class TopAccountController {
     @Autowired
     private TopAccountService service;
 
-    @Operation(summary = "资产信息")
+    @Operation(summary = "我的资产信息")
     @GetMapping("/getAccounts")
     public AjaxResult getAccounts(@RequestParam(required = false) String symbol) {
         return AjaxResult.success(service.getAccounts(RequestUtil.getWallet(), symbol));
