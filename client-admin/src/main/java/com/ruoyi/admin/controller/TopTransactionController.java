@@ -3,6 +3,7 @@ package com.ruoyi.admin.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.dto.TopTransactionDTO;
+import com.ruoyi.admin.dto.TransactionStatisticDTO;
 import com.ruoyi.admin.dto.UnAuditTopTransactionDTO;
 import com.ruoyi.admin.entity.TopPowerConfig;
 import com.ruoyi.admin.entity.TopTransaction;
@@ -11,6 +12,7 @@ import com.ruoyi.admin.service.TopPowerConfigService;
 import com.ruoyi.admin.service.TopTokenService;
 import com.ruoyi.admin.service.TopTransactionService;
 import com.ruoyi.admin.utils.UnsignMessageUtils;
+import com.ruoyi.admin.vo.StatisticTransactionVO;
 import com.ruoyi.admin.vo.TopTransactionVO;
 import com.ruoyi.admin.vo.WithdrawAuditBody;
 import com.ruoyi.admin.vo.WithdrawBTCAuditBody;
@@ -148,5 +150,17 @@ TopTransactionController {
             topTokenService.withdrawAuditReject(topTransaction);
         }
         return AjaxResult.success();
+    }
+
+    @Operation(summary = "充值提现日统计查询")
+    @GetMapping("/getDayStatic")
+    public AjaxResult<List<StatisticTransactionVO>> getDayStatic(@ParameterObject TransactionStatisticDTO transactionStatisticDTO) {
+        return AjaxResult.success(topTransactionService.getDayStatic(transactionStatisticDTO));
+    }
+
+    @Operation(summary = "充值提现月统计查询")
+    @GetMapping("/getMonthStatic")
+    public AjaxResult<List<StatisticTransactionVO>> getMonthStatic(@ParameterObject TransactionStatisticDTO transactionStatisticDTO) {
+        return AjaxResult.success(topTransactionService.getMonthStatic(transactionStatisticDTO));
     }
 }

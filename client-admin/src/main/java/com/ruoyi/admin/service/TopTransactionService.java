@@ -7,11 +7,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.ruoyi.admin.common.CommonStatus;
 import com.ruoyi.admin.dto.TopTransactionDTO;
+import com.ruoyi.admin.dto.TransactionStatisticDTO;
 import com.ruoyi.admin.dto.UnAuditTopTransactionDTO;
 import com.ruoyi.admin.entity.TopTransaction;
 import com.ruoyi.admin.enums.TransactionType;
 import com.ruoyi.admin.exception.ServiceException;
 import com.ruoyi.admin.mapper.TopTransactionMapper;
+import com.ruoyi.admin.vo.StatisticTransactionVO;
 import com.ruoyi.admin.vo.TopTransactionVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -81,5 +83,13 @@ public class TopTransactionService extends ServiceImpl<TopTransactionMapper, Top
                 .eq((unAuditTopTransactionDTO.getChainId() != null), TopTransaction::getChainId, unAuditTopTransactionDTO.getChainId())
                 .orderByDesc(TopTransaction::getCreateTime);
         return this.getBaseMapper().selectList(wrapper);
+    }
+
+    public List<StatisticTransactionVO> getDayStatic(TransactionStatisticDTO transactionStatisticDTO) {
+        return this.getBaseMapper().getDayStatic(transactionStatisticDTO);
+    }
+
+    public List<StatisticTransactionVO> getMonthStatic(TransactionStatisticDTO transactionStatisticDTO) {
+        return this.getBaseMapper().getMonthStatic(transactionStatisticDTO);
     }
 }

@@ -213,6 +213,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
             topTransaction.setHeight(currentHeight);
 
             log.info("tokenAmount is:{}", tokenAmount);
+            LocalDate now = LocalDate.now();
+            topTransaction.setCreatedDate(now);
+            topTransaction.setUpdatedDate(now);
             topTransaction.setIsConfirm(0);
             topTransaction.setCreateTime(LocalDateTime.now());
             topTransaction.setUpdateTime(LocalDateTime.now());
@@ -311,7 +314,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
             long currentBlockNumber = wrapper.getNowBlock().getBlockHeader().getRawData().getNumber();
             topTransaction.setHeight(BigInteger.valueOf(currentBlockNumber));
-
+            LocalDate now = LocalDate.now();
+            topTransaction.setCreatedDate(now);
+            topTransaction.setUpdatedDate(now);
             log.info("tokenAmount is:{}", tokenAmount);
             topTransaction.setIsConfirm(0);
             topTransaction.setCreateTime(LocalDateTime.now());
@@ -887,6 +892,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
 
 
 //        topTransaction.setHash(transactionHash);
+            LocalDate now = LocalDate.now();
+            topTransaction.setCreatedDate(now);
+            topTransaction.setUpdatedDate(now);
             topTransaction.setWithdrawReceiveAddress(to);
             topTransaction.setErc20Address(contractAddress);
             topTransaction.setTransNo(uuid);
@@ -1019,6 +1027,9 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
         );
 
 //        topTransaction.setHash(transactionHash);
+        LocalDate now = LocalDate.now();
+        topTransaction.setCreatedDate(now);
+        topTransaction.setUpdatedDate(now);
         topTransaction.setWithdrawReceiveAddress(btcTransferAddress);
         topTransaction.setTransNo(uuid);
         topTransaction.setChainId(0L);
