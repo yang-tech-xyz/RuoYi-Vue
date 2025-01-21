@@ -1179,7 +1179,10 @@ public class TopTokenService extends ServiceImpl<TopTokenMapper, TopToken> {
     }
 
     public List<TokenVO> getList() {
-        return baseMapper.selectOnlineListVO();
+//        return baseMapper.selectOnlineListVO();
+        return baseMapper.selectOnlineListVO().stream().filter(t -> {
+            return !Objects.equals(t.getSymbol(), "USDT");
+        }).toList();
     }
 
     public TopToken getBySymbol(String symbol) {

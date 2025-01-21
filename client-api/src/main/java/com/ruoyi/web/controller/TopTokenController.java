@@ -26,6 +26,7 @@ import org.tron.trident.core.ApiWrapper;
 
 import java.security.SignatureException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -60,7 +61,9 @@ public class TopTokenController {
     @Operation(summary = "根据链id查询所有支持的token")
     @GetMapping("queryTokensByChainId")
     public AjaxResult<List<TopTokenChainVO>> queryTokensByChainId(@Parameter(description = "链id",example = "11155111") String chainId) {
-        List<TopTokenChainVO> list = topTokenService.queryTokensByChainId(chainId);
+        List<TopTokenChainVO> list = topTokenService.queryTokensByChainId(chainId).stream().filter(t->{
+            return !Objects.equals(t.getSymbol(), "USDT");
+        }).toList();
         return AjaxResult.success("success", list);
     }
 

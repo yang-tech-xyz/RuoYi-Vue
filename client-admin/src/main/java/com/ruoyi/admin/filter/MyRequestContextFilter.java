@@ -27,28 +27,30 @@ public class MyRequestContextFilter extends OncePerRequestFilter {
     @Qualifier("handlerExceptionResolver")
     private HandlerExceptionResolver resolver;
 
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String url = request.getRequestURI();
-        // swagger
-        if (StringUtils.containsAny(url, "doc.html", "api-docs", "webjars","favicon.ico")) {
-            filterChain.doFilter(request,response);
-            return;
-        }
-        if (url.contains("public")) {
-            filterChain.doFilter(request,response);
-            return;
-        }
-        String token = request.getHeader("Authorization");
-        if (StringUtils.isBlank(token)) {
-            resolver.resolveException(request, response, null, new ServiceException("未登录", 500));
-            return;
-        }
-        if (!LoginUtil.loginMap.containsKey(token)) {
-            resolver.resolveException(request, response, null, new ServiceException("未登录", 500));
-            return;
-        }
-        request.setAttribute("adminId", LoginUtil.loginMap.get(token));
+// 临时调试，不可提交
+        //        String url = request.getRequestURI();
+//        // swagger
+//        if (StringUtils.containsAny(url, "doc.html", "api-docs", "webjars","favicon.ico")) {
+//            filterChain.doFilter(request,response);
+//            return;
+//        }
+//        if (url.contains("public")) {
+//            filterChain.doFilter(request,response);
+//            return;
+//        }
+//        String token = request.getHeader("Authorization");
+//        if (StringUtils.isBlank(token)) {
+//            resolver.resolveException(request, response, null, new ServiceException("未登录", 500));
+//            return;
+//        }
+//        if (!LoginUtil.loginMap.containsKey(token)) {
+//            resolver.resolveException(request, response, null, new ServiceException("未登录", 500));
+//            return;
+//        }
+//        request.setAttribute("adminId", LoginUtil.loginMap.get(token));
         filterChain.doFilter(request,response);
     }
 

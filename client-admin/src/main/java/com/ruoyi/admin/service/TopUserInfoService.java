@@ -1,24 +1,26 @@
 package com.ruoyi.admin.service;
 
+import org.springframework.stereotype.Service;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.ruoyi.admin.dto.PowerOrderPageDTO;
-import com.ruoyi.admin.entity.TopPowerOrder;
-import com.ruoyi.admin.mapper.TopPowerOrderMapper;
+import com.ruoyi.admin.dto.UserInfoPageDTO;
+import com.ruoyi.admin.entity.TopUserInfo;
+import com.ruoyi.admin.mapper.TopUserInfoMapper;
 import com.ruoyi.admin.vo.PageVO;
-import com.ruoyi.admin.vo.PowerOrderVO;
+import com.ruoyi.admin.vo.UserInfoVO;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 
-@Service
 @Slf4j
-public class TopPowerOrderService extends ServiceImpl<TopPowerOrderMapper, TopPowerOrder> {
+@Service
+public class TopUserInfoService extends ServiceImpl<TopUserInfoMapper, TopUserInfo> {
 
-    public PageVO<PowerOrderVO> getPage(PowerOrderPageDTO dto) {
-        IPage<PowerOrderVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
+    public PageVO<UserInfoVO> getPage(UserInfoPageDTO dto) {
+        IPage<UserInfoVO> iPage = new Page<>(dto.getPageNum(), dto.getPageSize());
         iPage = baseMapper.selectPageVO(iPage, dto);
-        PageVO<PowerOrderVO> pageVO = new PageVO<>();
+        PageVO<UserInfoVO> pageVO = new PageVO<>();
         pageVO.setPageNum(dto.getPageNum());
         pageVO.setPageSize(dto.getPageSize());
         pageVO.setTotal(iPage.getTotal());

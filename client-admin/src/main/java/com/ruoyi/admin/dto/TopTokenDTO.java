@@ -1,4 +1,4 @@
-package com.ruoyi.web.dto;
+package com.ruoyi.admin.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

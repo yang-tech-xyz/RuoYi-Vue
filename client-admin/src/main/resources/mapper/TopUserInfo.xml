@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.admin.mapper.TopUserInfoMapper">
+
+    <select id="selectPageVO" resultType="com.ruoyi.admin.vo.UserInfoVO">
+        select ui.id,ui.uid,ui.username,ui.status,ui.create_time,ui.update_time,wu.wallet_address from user_info ui 
+        left join web3_user wu on ui.uid = wu.uid
+        order by ui.id desc
+    </select>
+
+</mapper>

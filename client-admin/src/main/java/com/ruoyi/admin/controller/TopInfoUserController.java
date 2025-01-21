@@ -1,9 +1,11 @@
 package com.ruoyi.admin.controller;
 
 import com.ruoyi.admin.dto.UserBlockDTO;
+import com.ruoyi.admin.dto.UserInfoPageDTO;
 import com.ruoyi.admin.dto.UserPageDTO;
-import com.ruoyi.admin.service.TopUserService;
+import com.ruoyi.admin.service.TopUserInfoService;
 import com.ruoyi.admin.vo.PageVO;
+import com.ruoyi.admin.vo.UserInfoVO;
 import com.ruoyi.admin.vo.UserVO;
 import com.ruoyi.common.AjaxResult;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,24 +18,18 @@ import org.springframework.web.bind.annotation.*;
  *
  */
 @Slf4j
-@RequestMapping("/topUser")
+@RequestMapping("/topInfoUser")
 @Tag(description = "TopUserController", name = "用户信息")
 @RestController
-public class TopUserController {
+public class TopInfoUserController {
 
     @Autowired
-    private TopUserService service;
+    private TopUserInfoService service;
 
     @Operation(summary = "查询记录")
     @GetMapping("/getPage")
-    public AjaxResult<PageVO<UserVO>> getPage(@ModelAttribute UserPageDTO dto) {
+    public AjaxResult<PageVO<UserInfoVO>> getPage(@ModelAttribute UserInfoPageDTO dto) {
         return AjaxResult.success(service.getPage(dto));
-    }
-
-    @Operation(summary = "禁止开关")
-    @PostMapping("/blockEnabled")
-    public AjaxResult<Boolean> blockEnabled(@RequestBody UserBlockDTO dto) {
-        return AjaxResult.success(service.blockEnabled(dto));
     }
 
 }
