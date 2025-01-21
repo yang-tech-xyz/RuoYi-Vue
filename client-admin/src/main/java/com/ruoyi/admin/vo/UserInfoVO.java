@@ -1,9 +1,5 @@
 package com.ruoyi.admin.vo;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import lombok.Data;
 
 @Data
@@ -21,7 +17,7 @@ public class UserInfoVO{
 
     private String updateTime;
 
-    private String wallet;
+    private String walletAddress;
 
 
 }

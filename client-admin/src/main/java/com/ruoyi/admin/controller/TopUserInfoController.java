@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.*;
  *
  */
 @Slf4j
-@RequestMapping("/topInfoUser")
-@Tag(description = "TopUserController", name = "用户信息")
+@RequestMapping("/topUserInfo")
+@Tag(description = "TopUserInfoController", name = "用户信息")
 @RestController
-public class TopInfoUserController {
+public class TopUserInfoController {
 
     @Autowired
     private TopUserInfoService service;
