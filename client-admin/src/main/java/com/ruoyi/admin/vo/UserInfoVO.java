@@ -1,5 +1,6 @@
 package com.ruoyi.admin.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 @Data
@@ -18,6 +19,5 @@ public class UserInfoVO{
     private String updateTime;
 
     private String walletAddress;
-
 
 }

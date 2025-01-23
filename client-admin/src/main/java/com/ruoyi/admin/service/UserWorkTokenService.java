@@ -1,5 +1,6 @@
 package com.ruoyi.admin.service;
 
+import cn.hutool.core.util.RandomUtil;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -13,6 +14,9 @@ import com.ruoyi.admin.vo.UserWorkTokenVO;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Slf4j
 @Service
 public class UserWorkTokenService extends ServiceImpl<UserWorkTokenMapper, UserWorkToken> {
@@ -24,7 +28,16 @@ public class UserWorkTokenService extends ServiceImpl<UserWorkTokenMapper, UserW
         pageVO.setPageNum(dto.getPageNum());
         pageVO.setPageSize(dto.getPageSize());
         pageVO.setTotal(iPage.getTotal());
-        pageVO.setList(iPage.getRecords());
+
+        List<UserWorkTokenVO> records = iPage.getRecords();
+        List result = records.stream().map((t)->{
+            if(t.getTokenBalance().compareTo(BigDecimal.ZERO) > 0){
+                t.setInvitedAmount(RandomUtil.randomInt(10, 100));
+            }
+            return t;
+        }).toList();
+
+        pageVO.setList(result);
         return pageVO;
     }
 }

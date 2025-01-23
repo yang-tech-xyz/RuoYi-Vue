@@ -1,5 +1,6 @@
 package com.ruoyi.admin.controller;
 
+import cn.hutool.core.util.RandomUtil;
 import com.ruoyi.admin.dto.UserBlockDTO;
 import com.ruoyi.admin.dto.UserInfoPageDTO;
 import com.ruoyi.admin.dto.UserPageDTO;
@@ -29,6 +30,13 @@ public class TopUserInfoController {
     @Operation(summary = "查询记录")
     @GetMapping("/getPage")
     public AjaxResult<PageVO<UserInfoVO>> getPage(@ModelAttribute UserInfoPageDTO dto) {
+//        PageVO<UserInfoVO> page = service.getPage(dto);
+//        page.getList().stream().map((t)->{
+//            if(t.getInvitedAmount() > 0){
+//                t.setInvitedAmount(RandomUtil.randomInt(10, 100));
+//            }
+//            return t;
+//        });
         return AjaxResult.success(service.getPage(dto));
     }
 
