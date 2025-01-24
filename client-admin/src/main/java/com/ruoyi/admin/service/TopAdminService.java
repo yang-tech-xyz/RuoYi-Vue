@@ -29,7 +29,7 @@ import java.util.Optional;
 @Service
 public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
+    private static final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
     public AdminLoginVO login(AdminLoginDTO dto) {
         TopAdmin admin = Optional.ofNullable(baseMapper.selectOne(new LambdaQueryWrapper<TopAdmin>()
@@ -38,9 +38,9 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         if (!admin.getStatus().equals(Status._1._value)) {
             throw new ServiceException("状态错误", 500);
         }
-//        if (!passwordEncoder.matches(dto.getPassword(), admin.getPassword())) {
-//            throw new ServiceException("账号或密码错误", 500);
-//        }
+        if (!passwordEncoder.matches(dto.getPassword(), admin.getPassword())) {
+            throw new ServiceException("账号或密码错误", 500);
+        }
 //        if (!OtpAuthenticator.checkCode(admin.getGoogleSecret(), dto.getGoogleCode())) {
 //            throw new ServiceException("谷歌验证码错误", 500);
 //        }
@@ -89,6 +89,11 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
 
     public String getGoogleSecret(String account) {
         return OtpAuthenticator.secretKey();
+    }
+
+    public static void main(String[] args) {
+        String encode = passwordEncoder.encode("123456");
+        System.out.println(encode);
     }
 
 }
