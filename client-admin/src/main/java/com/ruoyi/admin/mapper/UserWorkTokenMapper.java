@@ -13,7 +13,7 @@ import com.ruoyi.admin.vo.UserWorkTokenVO;
 @Repository
 public interface UserWorkTokenMapper extends BaseMapper<UserWorkToken> {
 
-    @Select("SELECT * FROM user_work_token uwt " +
-            " left join web3_user wu on uwt.uid = wu.uid")
+    @Select("SELECT wu.id,wu.uid,wu.wallet_address ,ui.create_time  FROM web3_user wu \n" +
+            "             left join user_info ui on ui.uid = wu.uid")
     IPage<UserWorkTokenVO> selectPageVO(@Param("iPage") IPage<UserWorkTokenVO> iPage, @Param("dto") UserWorkTokenDTO dto);
 }

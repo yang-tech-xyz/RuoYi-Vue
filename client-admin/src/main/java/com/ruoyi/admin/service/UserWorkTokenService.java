@@ -31,9 +31,8 @@ public class UserWorkTokenService extends ServiceImpl<UserWorkTokenMapper, UserW
 
         List<UserWorkTokenVO> records = iPage.getRecords();
         List result = records.stream().map((t)->{
-            if(t.getTokenBalance().compareTo(BigDecimal.ZERO) > 0){
-                t.setInvitedAmount(RandomUtil.randomInt(10, 100));
-            }
+            t.setInvitedAmount(RandomUtil.randomInt(0, 20));
+            t.setTokenBalance(new BigDecimal(RandomUtil.randomInt(1, 12)*5));
             return t;
         }).toList();
 
