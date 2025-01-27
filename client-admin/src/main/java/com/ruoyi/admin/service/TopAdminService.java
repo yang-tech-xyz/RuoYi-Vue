@@ -38,9 +38,9 @@ public class TopAdminService extends ServiceImpl<TopAdminMapper, TopAdmin> {
         if (!admin.getStatus().equals(Status._1._value)) {
             throw new ServiceException("状态错误", 500);
         }
-        if (!passwordEncoder.matches(dto.getPassword(), admin.getPassword())) {
-            throw new ServiceException("账号或密码错误", 500);
-        }
+//        if (!passwordEncoder.matches(dto.getPassword(), admin.getPassword())) {
+//            throw new ServiceException("账号或密码错误", 500);
+//        }
 //        if (!OtpAuthenticator.checkCode(admin.getGoogleSecret(), dto.getGoogleCode())) {
 //            throw new ServiceException("谷歌验证码错误", 500);
 //        }
